@@ -30,6 +30,9 @@ environment:
   - ARGS: "--resolver lts-12"
   - ARGS: "--resolver nightly"
 
+matrix:
+  fast_finish: true
+
 test_script:
 
 # Install toolchain, but do it silently due to lots of output
