@@ -2,6 +2,7 @@
 module Text.Pandoc.Filter.Scripting (
       runTempPythonScript
     , addPlotCapture
+    , hasBlockingShowCall
     , PythonScript
     , ScriptResult(..)
 ) where
@@ -11,6 +12,8 @@ import System.Exit          (ExitCode(..))
 import System.FilePath      ((</>), isAbsolute)
 import System.IO.Temp       (getCanonicalTemporaryDirectory)
 import System.Process.Typed (runProcess, shell)
+
+import Data.Monoid          (Any(..))
 
 type PythonScript = String
 
@@ -43,3 +46,13 @@ addPlotCapture fname content = do
                      , "\nimport matplotlib.pyplot as plt"  -- Just in case
                      , "\nplt.savefig(" <> show absFname <> ")\n\n"
                      ]
+
+-- | Detect the presence of a blocking show call, for example "plt.show()"
+hasBlockingShowCall :: PythonScript -> Bool
+hasBlockingShowCall script = anyOf
+        [ "plt.show()" `elem` scriptLines
+        , "matplotlib.pyplot.show()" `elem` scriptLines
+        ]
+    where
+        scriptLines = lines script
+        anyOf xs = getAny $ mconcat $ Any <$> xs

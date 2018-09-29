@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiWayIf #-}
 
 module Text.Pandoc.Filter.Pyplot (
       makePlot
@@ -11,8 +12,9 @@ import           Text.Pandoc.Definition
 
 import           Text.Pandoc.Filter.Scripting
 
-data PandocPyplotError = ScriptError Int 
-                       | InvalidTargetError FilePath
+data PandocPyplotError = ScriptError Int                -- ^ Running Python script has yielded an error
+                       | InvalidTargetError FilePath    -- ^ Invalid figure path
+                       | BlockingCallError              -- ^ Python script contains a block call to 'show()'
 
 -- | Datatype containing all parameters required
 -- to run pandoc-pyplot
@@ -62,10 +64,10 @@ makePlot' cb @ (CodeBlock (id', cls, attrs) scriptSource) =
         Just spec -> do
             let figurePath = target spec
             
-            -- Check that target filename is valid
-            if not (isValid figurePath)
-            then return $ Left $ InvalidTargetError figurePath
-            else do
+            if | not (isValid figurePath)         -> return $ Left $ InvalidTargetError figurePath
+               | hasBlockingShowCall scriptSource -> return $ Left $ BlockingCallError
+               | otherwise -> do 
+                    
                 script <- addPlotCapture figurePath scriptSource
                 result <- runTempPythonScript script
                 
@@ -97,6 +99,7 @@ makePlot' x = return $ Right x
 showError :: PandocPyplotError -> String
 showError (ScriptError exitcode)     = "Script error: plot could not be generated. Exit code " <> (show exitcode)
 showError (InvalidTargetError fname) = "Target filename " <> fname <> " is not valid."
+showError BlockingCallError          = "Script contains a block show call like 'plt.show()'"
 
 -- | Highest-level function that can be walked over a Pandoc tree
 makePlot :: Block -> IO Block

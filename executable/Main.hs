@@ -1,4 +1,4 @@
-
+{-# LANGUAGE LambdaCase #-}
 module Main where
 
 import Data.List                 (intersperse)
@@ -32,14 +32,12 @@ help = "\n\
 
 main :: IO ()
 main = do
-    args <- getArgs
-    case args of
-        [] -> toJSONFilter makePlot 
-        (arg:_)
-            | arg `elem` ["-h", "--help"]    -> showHelp
-            | arg `elem` ["-v", "--version"] -> showVersion
-            | otherwise                      -> die $ "Invalid argument(s): " <> (showArgs args)
+    getArgs >>=
+        \case
+            (arg:_) 
+                | arg `elem` ["-h", "--help"]    -> showHelp
+                | arg `elem` ["-v", "--version"] -> showVersion
+            _ -> toJSONFilter makePlot 
     where
         showHelp    = putStrLn help
         showVersion = putStrLn (V.showVersion version)
-        showArgs    = (mconcat . intersperse ", ")
