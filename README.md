@@ -56,14 +56,6 @@ You can also specify some alternate text for your image. This is done using the 
     plt.title('This is an example figure')
     ```
 
-### Command-line usage
-
-`pandoc-pyplot` has a very limited command-line interface. Take a look at the help available using the `-h` or `--help` argument:
-
-```bash
-pandoc-pyplot --help
-```
-
 ## Install
 
 ## Requirements
@@ -85,6 +77,12 @@ pandoc --filter pandoc-pyplot input.md output.pdf
 ```
 
 Python exceptions will be printed to screen in case of a problem.
+
+`pandoc-pyplot` has a very limited command-line interface. Take a look at the help available using the `-h` or `--help` argument:
+
+```bash
+pandoc-pyplot --help
+```
 
 ## Usage as a Haskell library
 
