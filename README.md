@@ -1,6 +1,6 @@
 # pandoc-pyplot
 
-[![Windows Build Status](https://img.shields.io/appveyor/ci/LaurentRDC/pandoc-pyplot/master.svg)](https://ci.appveyor.com/project/LaurentRDC/pandoc-pyplot)
+[![Build status](https://ci.appveyor.com/api/projects/status/qbmq9cyks5jup48e?svg=true)](https://ci.appveyor.com/project/LaurentRDC/pandoc-pyplot)
 
 _A Pandoc filter for generating figures with Matplotlib from code directly in documents_
 
