@@ -99,7 +99,7 @@ makePlot' x = return $ Right x
 showError :: PandocPyplotError -> String
 showError (ScriptError exitcode)     = "Script error: plot could not be generated. Exit code " <> (show exitcode)
 showError (InvalidTargetError fname) = "Target filename " <> fname <> " is not valid."
-showError BlockingCallError          = "Script contains a block show call like 'plt.show()'"
+showError BlockingCallError          = "Script contains a blocking call to show, like 'plt.show()'"
 
 -- | Highest-level function that can be walked over a Pandoc tree
 makePlot :: Block -> IO Block
