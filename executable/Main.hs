@@ -1,9 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 module Main where
 
-import Data.List                 (intersperse)
 import System.Environment        (getArgs)
-import System.Exit               (die)
 
 import Text.Pandoc.JSON          (toJSONFilter)
 import Text.Pandoc.Filter.Pyplot (makePlot)
