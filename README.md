@@ -1,5 +1,7 @@
 # pandoc-pyplot
 
+[![Windows Build Status](https://img.shields.io/appveyor/ci/LaurentRDC/pandoc-pyplot/master.svg)](https://ci.appveyor.com/project/LaurentRDC/pandoc-pyplot)
+
 _A Pandoc filter for generating figures with Matplotlib from code directly in documents_
 
 Inspired by [sphinx](https://sphinxdoc.org)'s `plot_directive`, `pandoc-pyplot` helps turn Python code present in your documents to embedded Matplotlib figures. 
