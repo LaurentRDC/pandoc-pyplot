@@ -13,6 +13,9 @@ before_test:
 - curl -sS -ostack.zip -L --insecure https://get.haskellstack.org/stable/windows-x86_64.zip
 - 7z x stack.zip stack.exe
 
+- cache:
+  - "C:\\sr"
+
 clone_folder: "c:\\stack"
 environment:
   global:
