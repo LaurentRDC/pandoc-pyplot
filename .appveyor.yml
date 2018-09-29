@@ -1,4 +1,4 @@
-# This Appveyor configuration file is taken from Stack's documentation
+# This Appveyor configuration file is modified from Stack's documentation
 #   https://github.com/commercialhaskell/stack/blob/stable/doc/appveyor.yml
 #
 # A discussion is available here:
