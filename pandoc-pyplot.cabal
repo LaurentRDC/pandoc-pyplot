@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7935c5cb406c0839dcf0af1ab32ad6897b5e272e98ee958a41b22c85dda8bdb6
+-- hash: 43cc3789cc9060329cec788cf746a00f84fbed3e65ef29705b5084f3a967c5fb
 
 name:           pandoc-pyplot
-version:        0.1.0
+version:        1.0.0
 synopsis:       A Pandoc filter for including figures generated from Matplotlib
 description:    A pandoc filter for including figures generated from Matplotlib. Keep the document and Python code in the same location. Output from Matplotlib is captured and included as a figure.
 category:       Documentation
@@ -35,7 +35,7 @@ library
       Text.Pandoc.Filter.Scripting
   hs-source-dirs:
       src
-  ghc-options: -Wall
+  ghc-options: -Wall -Wcompat
   build-depends:
       base
     , containers
@@ -52,7 +52,7 @@ executable pandoc-pyplot
       Paths_pandoc_pyplot
   hs-source-dirs:
       executable
-  ghc-options: -Wall -rtsopts -threaded -with-rtsopts=-N -O2
+  ghc-options: -Wall -Wcompat -rtsopts -threaded -with-rtsopts=-N -O2
   build-depends:
       base
     , pandoc-pyplot
@@ -67,7 +67,7 @@ test-suite pandoc-pyplot-test-suite
       Paths_pandoc_pyplot
   hs-source-dirs:
       tests
-  ghc-options: -Wall -rtsopts -threaded -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -rtsopts -threaded -with-rtsopts=-N
   build-depends:
       base
     , hspec
