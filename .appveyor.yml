@@ -1,0 +1,37 @@
+# This Appveyor configuration file is taken from Stack's documentation
+#   https://github.com/commercialhaskell/stack/blob/stable/doc/appveyor.yml
+#
+# A discussion is available here:
+#   https://www.snoyman.com/blog/2016/08/appveyor-haskell-windows-ci
+#
+build: off
+
+before_test:
+# http://help.appveyor.com/discussions/problems/6312-curl-command-not-found
+- set PATH=C:\Program Files\Git\mingw64\bin;%PATH%
+
+- curl -sS -ostack.zip -L --insecure https://get.haskellstack.org/stable/windows-x86_64.zip
+- 7z x stack.zip stack.exe
+
+clone_folder: "c:\\stack"
+environment:
+  global:
+    STACK_ROOT: "c:\\sr"
+
+    # Override the temp directory to avoid sed escaping issues
+    # See https://github.com/haskell/cabal/issues/5386
+    TMP: "c:\\tmp"
+
+  matrix:
+  - ARGS: ""
+  - ARGS: "--resolver lts-12"
+  - ARGS: "--resolver nightly"
+
+test_script:
+
+# Install toolchain, but do it silently due to lots of output
+- stack %ARGS% setup > nul
+
+# The ugly echo "" hack is to avoid complaints about 0 being an invalid file
+# descriptor
+- echo "" | stack %ARGS% --no-terminal test
