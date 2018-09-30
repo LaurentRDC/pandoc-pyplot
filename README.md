@@ -15,13 +15,13 @@ The filter recognizes code blocks with the `plot_target` attribute present. It w
 Here is a basic example using the scripting `matplotlib.pyplot` API:
 
 ```markdown
-    ```{plot_target=my_figure.jpg}
-    import matplotlib.pyplot as plt
+```{plot_target=my_figure.jpg}
+import matplotlib.pyplot as plt
 
-    plt.figure()
-    plt.plot([0,1,2,3,4], [1,2,3,4,5])
-    plt.title('This is an example figure')
-    ```
+plt.figure()
+plt.plot([0,1,2,3,4], [1,2,3,4,5])
+plt.title('This is an example figure')
+```
 ```
 
 `pandoc-pyplot` will determine whether the `plot_target` is a relative or absolute path. In case of a relative path (like above), all paths will be considered relative to the current working directory.
@@ -51,16 +51,14 @@ In case of an output format that supports links (e.g. HTML), the embedded image 
 You can also specify some alternate text for your image. This is done using the optional `plot_alt` parameter:
 
 ```markdown
-    ```{plot_target=my_figure.jpg, plot_alt="This is a simple figure"}
-    import matplotlib.pyplot as plt
+```{plot_target=my_figure.jpg, plot_alt="This is a simple figure"}
+import matplotlib.pyplot as plt
 
-    plt.figure()
-    plt.plot([0,1,2,3,4], [1,2,3,4,5])
-    plt.title('This is an example figure')
+plt.figure()
+plt.plot([0,1,2,3,4], [1,2,3,4,5])
+plt.title('This is an example figure')
     ```
 ```
-
-## Install
 
 ## Requirements
 
@@ -113,17 +111,17 @@ import Text.Pandoc          (Pandoc)
 import Text.Pandoc.Walk     (walkM)
 
 -- from pandoc-pyplot
-import Text.Pandoc.Filter.IncludePyplot (includePlot)
+import Text.Pandoc.Filter.Pyplot (makePlot)
 
 import Hakyll
 
 plotTransform :: Pandoc -> IO Pandoc
-plotTransform = walkM . includePlot
+plotTransform = walkM . makePlot
 
 -- Unsafe compiler is required because of the interaction
 -- in IO (i.e. running an external Python script).
-includePlotPandocCompiler :: Compiler (Item String)
-includePlotPandocCompiler =
+makePlotPandocCompiler :: Compiler (Item String)
+makePlotPandocCompiler =
   pandocCompilerWithTransformM
     defaultHakyllReaderOptions
     defaultHakyllWriterOptions
