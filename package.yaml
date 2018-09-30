@@ -2,6 +2,7 @@ name: pandoc-pyplot
 version: '1.0.0'
 github: "LaurentRDC/pandoc-pyplot"
 license: MIT
+license-file: LICENSE.md
 author: "Laurent P. René de Cotret"
 maintainer: "Laurent P. René de Cotret"
 synopsis: A Pandoc filter for including figures generated from Matplotlib
@@ -22,7 +23,7 @@ ghc-options: -Wall -Wcompat
 
 library:
   dependencies:
-  - base
+  - base        > 4.8 && < 5
   - directory
   - filepath
   - pandoc-types
@@ -40,14 +41,13 @@ executables:
     source-dirs: executable
     main: Main.hs
     dependencies:
-    - base
+    - base                > 4.8 && < 5
     - pandoc-pyplot
     - pandoc-types
     ghc-options:
     - -rtsopts
     - -threaded
     - -with-rtsopts=-N
-    - -O2
 
 tests:
   pandoc-pyplot-test-suite:

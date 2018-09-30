@@ -14,6 +14,7 @@ The filter recognizes code blocks with the `plot_target` attribute present. It w
 
 Here is a basic example using the scripting `matplotlib.pyplot` API:
 
+```markdown
     ```{plot_target=my_figure.jpg}
     import matplotlib.pyplot as plt
 
@@ -21,6 +22,7 @@ Here is a basic example using the scripting `matplotlib.pyplot` API:
     plt.plot([0,1,2,3,4], [1,2,3,4,5])
     plt.title('This is an example figure')
     ```
+```
 
 `pandoc-pyplot` will determine whether the `plot_target` is a relative or absolute path. In case of a relative path (like above), all paths will be considered relative to the current working directory.
 
@@ -48,6 +50,7 @@ In case of an output format that supports links (e.g. HTML), the embedded image 
 
 You can also specify some alternate text for your image. This is done using the optional `plot_alt` parameter:
 
+```markdown
     ```{plot_target=my_figure.jpg, plot_alt="This is a simple figure"}
     import matplotlib.pyplot as plt
 
@@ -55,6 +58,7 @@ You can also specify some alternate text for your image. This is done using the 
     plt.plot([0,1,2,3,4], [1,2,3,4,5])
     plt.title('This is an example figure')
     ```
+```
 
 ## Install
 
