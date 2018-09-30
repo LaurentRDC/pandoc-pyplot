@@ -1,7 +1,10 @@
 {-# LANGUAGE MultiWayIf #-}
 
 module Text.Pandoc.Filter.Pyplot (
-      makePlot
+        makePlot
+      , makePlot'
+      , PandocPyplotError(..)
+      , showError
     ) where
 
 import           Control.Monad   ((>=>))
@@ -101,6 +104,8 @@ showError (ScriptError exitcode)     = "Script error: plot could not be generate
 showError (InvalidTargetError fname) = "Target filename " <> fname <> " is not valid."
 showError BlockingCallError          = "Script contains a blocking call to show, like 'plt.show()'"
 
--- | Highest-level function that can be walked over a Pandoc tree
+-- | Highest-level function that can be walked over a Pandoc tree.
+-- All code blocks that have the 'plot_target' parameter will be considered
+-- figures.
 makePlot :: Block -> IO Block
 makePlot = makePlot' >=> either (fail . showError) return

@@ -2,7 +2,6 @@ name: pandoc-pyplot
 version: '1.0.0.0'
 github: "LaurentRDC/pandoc-pyplot"
 license: MIT
-license-file: LICENSE.md
 author: "Laurent P. René de Cotret"
 maintainer: "Laurent P. René de Cotret"
 synopsis: A Pandoc filter for including figures generated from Matplotlib
@@ -11,6 +10,8 @@ description:
   Keep the document and Python code in the same location. Output from Matplotlib
   is captured and included as a figure.
 category: Documentation
+
+license-file: LICENSE.md
 
 extra-source-files:
 - CHANGELOG.md
@@ -23,17 +24,16 @@ ghc-options: -Wall -Wcompat
 
 library:
   dependencies:
-  - base        > 4.8 && < 5
+  - base            > 4.8 && < 5
   - directory
   - filepath
-  - pandoc-types
+  - pandoc-types    > 1.12 && < 2
   - temporary
   - typed-process
   - containers
   source-dirs: src
   exposed-modules:
   - Text.Pandoc.Filter.Pyplot
-  other-modules:
   - Text.Pandoc.Filter.Scripting
 
 executables:
@@ -41,25 +41,9 @@ executables:
     source-dirs: executable
     main: Main.hs
     dependencies:
-    - base                > 4.8 && < 5
+    - base                > 4.8  && < 5
     - pandoc-pyplot
-    - pandoc-types
-    ghc-options:
-    - -rtsopts
-    - -threaded
-    - -with-rtsopts=-N
-
-tests:
-  pandoc-pyplot-test-suite:
-    source-dirs: tests
-    main: Spec.hs
-    dependencies:
-    - base
-    - pandoc-pyplot
-    - pandoc-types
-    - tasty
-    - tasty-hspec
-    - hspec
+    - pandoc-types        > 1.12 && < 2
     ghc-options:
     - -rtsopts
     - -threaded
