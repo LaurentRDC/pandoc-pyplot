@@ -62,7 +62,7 @@ You can also specify some alternate text for your image. This is done using the 
 
 ## Requirements
 
-This filter only works with the Matplotlib plotting library. Therefore, you need [Matplotlib](matplotlib.org) and a Python interpreter. The python interpreter is expected to be discoverable using the name `"python"` (as opposed to `"python3"`, for example)
+This filter only works with the Matplotlib plotting library. Therefore, you a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The python interpreter is expected to be discoverable using the name `"python"` (as opposed to `"python3"`, for example)
 
 ## Running the filter
 
