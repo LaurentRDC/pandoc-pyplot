@@ -1,4 +1,16 @@
 
+{-|
+Module      : Text.Pandoc.Filter.Scripting
+Copyright   : (c) Laurent P René de Cotret, 2018
+License     : MIT
+Maintainer  : laurent.decotret@outlook.com
+Stability   : internal
+Portability : portable
+
+This module defines types and functions that help
+with running Python scripts.
+-}
+
 module Text.Pandoc.Filter.Scripting (
       runTempPythonScript
     , addPlotCapture

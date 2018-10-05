@@ -1,5 +1,17 @@
 {-# LANGUAGE MultiWayIf #-}
+{-|
+Module      : Text.Pandoc.Filter.Pyplot
+Description : Pandoc filter to create Matplotlib figures from code blocks
+Copyright   : (c) Laurent P René de Cotret, 2018
+License     : MIT
+Maintainer  : laurent.decotret@outlook.com
+Stability   : stable
+Portability : portable
 
+This module defines a Pandoc filter @makePlot@ that can be 
+used to walk over a Pandoc document and generate figures from
+Python code blocks.
+-}
 module Text.Pandoc.Filter.Pyplot (
         makePlot
       , makePlot'
