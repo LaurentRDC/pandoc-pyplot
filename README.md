@@ -128,6 +128,10 @@ makePlotPandocCompiler =
     (unsafeCompiler . plotTransform)
 ```
 
+## Warning
+
+Do not run this filter on unknown documents. There is nothing in `pandoc-pyplot` that can stop a Python script from performing evil actions. 
+
 ## Aknowledgements
 
 This package is inspired from [`pandoc-include-code`](https://github.com/owickstrom/pandoc-include-code).
