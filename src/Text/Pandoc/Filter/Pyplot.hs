@@ -1,4 +1,5 @@
 {-# LANGUAGE MultiWayIf #-}
+{-# LANGUAGE Unsafe     #-}
 {-|
 Module      : Text.Pandoc.Filter.Pyplot
 Description : Pandoc filter to create Matplotlib figures from code blocks
@@ -27,6 +28,7 @@ import           Text.Pandoc.Definition
 
 import           Text.Pandoc.Filter.Scripting
 
+-- | Possible errors returned by the filter
 data PandocPyplotError = ScriptError Int                -- ^ Running Python script has yielded an error
                        | InvalidTargetError FilePath    -- ^ Invalid figure path
                        | BlockingCallError              -- ^ Python script contains a block call to 'show()'

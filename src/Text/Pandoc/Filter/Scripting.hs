@@ -1,4 +1,4 @@
-
+{-# LANGUAGE Unsafe #-}
 {-|
 Module      : Text.Pandoc.Filter.Scripting
 Copyright   : (c) Laurent P René de Cotret, 2018
@@ -27,8 +27,10 @@ import System.Process.Typed (runProcess, shell)
 
 import Data.Monoid          (Any(..))
 
+-- | String representation of a Python script
 type PythonScript = String
 
+-- | Possible result of running a Python script
 data ScriptResult = ScriptSuccess 
                   | ScriptFailure Int
 
