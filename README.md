@@ -37,7 +37,7 @@ pandoc --filter pandoc-pyplot input.md --output output.html
 or
 
 ```bash
-pandoc --filter pandoc-pyplot input.md output.pdf
+pandoc --filter pandoc-pyplot input.md --output output.pdf
 ```
 
 or any other output format you want. There are more examples in the source repository, in the `\examples` directory.
