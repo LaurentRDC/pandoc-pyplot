@@ -23,7 +23,8 @@ module Text.Pandoc.Filter.Pyplot (
 
 import           Control.Monad                  ((>=>))
 import qualified Data.Map.Strict                as M
-import           System.FilePath                (replaceExtension, isValid)
+import           System.Directory               (doesDirectoryExist)
+import           System.FilePath                (isValid, replaceExtension, takeDirectory)
 
 import           Text.Pandoc.Definition
 import           Text.Pandoc.Walk               (walkM)
@@ -33,6 +34,7 @@ import           Text.Pandoc.Filter.Scripting
 -- | Possible errors returned by the filter
 data PandocPyplotError = ScriptError Int                -- ^ Running Python script has yielded an error
                        | InvalidTargetError FilePath    -- ^ Invalid figure path
+                       | MissingDirectoryError FilePath -- ^ Directory where to save figure does not exist
                        | BlockingCallError              -- ^ Python script contains a block call to 'show()'
 
 -- | Datatype containing all parameters required
@@ -82,8 +84,13 @@ makePlot' cb @ (CodeBlock (id', cls, attrs) scriptSource) =
         -- Could parse : run the script and capture output
         Just spec -> do
             let figurePath = target spec
+                figureDir = takeDirectory figurePath
+            
+            -- Check that the directory in which to save the figure exists
+            validDirectory <- doesDirectoryExist figureDir
             
             if | not (isValid figurePath)         -> return $ Left $ InvalidTargetError figurePath
+               | not validDirectory               -> return $ Left $ MissingDirectoryError figureDir
                | hasBlockingShowCall scriptSource -> return $ Left $ BlockingCallError
                | otherwise -> do 
                     
@@ -116,9 +123,10 @@ makePlot' x = return $ Right x
 
 -- | Translate filter error to an error message
 showError :: PandocPyplotError -> String
-showError (ScriptError exitcode)     = "Script error: plot could not be generated. Exit code " <> (show exitcode)
-showError (InvalidTargetError fname) = "Target filename " <> fname <> " is not valid."
-showError BlockingCallError          = "Script contains a blocking call to show, like 'plt.show()'"
+showError (ScriptError exitcode)          = "Script error: plot could not be generated. Exit code " <> (show exitcode)
+showError (InvalidTargetError fname)      = "Target filename " <> fname <> " is not valid."
+showError (MissingDirectoryError dirname) = "Target directory " <> dirname <> " does not exist." 
+showError BlockingCallError               = "Script contains a blocking call to show, like 'plt.show()'"
 
 -- | Highest-level function that can be walked over a Pandoc tree.
 -- All code blocks that have the 'plot_target' parameter will be considered
