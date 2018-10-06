@@ -16,17 +16,19 @@ Python code blocks.
 module Text.Pandoc.Filter.Pyplot (
         makePlot
       , makePlot'
+      , plotTransform
       , PandocPyplotError(..)
       , showError
     ) where
 
-import           Control.Monad   ((>=>))
-import qualified Data.Map.Strict as M
-import           System.FilePath (replaceExtension, isValid)
+import           Control.Monad                  ((>=>))
+import qualified Data.Map.Strict                as M
+import           System.FilePath                (replaceExtension, isValid)
 
 import           Text.Pandoc.Definition
+import           Text.Pandoc.Walk               (walkM)
 
-import           Text.Pandoc.Filter.Scripting
+import           Text.Pandoc.Filter.Scripting   
 
 -- | Possible errors returned by the filter
 data PandocPyplotError = ScriptError Int                -- ^ Running Python script has yielded an error
@@ -123,3 +125,8 @@ showError BlockingCallError          = "Script contains a blocking call to show,
 -- figures.
 makePlot :: Block -> IO Block
 makePlot = makePlot' >=> either (fail . showError) return
+
+-- | Walk over an entire Pandoc document, changing appropriate code blocks
+-- into figures.
+plotTransform :: Pandoc -> IO Pandoc
+plotTransform = walkM makePlot
