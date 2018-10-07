@@ -88,35 +88,16 @@ pandoc-pyplot --help
 
 ## Usage as a Haskell library
 
-To include the functionality of `pandoc-pyplot` in a Haskell package, you can use the `makePlot` function:
+To include the functionality of `pandoc-pyplot` in a Haskell package, you can use the `makePlot :: Block -> IO Block`{.haskell} function (for single blocks) or `plotTransform :: Pandoc -> IO Pandoc`{.haskell} function (for entire documents).
+
+### Usage with Hakyll
+
+This filter was originally designed to be used with [Hakyll](https://jaspervdj.be/hakyll/). In case you want to use the filter with your own Hakyll setup, you can use a transform function that works on entire documents:
 
 ```haskell
--- From pandoc-types
-import Text.Pandoc.Walk         (walkM)
-import Text.Pandoc.Definition   (Pandoc)
--- From pandoc-pyplot
-import Text.Pandoc.Filter.Pyplot (makePlot)
-
-transformDocument :: Pandoc -> IO Pandoc
-transformDocument = walkM makePlot
-```
-
-## Usage with Hakyll
-
-This filter was originally designed to be used with [Hakyll](https://jaspervdj.be/hakyll/). In case you want to use the filter with your own Hakyll setup, you must create a transform function first:
-
-```haskell
--- From pandoc-types
-import Text.Pandoc          (Pandoc)
-import Text.Pandoc.Walk     (walkM)
-
--- from pandoc-pyplot
-import Text.Pandoc.Filter.Pyplot (makePlot)
+import Text.Pandoc.Filter.Pyplot (plotTransform)
 
 import Hakyll
-
-plotTransform :: Pandoc -> IO Pandoc
-plotTransform = walkM . makePlot
 
 -- Unsafe compiler is required because of the interaction
 -- in IO (i.e. running an external Python script).
