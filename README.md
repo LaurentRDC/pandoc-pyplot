@@ -88,7 +88,7 @@ pandoc-pyplot --help
 
 ## Usage as a Haskell library
 
-To include the functionality of `pandoc-pyplot` in a Haskell package, you can use the `makePlot :: Block -> IO Block`{.haskell} function (for single blocks) or `plotTransform :: Pandoc -> IO Pandoc`{.haskell} function (for entire documents).
+To include the functionality of `pandoc-pyplot` in a Haskell package, you can use the `makePlot :: Block -> IO Block` function (for single blocks) or `plotTransform :: Pandoc -> IO Pandoc` function (for entire documents).
 
 ### Usage with Hakyll
 
