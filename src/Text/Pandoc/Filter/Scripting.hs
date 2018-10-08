@@ -19,9 +19,8 @@ module Text.Pandoc.Filter.Scripting (
     , ScriptResult(..)
 ) where
 
-import System.Directory     (getCurrentDirectory)
 import System.Exit          (ExitCode(..))
-import System.FilePath      ((</>), isAbsolute)
+import System.FilePath      ((</>))
 import System.IO.Temp       (getCanonicalTemporaryDirectory)
 import System.Process.Typed (runProcess, shell)
 
@@ -51,15 +50,12 @@ runTempPythonScript script = do
 -- | Modify a Python plotting script to save the figure to a filename.
 addPlotCapture :: FilePath          -- ^ Path where to save the figure
                -> PythonScript      -- ^ Raw code block
-               -> IO PythonScript   -- ^ Code block with added capture
-addPlotCapture fname content = do
-    absFname <- if isAbsolute fname
-                then (return fname)
-                else (</> fname) <$> getCurrentDirectory
-    return $ mconcat [ content
-                     , "\nimport matplotlib.pyplot as plt"  -- Just in case
-                     , "\nplt.savefig(" <> show absFname <> ")\n\n"
-                     ]
+               -> PythonScript      -- ^ Code block with added capture
+addPlotCapture fname content = 
+    mconcat [ content
+            , "\nimport matplotlib.pyplot as plt"  -- Just in case
+            , "\nplt.savefig(" <> show fname <> ")\n\n"
+            ]
 
 -- | Detect the presence of a blocking show call, for example "plt.show()"
 hasBlockingShowCall :: PythonScript -> Bool
