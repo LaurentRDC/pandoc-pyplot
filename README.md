@@ -60,11 +60,43 @@ You can also specify some alternate text for your image. This is done using the 
     ```
 ```
 
-## Requirements
+## Installation
 
-This filter only works with the Matplotlib plotting library. Therefore, you a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The python interpreter is expected to be discoverable using the name `"python"` (as opposed to `"python3"`, for example)
+### Binaries
+
+Windows binaries are available on [`GitHub`](https://github.com/LaurentRDC/pandoc-pyplot/releases). Place the executable in a location that is in your PATH to be able to call it.
+
+### From Hackage/Stackage
+
+`pandoc-pyplot` is available on Hackage. Using the [`cabal-install`](https://www.haskell.org/cabal/) tool:
+
+```bash
+cabal update
+cabal install pandoc-pyplot
+```
+
+Similarly, `pandoc-pyplot` is available on Stackage:
+
+```bash
+stack update
+stack install pandoc-pyplot
+```
+
+### From source
+
+Building from source can be done using [`stack`](https://docs.haskellstack.org/en/stable/README/) or [`cabal`](https://www.haskell.org/cabal/):
+
+```bash
+git clone github.com/LaurentRDC/pandoc-pyplot.git
+cd pandoc-pylot
+stack install # Alternatively, `cabal install`
+```
 
 ## Running the filter
+
+### Requirements
+
+This filter only works with the Matplotlib plotting library. Therefore, you a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The python interpreter is expected to be discoverable using the name `"python"` (as opposed to `"python3"`, for example)
 
 The filter program must be in your `PATH`. In case it is, you can use the filter with Pandoc as follows:
 
