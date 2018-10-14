@@ -4,7 +4,7 @@
 
 ## A Pandoc filter for generating figures with Matplotlib from code directly in documents
 
-Inspired by [sphinx](https://sphinxdoc.org)'s `plot_directive`, `pandoc-pyplot` helps turn Python code present in your documents to embedded Matplotlib figures. 
+Inspired by [sphinx](https://sphinxdoc.org)'s `plot_directive`, `pandoc-pyplot` helps turn Python code present in your documents to embedded Matplotlib figures.
 
 ## Usage
 
@@ -64,7 +64,7 @@ You can also specify some alternate text for your image. This is done using the 
 
 ### Binaries
 
-Windows binaries are available on [`GitHub`](https://github.com/LaurentRDC/pandoc-pyplot/releases). Place the executable in a location that is in your PATH to be able to call it.
+Windows binaries are available on [GitHub](https://github.com/LaurentRDC/pandoc-pyplot/releases). Place the executable in a location that is in your PATH to be able to call it.
 
 ### From Hackage/Stackage
 
