@@ -1,0 +1,62 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.30.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 02a0b4cc9681a38e27465380086e167be8805a63959e4299baaca728b3e17c09
+
+name:           pandoc-pyplot
+version:        1.0.1.0
+synopsis:       A Pandoc filter for including figures generated from Matplotlib
+description:    A pandoc filter for including figures generated from Matplotlib. Keep the document and Python code in the same location. Output from Matplotlib is captured and included as a figure.
+category:       Documentation
+homepage:       https://github.com/LaurentRDC/pandoc-pyplot#readme
+bug-reports:    https://github.com/LaurentRDC/pandoc-pyplot/issues
+author:         Laurent P. René de Cotret
+maintainer:     Laurent P. René de Cotret
+license:        MIT
+license-file:   LICENSE.md
+build-type:     Simple
+extra-source-files:
+    CHANGELOG.md
+    LICENSE.md
+    package.yaml
+    README.md
+    stack.yaml
+
+source-repository head
+  type: git
+  location: https://github.com/LaurentRDC/pandoc-pyplot
+
+library
+  exposed-modules:
+      Text.Pandoc.Filter.Pyplot
+      Text.Pandoc.Filter.Scripting
+  other-modules:
+      Paths_pandoc_pyplot
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat
+  build-depends:
+      base >4.8 && <5
+    , containers
+    , directory
+    , filepath
+    , pandoc-types >1.12 && <2
+    , temporary
+    , typed-process
+  default-language: Haskell2010
+
+executable pandoc-pyplot
+  main-is: Main.hs
+  other-modules:
+      Paths_pandoc_pyplot
+  hs-source-dirs:
+      executable
+  ghc-options: -Wall -Wcompat -rtsopts -threaded -with-rtsopts=-N
+  build-depends:
+      base >4.8 && <5
+    , pandoc-pyplot
+    , pandoc-types >1.12 && <2
+  default-language: Haskell2010
