@@ -23,6 +23,7 @@ module Text.Pandoc.Filter.Pyplot (
 
 import           Control.Monad                  ((>=>))
 import qualified Data.Map.Strict                as M
+import           Data.Monoid                    ((<>))
 import           System.Directory               (doesDirectoryExist)
 import           System.FilePath                (isValid, replaceExtension, takeDirectory)
 
