@@ -24,7 +24,7 @@ import System.FilePath      ((</>))
 import System.IO.Temp       (getCanonicalTemporaryDirectory)
 import System.Process.Typed (runProcess, shell)
 
-import Data.Monoid          (Any(..))
+import Data.Monoid          (Any(..), (<>))
 
 -- | String representation of a Python script
 type PythonScript = String
