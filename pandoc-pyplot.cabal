@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 563259592becbb4f2496b0f914f546163be046510966e163f71175faa94504ad
+-- hash: 626dcf5618151ffdd49b13d4a8e3821e4419baa4bdf5860444df89603dc8aa25
 
 name:           pandoc-pyplot
-version:        1.0.2.0
+version:        1.0.3.0
 synopsis:       A Pandoc filter for including figures generated from Matplotlib
 description:    A pandoc filter for including figures generated from Matplotlib. Keep the document and Python code in the same location. Output from Matplotlib is captured and included as a figure.
 category:       Documentation
@@ -39,7 +39,7 @@ library
       src
   ghc-options: -Wall -Wcompat
   build-depends:
-      base >4.8 && <5
+      base >4 && <5
     , containers
     , directory
     , filepath

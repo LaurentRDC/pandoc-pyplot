@@ -41,7 +41,7 @@ executables:
     source-dirs: executable
     main: Main.hs
     dependencies:
-    - base                > 4.8  && < 5
+    - base                > 4 && < 5
     - pandoc-pyplot
     - pandoc-types        > 1.12 && < 2
     ghc-options:
