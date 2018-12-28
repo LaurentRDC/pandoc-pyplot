@@ -126,13 +126,13 @@ This filter only works with the Matplotlib plotting library. Therefore, you a Py
 The filter program must be in your `PATH`. In case it is, you can use the filter with Pandoc as follows:
 
 ```bash
-pandoc --filter pandoc-pyplot input.md -o output.html
+pandoc --filter pandoc-pyplot input.md --output output.html
 ```
 
 In which case, the output is HTML. Another example with PDF output:
 
 ```bash
-pandoc --filter pandoc-pyplot input.md -o output.pdf
+pandoc --filter pandoc-pyplot input.md -output output.pdf
 ```
 
 Python exceptions will be printed to screen in case of a problem.
