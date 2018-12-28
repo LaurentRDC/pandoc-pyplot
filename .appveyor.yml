@@ -34,8 +34,8 @@ environment:
     TMP: "c:\\tmp"
 
   matrix:
-  - ARGS: ""
   - ARGS: "--resolver lts-12"
+  - ARGS: "--resolver lts-13"
   - ARGS: "--resolver nightly"
 
 matrix:
