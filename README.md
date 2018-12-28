@@ -51,7 +51,7 @@ In case of an output format that supports links (e.g. HTML), the embedded image 
 You can also specify a caption for your image. This is done using the optional `plot_alt` parameter:
 
 ```markdown
-    ```{plot_target=my_figure.jpg, plot_alt="This is a simple figure"}
+    ```{plot_target=my_figure.jpg plot_alt="This is a simple figure"}
     import matplotlib.pyplot as plt
 
     plt.figure()
@@ -74,7 +74,7 @@ plt.xkcd()
 and include it in your document as follows:
 
 ```markdown
-    ```{plot_target=my_figure.jpg, plot_include=style.py}
+    ```{plot_target=my_figure.jpg plot_include=style.py}
     import matplotlib.pyplot as plt
 
     plt.figure()
