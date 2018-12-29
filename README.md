@@ -62,8 +62,6 @@ You can also specify a caption for your image. This is done using the optional `
 
 ### Including scripts
 
-_New in pandoc-pyplot v 1.1.0.0_
-
 If you find yourself always repeating some steps, inclusion of scripts is possible using the `plot_include` parameter. For example, if you want all plots to have the [`ggplot`](https://matplotlib.org/tutorials/introductory/customizing.html#sphx-glr-tutorials-introductory-customizing-py) style, you can write a very short preamble `style.py` like so:
 
 ```python
@@ -180,7 +178,3 @@ makePlotPandocCompiler =
 ## Warning
 
 Do not run this filter on unknown documents. There is nothing in `pandoc-pyplot` that can stop a Python script from performing evil actions. This is the reason this package is deemed __unsafe__ in the parlance of [Safe Haskell](https://ghc.haskell.org/trac/ghc/wiki/SafeHaskell).
-
-## Aknowledgements
-
-This package is inspired from [`pandoc-include-code`](https://github.com/owickstrom/pandoc-include-code).
