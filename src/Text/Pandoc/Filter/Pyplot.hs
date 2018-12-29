@@ -15,10 +15,9 @@ Python code blocks.
 -}
 module Text.Pandoc.Filter.Pyplot (
         makePlot
-      , makePlot'
+      , makePlot' -- For testing
       , plotTransform
       , PandocPyplotError(..)
-      , show
     ) where
 
 import           Control.Monad                  ((>=>))
