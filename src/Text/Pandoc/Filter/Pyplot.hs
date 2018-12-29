@@ -12,6 +12,31 @@ Portability : portable
 This module defines a Pandoc filter @makePlot@ that can be 
 used to walk over a Pandoc document and generate figures from
 Python code blocks.
+
+The syntax for code blocks is simple, Code blocks with the @plot_target=...@
+attribute will trigger the filter. The code block will be reworked into a Python
+script and the output figure will be captured.
+
+Here are the possible attributes what pandoc-pyplot understands:
+
+    * @plot_target=...@ (_required_): Filepath where the resulting figure should be saved.
+    * @plot_alt="..."@ (_optional_): Specify a plot caption (or alternate text).
+    * @plot_include=...@ (_optional_): Path to a Python script to include before the code block. 
+    Ideal to avoid repetition over many figures.
+
+Here are some example blocks in Markdown:
+
+@
+This is a paragraph
+
+```{plot_target=my_figure.jpg plot_alt="This is a caption."}
+import matplotlib.pyplot as plt
+
+plt.figure()
+plt.plot([0,1,2,3,4], [1,2,3,4,5])
+plt.title('This is an example figure')
+```
+@
 -}
 module Text.Pandoc.Filter.Pyplot (
         makePlot
