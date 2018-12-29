@@ -16,6 +16,7 @@ extra-source-files:
     LICENSE.md
     README.md
     stack.yaml
+    test/fixtures/*.py
 
 source-repository head
     type: git

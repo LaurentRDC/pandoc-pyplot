@@ -2,6 +2,7 @@
 module Test where
 
 import Control.Monad  (unless)
+import Data.List      (isInfixOf)
 
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -15,20 +16,28 @@ import System.FilePath  ((</>))
 import System.IO.Temp   (getCanonicalTemporaryDirectory)
 
 -- | Create a code block with the right attributes to trigger pandoc-pyplot
-mkPlotCodeBlock :: FilePath     -- ^ Plot target
-                -> String       -- ^ Plot alt description
-                -> String       -- ^ Plot caption
+mkPlotCodeBlock :: FilePath            -- ^ Plot target
+                -> String              -- ^ Plot alt description
+                -> String              -- ^ Plot caption
+                -> Maybe FilePath      -- ^ Possible inclusion
                 -> Filter.PythonScript -- ^ Script
                 -> Block
-mkPlotCodeBlock target alt caption script =
-    let attrs = ( mempty 
-                , mempty
-                , [ ("plot_target", target)
-                  , ("plot_alt", alt)
-                  , ("plot_caption", caption)
-                  ]
-                )
-    in CodeBlock attrs script
+mkPlotCodeBlock target alt caption include script = CodeBlock attrs script
+    where
+        attrs = case include of
+            Nothing -> ( mempty , mempty
+                       , [ ("plot_target", target)
+                         , ("plot_alt", alt)
+                         , ("plot_caption", caption)
+                         ]
+                       )
+            Just includePath -> ( mempty , mempty
+                                , [ ("plot_target", target)
+                                , ("plot_alt", alt)
+                                , ("plot_caption", caption)
+                                , ("plot_include", includePath)
+                                  ]
+                                )
 
 -- | Assert that a file exists
 assertFileExists :: HasCallStack 
@@ -40,14 +49,49 @@ assertFileExists filepath = do
     where
         msg = mconcat ["File ", filepath, " does not exist."]
 
+-- | Assert that a list first list is contained, 
+-- wholly and intact, anywhere within the second.
+assertIsInfix :: (Eq a, Show a, HasCallStack)
+              => [a]
+              -> [a]
+              -> Assertion
+assertIsInfix xs ys = 
+    unless (xs `isInfixOf` ys) (assertFailure msg)
+    where
+        msg = mconcat ["Expected ", show xs, " to be an infix of ", show ys]
+
+-- Test that plot files and source files are created when the filter is run
 testFileCreation :: TestTree
 testFileCreation = testCase "writes output and source files" $ do
     tempDir <- getCanonicalTemporaryDirectory
-    let codeBlock = mkPlotCodeBlock (tempDir </> "test.jpg") "" "" "import matplotlib.pyplot as plt\n"
+    let codeBlock = mkPlotCodeBlock 
+            (tempDir </> "test.png") 
+            mempty 
+            mempty 
+            Nothing
+            "import matplotlib.pyplot as plt\n"    
     _ <- Filter.makePlot' codeBlock
-    assertFileExists (tempDir </> "test.jpg")
-    -- assertFileExists (tempDir </> "test.txt")
+    assertFileExists (tempDir </> "test.png")
+    assertFileExists (tempDir </> "test.txt")
+
+-- Test that included files are found within the source
+testFileInclusion :: TestTree
+testFileInclusion = testCase "includes plot inclusions" $ do
+    tempDir <- getCanonicalTemporaryDirectory
+    
+    let codeBlock = mkPlotCodeBlock 
+            (tempDir </> "test.png") 
+            mempty 
+            mempty 
+            (Just "test/fixtures/include.py") 
+            "import matplotlib.pyplot as plt\n"
+    _ <- Filter.makePlot' codeBlock
+
+    inclusion <- readFile "test/fixtures/include.py"
+    src <- readFile (tempDir </> "test.txt")
+    assertIsInfix inclusion src
 
 tests = testGroup "Text.Pandoc.Filter.IncludeCode" 
     [ testFileCreation
+    , testFileInclusion
     ]
