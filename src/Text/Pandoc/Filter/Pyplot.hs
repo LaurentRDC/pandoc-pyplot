@@ -93,7 +93,9 @@ makePlot' block =
         -- Could parse : run the script and capture output
         Just spec -> do
             
-            fullScript <- addPlotCapture (target spec) <$> (renderScript spec)
+            -- Rendered script, including possible inclusions and other additions
+            -- except the plot capture.
+            rendered <- renderScript spec
 
             let figurePath = target spec
                 figureDir = takeDirectory figurePath
@@ -103,11 +105,12 @@ makePlot' block =
             
             if | not (isValid figurePath)         -> return $ Left $ InvalidTargetError figurePath
                | not validDirectory               -> return $ Left $ MissingDirectoryError figureDir
-               | hasBlockingShowCall fullScript   -> return $ Left $ BlockingCallError
+               | hasBlockingShowCall rendered     -> return $ Left $ BlockingCallError
                | otherwise -> do 
                     
-                -- Running the script happens on the next line
-                result <- runTempPythonScript fullScript
+                -- Running the script
+                -- A plot capture (plt.savefig(...)) is added as well
+                result <- runTempPythonScript $ addPlotCapture (target spec) rendered
                 
                 case result of
                     ScriptFailure code -> return $ Left $ ScriptError code
@@ -117,7 +120,7 @@ makePlot' block =
                         -- Note : using a .txt file allows to view source directly
                         --        in the browser, in the case of HTML output
                         let sourcePath = replaceExtension figurePath ".txt"
-                        _ <- writeFile sourcePath <$> (renderScript spec)
+                        writeFile sourcePath rendered
                         
                         -- Propagate attributes that are not related to pandoc-pyplot
                         let relevantAttrs = blockAttrs spec
