@@ -46,6 +46,12 @@ test_script:
 # Install toolchain, but do it silently due to lots of output
 - stack %ARGS% setup > nul
 
+# Set python 3.6 as the default
+# Also at least install matplotlib
+- set PATH=%PATH%;C:\Python36-x64
+- refreshenv
+- python -m pip install --upgrade matplotlib 
+
 # The ugly echo "" hack is to avoid complaints about 0 being an invalid file
 # descriptor
-- echo "" | stack %ARGS% --no-terminal build --ghc-options=-Werror
+- echo "" | stack %ARGS% --no-terminal test --ghc-options=-Werror

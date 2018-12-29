@@ -1,13 +1,6 @@
-cabal-version: 1.12
-
--- This file has been generated from package.yaml by hpack version 0.30.0.
---
--- see: https://github.com/sol/hpack
---
--- hash: 5d8bb0150445cfc4c1e237814431e82db10c7e0ca6f9cb8785de3368f448214b
-
 name:           pandoc-pyplot
 version:        1.1.0.0
+cabal-version:  >= 1.12
 synopsis:       A Pandoc filter for including figures generated from Matplotlib
 description:    A pandoc filter for including figures generated from Matplotlib. Keep the document and Python code in the same location. Output from Matplotlib is captured and included as a figure.
 category:       Documentation
@@ -21,42 +14,59 @@ build-type:     Simple
 extra-source-files:
     CHANGELOG.md
     LICENSE.md
-    package.yaml
     README.md
     stack.yaml
 
 source-repository head
-  type: git
-  location: https://github.com/LaurentRDC/pandoc-pyplot
+    type: git
+    location: https://github.com/LaurentRDC/pandoc-pyplot
 
 library
-  exposed-modules:
-      Text.Pandoc.Filter.Pyplot
-      Text.Pandoc.Filter.Scripting
-  other-modules:
-      Paths_pandoc_pyplot
-  hs-source-dirs:
-      src
-  ghc-options: -Wall -Wcompat
-  build-depends:
-      base >=4 && <5
-    , containers
-    , directory
-    , filepath
-    , pandoc-types >1.12 && <2
-    , temporary
-    , typed-process
-  default-language: Haskell2010
+    exposed-modules:
+        Text.Pandoc.Filter.Pyplot
+        Text.Pandoc.Filter.Scripting
+    other-modules:
+        Paths_pandoc_pyplot
+    hs-source-dirs:
+        src
+    ghc-options: -Wall -Wcompat
+    build-depends:
+          base >=4 && <5
+        , containers
+        , directory
+        , filepath
+        , pandoc-types >1.12 && <2
+        , temporary
+        , typed-process
+    default-language: Haskell2010
 
 executable pandoc-pyplot
-  main-is: Main.hs
-  other-modules:
-      Paths_pandoc_pyplot
-  hs-source-dirs:
-      executable
-  ghc-options: -Wall -Wcompat -rtsopts -threaded -with-rtsopts=-N
-  build-depends:
-      base >=4 && <5
-    , pandoc-pyplot
-    , pandoc-types >1.12 && <2
-  default-language: Haskell2010
+    main-is: Main.hs
+    other-modules:
+        Paths_pandoc_pyplot
+    hs-source-dirs:
+        executable
+    ghc-options: -Wall -Wcompat -rtsopts -threaded -with-rtsopts=-N
+    build-depends:
+          base >=4 && <5
+        , pandoc-pyplot
+        , pandoc-types >1.12 && <2
+    default-language: Haskell2010
+
+test-suite tests
+    type: exitcode-stdio-1.0
+    hs-source-dirs:  test
+    other-modules:   Test
+    main-is:         Main.hs
+    build-depends:   base                 >= 4 && < 5
+                   , directory
+                   , filepath
+                   , pandoc-types         >= 1.12 && <= 2
+                   , pandoc-pyplot
+                   , tasty
+                   , tasty-hunit
+                   , tasty-hspec
+                   , temporary
+                   , hspec
+                   , hspec-expectations
+  
