@@ -141,7 +141,7 @@ pandoc --filter pandoc-pyplot input.md --output output.html
 In which case, the output is HTML. Another example with PDF output:
 
 ```bash
-pandoc --filter pandoc-pyplot input.md -output output.pdf
+pandoc --filter pandoc-pyplot input.md --output output.pdf
 ```
 
 Python exceptions will be printed to screen in case of a problem.
