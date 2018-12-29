@@ -64,18 +64,29 @@ You can also specify a caption for your image. This is done using the optional `
 
 _New in pandoc-pyplot v 1.1.0.0_
 
-If you find yourself always repeating some steps, inclusion of scripts is possible using the `plot_include` parameter. For example, if you want all plots to have the [xkcd](http://jakevdp.github.io/blog/2013/07/10/XKCD-plots-in-matplotlib/) style, you can write a very short preamble `style.py` like so:
+If you find yourself always repeating some steps, inclusion of scripts is possible using the `plot_include` parameter. For example, if you want all plots to have the [`ggplot`](https://matplotlib.org/tutorials/introductory/customizing.html#sphx-glr-tutorials-introductory-customizing-py) style, you can write a very short preamble `style.py` like so:
 
 ```python
 import matplotlib.pyplot as plt
-plt.xkcd()
+plt.style.use('ggplot')
 ```
 
 and include it in your document as follows:
 
 ```markdown
     ```{plot_target=my_figure.jpg plot_include=style.py}
+    plt.figure()
+    plt.plot([0,1,2,3,4], [1,2,3,4,5])
+    plt.title('This is an example figure')
+    ```
+```
+
+Which is equivalent to writing the following markdown:
+
+```markdown
+    ```{plot_target=my_figure.jpg}
     import matplotlib.pyplot as plt
+    plt.style.use('ggplot')
 
     plt.figure()
     plt.plot([0,1,2,3,4], [1,2,3,4,5])
@@ -83,7 +94,7 @@ and include it in your document as follows:
     ```
 ```
 
-This `plot_include` parameter is perfect for longer documents with many plots. Simply define the style you want in a separate script!
+This `plot_include` parameter is perfect for longer documents with many plots. Simply define the style you want in a separate script! You can also import packages this way, or define functions you often use.
 
 ## Installation
 
