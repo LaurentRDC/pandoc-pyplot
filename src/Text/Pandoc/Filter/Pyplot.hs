@@ -18,7 +18,7 @@ module Text.Pandoc.Filter.Pyplot (
       , makePlot'
       , plotTransform
       , PandocPyplotError(..)
-      , showError
+      , show
     ) where
 
 import           Control.Monad                  ((>=>))
@@ -38,6 +38,15 @@ data PandocPyplotError = ScriptError Int                -- ^ Running Python scri
                        | InvalidTargetError FilePath    -- ^ Invalid figure path
                        | MissingDirectoryError FilePath -- ^ Directory where to save figure does not exist
                        | BlockingCallError              -- ^ Python script contains a block call to 'show()'
+        deriving Eq
+
+instance Show PandocPyplotError where
+    -- | Translate filter error to an error message
+    show (ScriptError exitcode)          = "Script error: plot could not be generated. Exit code " <> (show exitcode)
+    show (InvalidTargetError fname)      = "Target filename " <> fname <> " is not valid."
+    show (MissingDirectoryError dirname) = "Target directory " <> dirname <> " does not exist." 
+    show BlockingCallError               = "Script contains a blocking call to show, like 'plt.show()'"
+
 
 -- | Datatype containing all parameters required
 -- to run pandoc-pyplot
@@ -133,18 +142,11 @@ makePlot' block =
 
                         return $ Right $ Para $ [image]
 
--- | Translate filter error to an error message
-showError :: PandocPyplotError -> String
-showError (ScriptError exitcode)          = "Script error: plot could not be generated. Exit code " <> (show exitcode)
-showError (InvalidTargetError fname)      = "Target filename " <> fname <> " is not valid."
-showError (MissingDirectoryError dirname) = "Target directory " <> dirname <> " does not exist." 
-showError BlockingCallError               = "Script contains a blocking call to show, like 'plt.show()'"
-
 -- | Highest-level function that can be walked over a Pandoc tree.
 -- All code blocks that have the 'plot_target' parameter will be considered
 -- figures.
 makePlot :: Block -> IO Block
-makePlot = makePlot' >=> either (fail . showError) return
+makePlot = makePlot' >=> either (fail . show) return
 
 -- | Walk over an entire Pandoc document, changing appropriate code blocks
 -- into figures.

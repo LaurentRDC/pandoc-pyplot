@@ -1,8 +1,8 @@
 
 module Test where
 
-import Control.Monad  (unless)
-import Data.List      (isInfixOf)
+import Control.Monad     (unless)
+import Data.List         (isInfixOf)
 
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -91,7 +91,29 @@ testFileInclusion = testCase "includes plot inclusions" $ do
     src <- readFile (tempDir </> "test.txt")
     assertIsInfix inclusion src
 
+-- Test that a script containing a blockign call to matplotlib.pyplot.show
+-- returns the appropriate error
+testBlockingCallError :: TestTree
+testBlockingCallError = testCase "raises an exception for blocking calls" $ do
+    tempDir <- getCanonicalTemporaryDirectory
+
+    let codeBlock = mkPlotCodeBlock 
+            (tempDir </> "test.png") 
+            mempty 
+            mempty 
+            Nothing
+            "import matplotlib.pyplot as plt\nplt.show()"
+    
+    result <- Filter.makePlot' codeBlock
+    case result of
+        Right block -> assertFailure "did not catch the expected blocking call"
+        Left  error -> 
+            if error == Filter.BlockingCallError 
+            then pure () 
+            else assertFailure "did not catch the expected blocking call"
+
 tests = testGroup "Text.Pandoc.Filter.IncludeCode" 
     [ testFileCreation
     , testFileInclusion
+    , testBlockingCallError
     ]
