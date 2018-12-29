@@ -92,21 +92,21 @@ makePlot' block =
         Nothing -> return $ Right block
         -- Could parse : run the script and capture output
         Just spec -> do
+            
+            fullScript <- addPlotCapture (target spec) <$> (renderScript spec)
+
             let figurePath = target spec
                 figureDir = takeDirectory figurePath
-                scriptSource = script spec
             
             -- Check that the directory in which to save the figure exists
-            validDirectory <- doesDirectoryExist figureDir
+            validDirectory <- doesDirectoryExist $ takeDirectory figurePath
             
             if | not (isValid figurePath)         -> return $ Left $ InvalidTargetError figurePath
                | not validDirectory               -> return $ Left $ MissingDirectoryError figureDir
-               | hasBlockingShowCall scriptSource -> return $ Left $ BlockingCallError
+               | hasBlockingShowCall fullScript   -> return $ Left $ BlockingCallError
                | otherwise -> do 
                     
                 -- Running the script happens on the next line
-                -- Note that the script is slightly modified to be able to capture the output
-                fullScript <- addPlotCapture (target spec) <$> (renderScript spec)
                 result <- runTempPythonScript fullScript
                 
                 case result of
@@ -116,7 +116,7 @@ makePlot' block =
                         -- so it can be inspected
                         -- Note : using a .txt file allows to view source directly
                         --        in the browser, in the case of HTML output
-                        let sourcePath = replaceExtension (target spec) ".txt"
+                        let sourcePath = replaceExtension figurePath ".txt"
                         _ <- writeFile sourcePath <$> (renderScript spec)
                         
                         -- Propagate attributes that are not related to pandoc-pyplot
