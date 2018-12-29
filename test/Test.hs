@@ -112,7 +112,7 @@ testBlockingCallError = testCase "raises an exception for blocking calls" $ do
             then pure () 
             else assertFailure "did not catch the expected blocking call"
 
-tests = testGroup "Text.Pandoc.Filter.IncludeCode" 
+tests = testGroup "Text.Pandoc.Filter.Pyplot" 
     [ testFileCreation
     , testFileInclusion
     , testBlockingCallError
