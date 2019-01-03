@@ -1,7 +1,7 @@
 {-# LANGUAGE Unsafe #-}
 {-|
 Module      : Text.Pandoc.Filter.Scripting
-Copyright   : (c) Laurent P René de Cotret, 2018
+Copyright   : (c) Laurent P René de Cotret, 2019
 License     : MIT
 Maintainer  : laurent.decotret@outlook.com
 Stability   : internal

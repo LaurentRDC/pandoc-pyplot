@@ -3,7 +3,7 @@
 {-|
 Module      : Text.Pandoc.Filter.Pyplot
 Description : Pandoc filter to create Matplotlib figures from code blocks
-Copyright   : (c) Laurent P René de Cotret, 2018
+Copyright   : (c) Laurent P René de Cotret, 2019
 License     : MIT
 Maintainer  : laurent.decotret@outlook.com
 Stability   : stable
