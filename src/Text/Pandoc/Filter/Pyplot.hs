@@ -9,7 +9,7 @@ Maintainer  : laurent.decotret@outlook.com
 Stability   : stable
 Portability : portable
 
-This module defines a Pandoc filter @makePlot@ that can be 
+This module defines a Pandoc filter @makePlot@ that can be
 used to walk over a Pandoc document and generate figures from
 Python code blocks.
 
@@ -21,7 +21,7 @@ Here are the possible attributes what pandoc-pyplot understands:
 
     * @plot_target=...@ (__required__): Filepath where the resulting figure should be saved.
     * @plot_alt="..."@ (__optional__): Specify a plot caption (or alternate text).
-    * @plot_include=...@ (__optional__): Path to a Python script to include before the code block. 
+    * @plot_include=...@ (__optional__): Path to a Python script to include before the code block.
     Ideal to avoid repetition over many figures.
 
 Here are some example blocks in Markdown:
@@ -45,20 +45,21 @@ module Text.Pandoc.Filter.Pyplot (
       , PandocPyplotError(..)
     ) where
 
-import           Control.Monad                  ((>=>))
-import qualified Data.Map.Strict                as Map
-import           Data.Maybe                     (fromMaybe)
-import           Data.Monoid                    ((<>))
-import           Data.Version                   (showVersion)
-import           Paths_pandoc_pyplot            (version)
+import           Control.Monad                ((>=>))
+import qualified Data.Map.Strict              as Map
+import           Data.Maybe                   (fromMaybe)
+import           Data.Monoid                  ((<>))
+import           Data.Version                 (showVersion)
+import           Paths_pandoc_pyplot          (version)
 
-import           System.Directory               (doesDirectoryExist)
-import           System.FilePath                (isValid, replaceExtension, takeDirectory)
+import           System.Directory             (doesDirectoryExist)
+import           System.FilePath              (isValid, replaceExtension,
+                                               takeDirectory)
 
 import           Text.Pandoc.Definition
-import           Text.Pandoc.Walk               (walkM)
+import           Text.Pandoc.Walk             (walkM)
 
-import           Text.Pandoc.Filter.Scripting   
+import           Text.Pandoc.Filter.Scripting
 
 -- | Possible errors returned by the filter
 data PandocPyplotError = ScriptError Int                -- ^ Running Python script has yielded an error
@@ -71,13 +72,13 @@ instance Show PandocPyplotError where
     -- | Translate filter error to an error message
     show (ScriptError exitcode)          = "Script error: plot could not be generated. Exit code " <> (show exitcode)
     show (InvalidTargetError fname)      = "Target filename " <> fname <> " is not valid."
-    show (MissingDirectoryError dirname) = "Target directory " <> dirname <> " does not exist." 
+    show (MissingDirectoryError dirname) = "Target directory " <> dirname <> " does not exist."
     show BlockingCallError               = "Script contains a blocking call to show, like 'plt.show()'"
 
 
 -- | Datatype containing all parameters required
 -- to run pandoc-pyplot
-data FigureSpec = FigureSpec 
+data FigureSpec = FigureSpec
     { target      :: FilePath       -- ^ filepath where generated figure will be saved.
     , alt         :: String         -- ^ Alternate text for the figure (optional).
     , script      :: PythonScript   -- ^ Source code for the figure.
@@ -102,7 +103,7 @@ includePathKey = "plot_include"
 -- | Determine inclusion specifications from Block attributes.
 -- Note that the target key is required, but all other parameters are optional
 parseFigureSpec :: Block -> Maybe FigureSpec
-parseFigureSpec (CodeBlock (id', cls, attrs) content) = 
+parseFigureSpec (CodeBlock (id', cls, attrs) content) =
     createInclusion <$> Map.lookup targetKey attrs'
     where
         attrs' = Map.fromList attrs
@@ -121,45 +122,45 @@ parseFigureSpec _ = Nothing
 -- | Main routine to include Matplotlib plots.
 -- Code blocks containing the attributes @plot_target@ are considered
 -- Python plotting scripts. All other possible blocks are ignored.
--- The source code is also saved in another file, which can be access by 
+-- The source code is also saved in another file, which can be access by
 -- clicking the image
 makePlot' :: Block -> IO (Either PandocPyplotError Block)
-makePlot' block = 
+makePlot' block =
     case parseFigureSpec block of
         -- Could not parse - leave code block unchanged
         Nothing -> return $ Right block
         -- Could parse : run the script and capture output
         Just spec -> do
-            
+
             -- Rendered script, including possible inclusions and other additions
             -- except the plot capture.
             rendered <- renderScript spec
 
             let figurePath = target spec
                 figureDir = takeDirectory figurePath
-            
+
             -- Check that the directory in which to save the figure exists
             validDirectory <- doesDirectoryExist $ takeDirectory figurePath
-            
+
             if | not (isValid figurePath)         -> return $ Left $ InvalidTargetError figurePath
                | not validDirectory               -> return $ Left $ MissingDirectoryError figureDir
                | hasBlockingShowCall rendered     -> return $ Left $ BlockingCallError
-               | otherwise -> do 
-                    
+               | otherwise -> do
+
                 -- Running the script
                 -- A plot capture (plt.savefig(...)) is added as well
                 result <- runTempPythonScript $ addPlotCapture (target spec) rendered
-                
+
                 case result of
                     ScriptFailure code -> return $ Left $ ScriptError code
-                    ScriptSuccess -> do 
+                    ScriptSuccess -> do
                         -- Save the original script into a separate file
                         -- so it can be inspected
                         -- Note : using a .txt file allows to view source directly
                         --        in the browser, in the case of HTML output
                         let sourcePath = replaceExtension figurePath ".txt"
                         writeFile sourcePath rendered
-                        
+
                         -- Propagate attributes that are not related to pandoc-pyplot
                         let relevantAttrs = blockAttrs spec
                             srcTarget = Link nullAttr [Str "Source code"] (sourcePath, "")
