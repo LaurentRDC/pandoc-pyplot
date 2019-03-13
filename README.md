@@ -100,6 +100,10 @@ This `plot_include` parameter is perfect for longer documents with many plots. S
 
 Windows binaries are available on [GitHub](https://github.com/LaurentRDC/pandoc-pyplot/releases). Place the executable in a location that is in your PATH to be able to call it.
 
+### Installers
+
+Starting with `pandoc-pyplot` version 1.1.0.0, Windows installers are also made available thanks to [Inno Setup](http://www.jrsoftware.org/isinfo.php). 
+
 ### From Hackage/Stackage
 
 `pandoc-pyplot` is available on Hackage. Using the [`cabal-install`](https://www.haskell.org/cabal/) tool:
