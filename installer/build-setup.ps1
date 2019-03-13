@@ -1,5 +1,5 @@
 "Build executable and move here"
-stack install pandoc-pyplot --local-bin-path ".\installer\executable"
+stack install pandoc-pyplot --local-bin-path ".stack-work\installer"
 
 Write-Host "Building setup using Inno Setup Compiler"
 if ($ENV:PROCESSOR_ARCHITECTURE -eq "AMD64"){
