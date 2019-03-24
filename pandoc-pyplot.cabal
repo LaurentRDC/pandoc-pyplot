@@ -1,5 +1,5 @@
 name:           pandoc-pyplot
-version:        1.1.0.0
+version:        2.0.0.0
 cabal-version:  >= 1.12
 synopsis:       A Pandoc filter for including figures generated from Matplotlib
 description:    A pandoc filter for including figures generated from Matplotlib. Keep the document and Python code in the same location. Output from Matplotlib is captured and included as a figure.
@@ -39,6 +39,7 @@ library
         , pandoc-types >1.12 && <2
         , temporary
         , typed-process
+        , random > 1 && < 2
     default-language: Haskell2010
 
 executable pandoc-pyplot
