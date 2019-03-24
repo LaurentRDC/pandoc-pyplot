@@ -16,7 +16,7 @@ help = "\n\
     \   usage: pandoc-pyplot [-h, --help] [-v, --version] \n\
     \\n\
     \   This pandoc filter generates plots from Python code blocks using Matplotlib. \n\
-    \   This allows to keep documentation and figures up-to-date.\n\
+    \   This allows to keep documentation and figures in perfect synchronicity.\n\
     \\n\
     \   Optional arguments:\n\
     \       -h, --help     Show this help message and exit\n\
