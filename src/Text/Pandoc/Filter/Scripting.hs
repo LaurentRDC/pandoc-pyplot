@@ -49,12 +49,16 @@ runTempPythonScript script = do
 
 -- | Modify a Python plotting script to save the figure to a filename.
 addPlotCapture :: FilePath          -- ^ Path where to save the figure
+               -> Int               -- ^ DPI
                -> PythonScript      -- ^ Raw code block
                -> PythonScript      -- ^ Code block with added capture
-addPlotCapture fname content =
+addPlotCapture fname dpi content =
     mconcat [ content
             , "\nimport matplotlib.pyplot as plt"  -- Just in case
-            , "\nplt.savefig(" <> show fname <> ")\n\n"
+            , mconcat [ "\nplt.savefig("
+                      , fname
+                      , ", dpi=", show dpi
+                      , ")\n\n"]
             ]
 
 -- | Detect the presence of a blocking show call, for example "plt.show()"
