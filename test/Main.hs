@@ -11,41 +11,41 @@ import qualified Text.Pandoc.Filter.Pyplot as Filter
 import qualified Text.Pandoc.Filter.Scripting as Filter
 import Text.Pandoc.JSON
 
-import System.Directory (doesFileExist)
+import System.Directory (doesFileExist, listDirectory, createDirectoryIfMissing, removeDirectoryRecursive)
 import System.FilePath  ((</>))
 import System.IO.Temp   (getCanonicalTemporaryDirectory)
 
 main :: IO ()
 main = defaultMain $ 
     testGroup "Text.Pandoc.Filter.Pyplot" 
-        [ testFileCreation
+        [ testFileCreationExplicitTarget
+        , testFileCreationNoExplicitTarget
         , testFileInclusion
         , testBlockingCallError
         ]
 
--- | Create a code block with the right attributes to trigger pandoc-pyplot
-mkPlotCodeBlock :: FilePath            -- ^ Plot target
-                -> String              -- ^ Plot alt description
-                -> String              -- ^ Plot caption
-                -> Maybe FilePath      -- ^ Possible inclusion
-                -> Filter.PythonScript -- ^ Script
-                -> Block
-mkPlotCodeBlock target alt caption include script = CodeBlock attrs script
-    where
-        attrs = case include of
-            Nothing -> ( mempty , mempty
-                       , [ ("plot_target", target)
-                         , ("plot_alt", alt)
-                         , ("plot_caption", caption)
-                         ]
-                       )
-            Just includePath -> ( mempty , mempty
-                                , [ ("plot_target", target)
-                                , ("plot_alt", alt)
-                                , ("plot_caption", caption)
-                                , ("plot_include", includePath)
-                                  ]
-                                )
+plotCodeBlock :: Filter.PythonScript -> Block
+plotCodeBlock script = CodeBlock (mempty, ["pyplot"], mempty) script
+
+addTarget :: FilePath -> Block -> Block
+addTarget target (CodeBlock (id', cls, attrs) script) = 
+    CodeBlock (id', cls, attrs ++ [(Filter.targetKey, target)]) script
+
+addCaption :: String -> Block -> Block
+addCaption caption (CodeBlock (id', cls, attrs) script) = 
+    CodeBlock (id', cls, attrs ++ [(Filter.captionKey, caption)]) script
+
+addDirectory :: FilePath -> Block -> Block
+addDirectory dir (CodeBlock (id', cls, attrs) script) = 
+    CodeBlock (id', cls, attrs ++ [(Filter.directoryKey, dir)]) script
+
+addInclusion :: FilePath -> Block -> Block
+addInclusion inclusionPath (CodeBlock (id', cls, attrs) script) = 
+    CodeBlock (id', cls, attrs ++ [(Filter.includePathKey, inclusionPath)]) script
+
+addDPI :: Int -> Block -> Block
+addDPI dpi (CodeBlock (id', cls, attrs) script) = 
+    CodeBlock (id', cls, attrs ++ [(Filter.dpiKey, show dpi)]) script
 
 -- | Assert that a file exists
 assertFileExists :: HasCallStack 
@@ -56,6 +56,16 @@ assertFileExists filepath = do
     unless fileExists (assertFailure msg)
     where
         msg = mconcat ["File ", filepath, " does not exist."]
+
+-- | Assert that a directory is not empty
+assertDirectoryNotEmpty :: HasCallStack 
+                        => FilePath
+                        -> Assertion
+assertDirectoryNotEmpty filepath = do
+    filesInDir <- (not . null) <$> listDirectory filepath 
+    unless filesInDir (assertFailure msg)
+    where
+        msg = mconcat ["Directory ", filepath, " is empty."]
 
 -- | Assert that a list first list is contained, 
 -- wholly and intact, anywhere within the second.
@@ -70,18 +80,28 @@ assertIsInfix xs ys =
 
 -------------------------------------------------------------------------------
 -- Test that plot files and source files are created when the filter is run
-testFileCreation :: TestTree
-testFileCreation = testCase "writes output and source files" $ do
+testFileCreationExplicitTarget :: TestTree
+testFileCreationExplicitTarget = testCase "writes output and source files" $ do
     tempDir <- getCanonicalTemporaryDirectory
-    let codeBlock = mkPlotCodeBlock 
-            (tempDir </> "test.png") 
-            mempty 
-            mempty 
-            Nothing
-            "import matplotlib.pyplot as plt\n"    
+    let codeBlock = ( addTarget (tempDir </> "test.png")  
+                    $ plotCodeBlock "import matplotlib.pyplot as plt\n"
+                    ) 
     _ <- Filter.makePlot' codeBlock
     assertFileExists (tempDir </> "test.png")
     assertFileExists (tempDir </> "test.txt")
+
+-------------------------------------------------------------------------------
+-- Test that plot files and source files are created when the filter is run
+testFileCreationNoExplicitTarget :: TestTree
+testFileCreationNoExplicitTarget = testCase "writes output files in appropriate directory" $ do
+    tempDir <- (</> "test-dir") <$> getCanonicalTemporaryDirectory
+    createDirectoryIfMissing True tempDir
+    let codeBlock = ( addDirectory tempDir  
+                    $ plotCodeBlock "import matplotlib.pyplot as plt\n"
+                    )    
+    _ <- Filter.makePlot' codeBlock
+    assertDirectoryNotEmpty tempDir
+    removeDirectoryRecursive tempDir
 
 -------------------------------------------------------------------------------
 -- Test that included files are found within the source
@@ -89,12 +109,10 @@ testFileInclusion :: TestTree
 testFileInclusion = testCase "includes plot inclusions" $ do
     tempDir <- getCanonicalTemporaryDirectory
     
-    let codeBlock = mkPlotCodeBlock 
-            (tempDir </> "test.png") 
-            mempty 
-            mempty 
-            (Just "test/fixtures/include.py") 
-            "import matplotlib.pyplot as plt\n"
+    let codeBlock = ( addTarget (tempDir </> "test.png")
+                    $ addInclusion "test/fixtures/include.py"
+                    $ plotCodeBlock "import matplotlib.pyplot as plt\n"
+                    )
     _ <- Filter.makePlot' codeBlock
 
     inclusion <- readFile "test/fixtures/include.py"
@@ -108,13 +126,9 @@ testBlockingCallError :: TestTree
 testBlockingCallError = testCase "raises an exception for blocking calls" $ do
     tempDir <- getCanonicalTemporaryDirectory
 
-    let codeBlock = mkPlotCodeBlock 
-            (tempDir </> "test.png") 
-            mempty 
-            mempty 
-            Nothing
-            "import matplotlib.pyplot as plt\nplt.show()"
-    
+    let codeBlock = ( addTarget (tempDir </> "test.png")
+                    $ plotCodeBlock "import matplotlib.pyplot as plt\nplt.show()"
+                    )    
     result <- Filter.makePlot' codeBlock
     case result of
         Right block -> assertFailure "did not catch the expected blocking call"
