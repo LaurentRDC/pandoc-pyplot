@@ -56,7 +56,7 @@ addPlotCapture fname dpi content =
     mconcat [ content
             , "\nimport matplotlib.pyplot as plt"  -- Just in case
             , mconcat [ "\nplt.savefig("
-                      , fname
+                      , show fname
                       , ", dpi=", show dpi
                       , ")\n\n"]
             ]
