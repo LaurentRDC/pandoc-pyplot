@@ -1,8 +1,10 @@
-
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import Control.Monad     (unless)
+
 import Data.List         (isInfixOf)
+import Data.Text         (unpack)
 
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -25,7 +27,7 @@ main = defaultMain $
         ]
 
 plotCodeBlock :: Filter.PythonScript -> Block
-plotCodeBlock script = CodeBlock (mempty, ["pyplot"], mempty) script
+plotCodeBlock script = CodeBlock (mempty, ["pyplot"], mempty) (unpack script)
 
 addTarget :: FilePath -> Block -> Block
 addTarget target (CodeBlock (id', cls, attrs) script) = 
