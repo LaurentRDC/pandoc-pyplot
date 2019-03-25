@@ -47,12 +47,13 @@ runTempPythonScript script = do
             scriptPath <- (</> "pandoc-pyplot.py") <$> getCanonicalTemporaryDirectory
             T.writeFile scriptPath script
             -- Execute script
-            ec <- runProcess $ shell $ "python " <> (show scriptPath)
+            ec <- runProcess $ shell $ "python -OO " <> (show scriptPath)
             case ec of
                 ExitSuccess      -> return ScriptSuccess
                 ExitFailure code -> return $ ScriptFailure code
 
 -- | Modify a Python plotting script to save the figure to a filename.
+-- TODO: add plot capture for hires PNG and PDF
 addPlotCapture :: FilePath          -- ^ Path where to save the figure
                -> Int               -- ^ DPI
                -> PythonScript      -- ^ Raw code block
