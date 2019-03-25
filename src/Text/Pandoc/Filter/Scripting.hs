@@ -16,6 +16,7 @@ module Text.Pandoc.Filter.Scripting (
       runTempPythonScript
     , addPlotCapture
     , hasBlockingShowCall
+    , toHiresPath
     , PythonScript
     , ScriptResult(..)
 ) where
@@ -25,7 +26,7 @@ import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
 
 import           System.Exit          (ExitCode (..))
-import           System.FilePath      ((</>))
+import           System.FilePath      ((</>), replaceExtension)
 import           System.IO.Temp       (getCanonicalTemporaryDirectory)
 import           System.Process.Typed (runProcess, shell)
 
@@ -38,6 +39,9 @@ type PythonScript = Text
 data ScriptResult = ScriptSuccess
                   | ScriptFailure Int
 
+toHiresPath :: FilePath -> FilePath
+toHiresPath = flip replaceExtension ".hires.png"
+
 -- | Take a python script in string form, write it in a temporary directory,
 -- then execute it.
 runTempPythonScript :: PythonScript    -- ^ Content of the script
@@ -47,13 +51,13 @@ runTempPythonScript script = do
             scriptPath <- (</> "pandoc-pyplot.py") <$> getCanonicalTemporaryDirectory
             T.writeFile scriptPath script
             -- Execute script
-            ec <- runProcess $ shell $ "python -OO " <> (show scriptPath)
+            ec <- runProcess $ shell $ "python " <> (show scriptPath)
             case ec of
                 ExitSuccess      -> return ScriptSuccess
                 ExitFailure code -> return $ ScriptFailure code
 
 -- | Modify a Python plotting script to save the figure to a filename.
--- TODO: add plot capture for hires PNG and PDF
+-- An additional file (with extension PNG) will also be captured.
 addPlotCapture :: FilePath          -- ^ Path where to save the figure
                -> Int               -- ^ DPI
                -> PythonScript      -- ^ Raw code block
@@ -61,16 +65,20 @@ addPlotCapture :: FilePath          -- ^ Path where to save the figure
 addPlotCapture fname dpi content =
     mconcat [ content
             , "\nimport matplotlib.pyplot as plt"  -- Just in case
-            , mconcat [ "\nplt.savefig("
-                      , T.pack $ show fname -- show is required for quotes
-                      , ", dpi=", T.pack $ show dpi
-                      , ")\n\n"]
+            , plotCapture fname dpi
+            , plotCapture (toHiresPath fname) (minimum [200, dpi * 2])
             ]
+    where
+        plotCapture fname' dpi' = mconcat [ "\nplt.savefig("
+                                        , T.pack $ show fname' -- show is required for quotes
+                                        , ", dpi=", T.pack $ show dpi'
+                                        , ")"]
 
 -- | Detect the presence of a blocking show call, for example "plt.show()"
 hasBlockingShowCall :: PythonScript -> Bool
 hasBlockingShowCall script = anyOf
         [ "plt.show()" `elem` scriptLines
+        , "pyplot.show()" `elem` scriptLines
         , "matplotlib.pyplot.show()" `elem` scriptLines
         ]
     where
