@@ -8,14 +8,14 @@ Inspired by [sphinx](https://sphinxdoc.org)'s `plot_directive`, `pandoc-pyplot` 
 
 ## Usage
 
-The filter recognizes code blocks with the `plot_target` attribute present. It will run the script in the associated code block in a Python interpreter and capture the generated Matplotlib figure. This captured figure will be saved in the located specific by `plot_target`.
+The filter recognizes code blocks with the `pyplot` class present. It will run the script in the associated code block in a Python interpreter and capture the generated Matplotlib figure.
 
 ### Basic example
 
 Here is a basic example using the scripting `matplotlib.pyplot` API:
 
 ```markdown
-    ```{plot_target=my_figure.jpg}
+    ```{.pyplot}
     import matplotlib.pyplot as plt
 
     plt.figure()
@@ -24,9 +24,19 @@ Here is a basic example using the scripting `matplotlib.pyplot` API:
     ```
 ```
 
-`pandoc-pyplot` will determine whether the `plot_target` is a relative or absolute path. In case of a relative path (like above), all paths will be considered relative to the current working directory.
+By default, this figure will be given a random name and saved as a PNG file. We can control the format of the output file by changing the `target` file extension:
 
-We can control the format of the output file by changing the `plot_target` file extension. All formats supported by Matplotlib on your machine are available.
+```markdown
+    ```{.pyplot target=myfigure.jpg}
+    import matplotlib.pyplot as plt
+
+    plt.figure()
+    plt.plot([0,1,2,3,4], [1,2,3,4,5])
+    plt.title('This is an example figure')
+    ```
+```
+
+All formats supported by Matplotlib on your machine are available.
 
 Putting the above in `input.md`, we can then generate the plot and embed it:
 
@@ -48,10 +58,10 @@ In case of an output format that supports links (e.g. HTML), the embedded image 
 
 ### Captions
 
-You can also specify a caption for your image. This is done using the optional `plot_alt` parameter:
+You can also specify a caption for your image. This is done using the optional `caption` parameter:
 
 ```markdown
-    ```{plot_target=my_figure.jpg plot_alt="This is a simple figure"}
+    ```{.pyplot caption="This is a simple figure"}
     import matplotlib.pyplot as plt
 
     plt.figure()
@@ -62,7 +72,7 @@ You can also specify a caption for your image. This is done using the optional `
 
 ### Including scripts
 
-If you find yourself always repeating some steps, inclusion of scripts is possible using the `plot_include` parameter. For example, if you want all plots to have the [`ggplot`](https://matplotlib.org/tutorials/introductory/customizing.html#sphx-glr-tutorials-introductory-customizing-py) style, you can write a very short preamble `style.py` like so:
+If you find yourself always repeating some steps, inclusion of scripts is possible using the `include` parameter. For example, if you want all plots to have the [`ggplot`](https://matplotlib.org/tutorials/introductory/customizing.html#sphx-glr-tutorials-introductory-customizing-py) style, you can write a very short preamble `style.py` like so:
 
 ```python
 import matplotlib.pyplot as plt
@@ -72,7 +82,7 @@ plt.style.use('ggplot')
 and include it in your document as follows:
 
 ```markdown
-    ```{plot_target=my_figure.jpg plot_include=style.py}
+    ```{.pyplot include=style.py}
     plt.figure()
     plt.plot([0,1,2,3,4], [1,2,3,4,5])
     plt.title('This is an example figure')
@@ -82,7 +92,7 @@ and include it in your document as follows:
 Which is equivalent to writing the following markdown:
 
 ```markdown
-    ```{plot_target=my_figure.jpg}
+    ```{.pyplot}
     import matplotlib.pyplot as plt
     plt.style.use('ggplot')
 
@@ -92,7 +102,7 @@ Which is equivalent to writing the following markdown:
     ```
 ```
 
-This `plot_include` parameter is perfect for longer documents with many plots. Simply define the style you want in a separate script! You can also import packages this way, or define functions you often use.
+This `include` parameter is perfect for longer documents with many plots. Simply define the style you want in a separate script! You can also import packages this way, or define functions you often use.
 
 ## Installation
 
