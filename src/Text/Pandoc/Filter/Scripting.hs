@@ -1,4 +1,5 @@
-{-# LANGUAGE Unsafe #-}
+{-# LANGUAGE Unsafe            #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-|
 Module      : Text.Pandoc.Filter.Scripting
 Copyright   : (c) Laurent P René de Cotret, 2019
@@ -19,6 +20,10 @@ module Text.Pandoc.Filter.Scripting (
     , ScriptResult(..)
 ) where
 
+import           Data.Text            (Text)
+import qualified Data.Text            as T
+import qualified Data.Text.IO         as T
+
 import           System.Exit          (ExitCode (..))
 import           System.FilePath      ((</>))
 import           System.IO.Temp       (getCanonicalTemporaryDirectory)
@@ -27,7 +32,7 @@ import           System.Process.Typed (runProcess, shell)
 import           Data.Monoid          (Any (..), (<>))
 
 -- | String representation of a Python script
-type PythonScript = String
+type PythonScript = Text
 
 -- | Possible result of running a Python script
 data ScriptResult = ScriptSuccess
@@ -39,8 +44,8 @@ runTempPythonScript :: PythonScript    -- ^ Content of the script
                     -> IO ScriptResult -- ^ Result with exit code.
 runTempPythonScript script = do
             -- Write script to temporary directory
-            scriptPath <- (</> "pandoc-pyplot.py") <$>  getCanonicalTemporaryDirectory
-            writeFile scriptPath script
+            scriptPath <- (</> "pandoc-pyplot.py") <$> getCanonicalTemporaryDirectory
+            T.writeFile scriptPath script
             -- Execute script
             ec <- runProcess $ shell $ "python " <> (show scriptPath)
             case ec of
@@ -56,8 +61,8 @@ addPlotCapture fname dpi content =
     mconcat [ content
             , "\nimport matplotlib.pyplot as plt"  -- Just in case
             , mconcat [ "\nplt.savefig("
-                      , show fname
-                      , ", dpi=", show dpi
+                      , T.pack $ show fname -- show is required for quotes
+                      , ", dpi=", T.pack $ show dpi
                       , ")\n\n"]
             ]
 
@@ -68,5 +73,5 @@ hasBlockingShowCall script = anyOf
         , "matplotlib.pyplot.show()" `elem` scriptLines
         ]
     where
-        scriptLines = lines script
+        scriptLines = T.lines script
         anyOf xs = getAny $ mconcat $ Any <$> xs
