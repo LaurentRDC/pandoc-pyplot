@@ -38,6 +38,7 @@ library
         , filepath
         , pandoc-types >1.12 && <2
         , temporary
+        , text
         , typed-process
         , random > 1 && < 2
     default-language: Haskell2010
@@ -62,13 +63,14 @@ test-suite tests
     build-depends:   base                 >= 4 && < 5
                    , directory
                    , filepath
+                   , hspec
+                   , hspec-expectations
                    , pandoc-types         >= 1.12 && <= 2
                    , pandoc-pyplot
                    , tasty
                    , tasty-hunit
                    , tasty-hspec
                    , temporary
-                   , hspec
-                   , hspec-expectations
+                   , text
     default-language: Haskell2010
   
