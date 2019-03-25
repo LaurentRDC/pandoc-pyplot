@@ -90,6 +90,7 @@ testFileCreationExplicitTarget = testCase "writes output and source files" $ do
                     ) 
     _ <- Filter.makePlot' codeBlock
     assertFileExists (tempDir </> "test.png")
+    assertFileExists (tempDir </> "test.hires.png")
     assertFileExists (tempDir </> "test.txt")
 
 -------------------------------------------------------------------------------
