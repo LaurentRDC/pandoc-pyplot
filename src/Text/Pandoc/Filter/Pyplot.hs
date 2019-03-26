@@ -58,8 +58,6 @@ module Text.Pandoc.Filter.Pyplot (
 
 import           Control.Monad                ((>=>))
 
-import           Data.Hashable                (hash)
-
 import           Data.List                    (intersperse)
 
 import qualified Data.Map.Strict              as Map
@@ -72,13 +70,14 @@ import           Data.Version                 (showVersion)
 import           Paths_pandoc_pyplot          (version)
 
 import           System.Directory             (createDirectoryIfMissing, doesFileExist)
-import           System.FilePath              (isValid, replaceExtension, addExtension
-                                              ,takeDirectory, (</>), makeValid)
+import           System.FilePath              (isValid, replaceExtension
+                                              ,takeDirectory, makeValid)
 
 import           Text.Pandoc.Definition
 import           Text.Pandoc.Walk             (walkM)
 
 import           Text.Pandoc.Filter.Scripting
+import           Text.Pandoc.Filter.Figure   (FigureSpec(..), figurePath)
 
 -- | Possible errors returned by the filter
 data PandocPyplotError = ScriptError Int                -- ^ Running Python script has yielded an error
@@ -91,20 +90,6 @@ instance Show PandocPyplotError where
     show (ScriptError exitcode)          = "Script error: plot could not be generated. Exit code " <> (show exitcode)
     show (InvalidTargetError fname)      = "Target filename " <> fname <> " is not valid."
     show BlockingCallError               = "Script contains a blocking call to show, like 'plt.show()'"
-
--- | Generate a filepath based on the content of a script via hashing
-hashedFigureFilePath :: PythonScript -> FilePath
-hashedFigureFilePath = (flip addExtension ".png") . show . hash
-
--- | Datatype containing all parameters required
--- to run pandoc-pyplot
-data FigureSpec = FigureSpec
-    { path        :: FilePath        -- ^ Fully-rendered save path
-    , caption     :: String          -- ^ Figure caption.
-    , script      :: PythonScript    -- ^ Source code for the figure.
-    , dpi         :: Int             -- ^ Dots-per-inch of figure
-    , blockAttrs  :: Attr            -- ^ Attributes not related to @pandoc-pyplot@ will be propagated.
-    }
 
 -- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
 directoryKey, captionKey, dpiKey, includePathKey :: String
@@ -126,7 +111,7 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
     where
         attrs' = Map.fromList attrs
         filteredAttrs = filter (\(k,_) -> k `notElem` inclusionKeys) attrs
-        dir = Map.findWithDefault "generated" directoryKey attrs' 
+        dir = makeValid $ Map.findWithDefault "generated" directoryKey attrs' 
         includePath = Map.lookup includePathKey attrs'          
 
         figureSpec :: IO FigureSpec
@@ -140,13 +125,42 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
                 dpi' = read $ Map.findWithDefault "80" dpiKey attrs'
                 -- We hash the information pertaining to this figure
                 -- so that the filename encodes change
-                hashVal = abs . hash $ (dpi', caption', fullScript)
-                figPath = makeValid $ dir </> (flip addExtension ".png" $ show $ hashVal)
                 blockAttrs' = ( id', filter (/= "pyplot") cls, filteredAttrs)
             
-            return $ FigureSpec figPath caption' fullScript dpi' blockAttrs'
+            return $ FigureSpec caption' fullScript dir dpi' blockAttrs'
     
 parseFigureSpec _ = return Nothing
+
+-- | Check figure specifications for common mistakes
+validateSpec :: FigureSpec -> Maybe PandocPyplotError
+validateSpec spec 
+    | not (isValid path)             = Just $ InvalidTargetError path
+    | hasBlockingShowCall rendered   = Just $ BlockingCallError
+    | otherwise                      = Nothing
+    where
+        path = figurePath spec
+        rendered = script spec
+
+-- | Run the Python script. In case the file already exists, we can safely assume
+-- there is no need to re-run it.
+runScriptIfNecessary :: FigureSpec -> IO ScriptResult
+runScriptIfNecessary spec = do
+    createDirectoryIfMissing True . takeDirectory $ figurePath spec
+    fileAlreadyExists <- doesFileExist $ figurePath spec
+    if fileAlreadyExists
+        then return ScriptSuccess
+        else do 
+            result <- runTempPythonScript $ addPlotCapture (figurePath spec) (dpi spec) (script spec)
+            case result of
+                ScriptFailure code -> return $ ScriptFailure code
+                ScriptSuccess -> do
+                    -- Save the original script into a separate file
+                    -- so it can be inspected
+                    -- Note : using a .txt file allows to view source directly
+                    --        in the browser, in the case of HTML output
+                    let sourcePath = replaceExtension (figurePath spec) ".txt"
+                    T.writeFile sourcePath $ script spec
+                    return ScriptSuccess
 
 -- | Main routine to include Matplotlib plots.
 -- Code blocks containing the attributes @plot_target@ are considered
@@ -157,49 +171,27 @@ makePlot' :: Block -> IO (Either PandocPyplotError Block)
 makePlot' block = do
     parsed <- parseFigureSpec block
     case parsed of
-        -- Could not parse - leave code block unchanged
         Nothing -> return $ Right block
-        -- Could parse : run the script and capture output
-        Just spec -> do
+        Just spec -> case validateSpec spec of
+            Just err -> return $ Left err
+            Nothing -> do
 
-            let figurePath = path spec
-                rendered = script spec
-
-            if | not (isValid figurePath)         -> return $ Left $ InvalidTargetError figurePath
-               | hasBlockingShowCall rendered     -> return $ Left $ BlockingCallError
-               | otherwise -> do
-
-                -- Create the necessary directories
-                createDirectoryIfMissing True . takeDirectory $ figurePath
-
-                -- Running the script
-                -- If the file already exists, we can be confident that we don't need to
-                -- rerun the script, since the filenames are hashes of the script content
-                fileAlreadyExists <- doesFileExist $ hashedFigureFilePath $ script spec              
-                result <- if fileAlreadyExists
-                            then return ScriptSuccess
-                            else runTempPythonScript $ addPlotCapture (path spec) (dpi spec) rendered
-
+                result <- runScriptIfNecessary spec
                 case result of
                     ScriptFailure code -> return $ Left $ ScriptError code
                     ScriptSuccess -> do
-                        -- Save the original script into a separate file
-                        -- so it can be inspected
-                        -- Note : using a .txt file allows to view source directly
-                        --        in the browser, in the case of HTML output
-                        let sourcePath = replaceExtension figurePath ".txt"
-                            hiresPath  = toHiresPath figurePath
-                        T.writeFile sourcePath rendered
 
                         -- Propagate attributes that are not related to pandoc-pyplot
                         let relevantAttrs = blockAttrs spec
+                            sourcePath = replaceExtension (figurePath spec) ".txt"
+                            hiresPath  = toHiresPath (figurePath spec)
                             srcTarget = Link nullAttr [Str "Source code"] (sourcePath, "")
                             hiresTarget = Link nullAttr [Str "High-resolution"] (hiresPath, "")
                             caption'   = [Str $ caption spec, Space, Str "(", srcTarget, Str ", ", hiresTarget, Str ")"]
                             -- To render images as figures with captions, the target title
                             -- must be "fig:"
                             -- Janky? yes
-                            image     = Image relevantAttrs caption' (figurePath, "fig:")
+                            image     = Image relevantAttrs caption' (figurePath spec, "fig:")
 
                         return $ Right $ Para $ [image]
 
