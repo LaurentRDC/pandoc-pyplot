@@ -181,13 +181,12 @@ makePlot' block = do
                     ScriptFailure code -> return $ Left $ ScriptError code
                     ScriptSuccess -> do
 
-                        -- Propagate attributes that are not related to pandoc-pyplot
                         let relevantAttrs = blockAttrs spec
-                            sourcePath = replaceExtension (figurePath spec) ".txt"
-                            hiresPath  = toHiresPath (figurePath spec)
-                            srcTarget = Link nullAttr [Str "Source code"] (sourcePath, "")
-                            hiresTarget = Link nullAttr [Str "High-resolution"] (hiresPath, "")
-                            caption'   = [Str $ caption spec, Space, Str "(", srcTarget, Str ", ", hiresTarget, Str ")"]
+                            sourcePath    = replaceExtension (figurePath spec) ".txt"
+                            hiresPath     = toHiresPath (figurePath spec)
+                            srcTarget     = Link nullAttr [Str "Source code"] (sourcePath, "")
+                            hiresTarget   = Link nullAttr [Str "high res."] (hiresPath, "")
+                            caption'      = [Str $ caption spec, Space, Str "(", srcTarget, Str ",", Space, hiresTarget, Str ")"]
                             -- To render images as figures with captions, the target title
                             -- must be "fig:"
                             -- Janky? yes
