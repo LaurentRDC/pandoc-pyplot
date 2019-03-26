@@ -36,6 +36,7 @@ library
         , containers
         , directory
         , filepath
+        , hashable > 1 && < 2
         , pandoc-types >1.12 && <2
         , temporary
         , text

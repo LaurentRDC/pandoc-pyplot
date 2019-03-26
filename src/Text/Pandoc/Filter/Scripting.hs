@@ -21,6 +21,8 @@ module Text.Pandoc.Filter.Scripting (
     , ScriptResult(..)
 ) where
 
+import           Data.Hashable        (hash)
+
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
@@ -47,14 +49,14 @@ toHiresPath = flip replaceExtension ".hires.png"
 runTempPythonScript :: PythonScript    -- ^ Content of the script
                     -> IO ScriptResult -- ^ Result with exit code.
 runTempPythonScript script = do
-            -- Write script to temporary directory
-            scriptPath <- (</> "pandoc-pyplot.py") <$> getCanonicalTemporaryDirectory
-            T.writeFile scriptPath script
-            -- Execute script
-            ec <- runProcess $ shell $ "python " <> (show scriptPath)
-            case ec of
-                ExitSuccess      -> return ScriptSuccess
-                ExitFailure code -> return $ ScriptFailure code
+    -- Write script to temporary directory
+    scriptPath <- (</> "pandoc-pyplot.py") <$> getCanonicalTemporaryDirectory
+    T.writeFile scriptPath script
+    -- Execute script
+    ec <- runProcess $ shell $ "python " <> (show scriptPath)
+    case ec of
+        ExitSuccess      -> return ScriptSuccess
+        ExitFailure code -> return $ ScriptFailure code
 
 -- | Modify a Python plotting script to save the figure to a filename.
 -- An additional file (with extension PNG) will also be captured.
