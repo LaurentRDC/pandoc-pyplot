@@ -21,8 +21,6 @@ module Text.Pandoc.Filter.Scripting (
     , ScriptResult(..)
 ) where
 
-import           Data.Hashable        (hash)
-
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T

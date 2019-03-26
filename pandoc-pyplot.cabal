@@ -26,6 +26,7 @@ library
     exposed-modules:
         Text.Pandoc.Filter.Pyplot
         Text.Pandoc.Filter.Scripting
+        Text.Pandoc.Filter.Figure
     other-modules:
         Paths_pandoc_pyplot
     hs-source-dirs:
