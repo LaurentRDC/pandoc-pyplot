@@ -61,17 +61,7 @@ assertFileExists filepath = do
     where
         msg = mconcat ["File ", filepath, " does not exist."]
 
--- | Assert that a directory is not empty
-assertDirectoryNotEmpty :: HasCallStack 
-                        => FilePath
-                        -> Assertion
-assertDirectoryNotEmpty filepath = do
-    filesInDir <- (not . null) <$> listDirectory filepath 
-    unless filesInDir (assertFailure msg)
-    where
-        msg = mconcat ["Directory ", filepath, " is empty."]
-
--- | Assert that a list first list is contained, 
+-- | Assert that the first list is contained, 
 -- wholly and intact, anywhere within the second.
 assertIsInfix :: (Eq a, Show a, HasCallStack)
               => [a]
