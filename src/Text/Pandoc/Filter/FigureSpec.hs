@@ -11,7 +11,7 @@ This module defines types and functions that help
 with running Python scripts.
 -}
 
-module Text.Pandoc.Filter.Figure (
+module Text.Pandoc.Filter.FigureSpec (
         FigureSpec (..)
       , figurePath
 ) where
