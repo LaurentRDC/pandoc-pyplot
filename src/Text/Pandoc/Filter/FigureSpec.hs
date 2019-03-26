@@ -8,7 +8,7 @@ Stability   : internal
 Portability : portable
 
 This module defines types and functions that help
-with running Python scripts.
+with keeping track of figure specifications
 -}
 
 module Text.Pandoc.Filter.FigureSpec (
@@ -20,7 +20,7 @@ import           Data.Hashable                (Hashable, hashWithSalt, hash)
 
 import           System.FilePath              (FilePath, addExtension, (</>))
 
-import           Text.Pandoc.Filter.Scripting
+import           Text.Pandoc.Filter.Scripting (PythonScript)
 import           Text.Pandoc.Definition       (Attr)
 
 -- | Datatype containing all parameters required
