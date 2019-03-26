@@ -13,25 +13,27 @@ import qualified Text.Pandoc.Filter.Pyplot as Filter
 import qualified Text.Pandoc.Filter.Scripting as Filter
 import Text.Pandoc.JSON
 
-import System.Directory (doesFileExist, listDirectory, createDirectoryIfMissing, removeDirectoryRecursive)
-import System.FilePath  ((</>))
+import System.Directory ( doesFileExist
+                        , doesDirectoryExist
+                        , listDirectory
+                        , createDirectoryIfMissing
+                        , createDirectory
+                        , removeDirectoryRecursive
+                        , removePathForcibly 
+                        )
+import System.FilePath  ((</>), isExtensionOf)
 import System.IO.Temp   (getCanonicalTemporaryDirectory)
 
 main :: IO ()
 main = defaultMain $ 
     testGroup "Text.Pandoc.Filter.Pyplot" 
-        [ testFileCreationExplicitTarget
-        , testFileCreationNoExplicitTarget
+        [ testFileCreation
         , testFileInclusion
         , testBlockingCallError
         ]
 
 plotCodeBlock :: Filter.PythonScript -> Block
 plotCodeBlock script = CodeBlock (mempty, ["pyplot"], mempty) (unpack script)
-
-addTarget :: FilePath -> Block -> Block
-addTarget target (CodeBlock (id', cls, attrs) script) = 
-    CodeBlock (id', cls, attrs ++ [(Filter.targetKey, target)]) script
 
 addCaption :: String -> Block -> Block
 addCaption caption (CodeBlock (id', cls, attrs) script) = 
@@ -82,44 +84,46 @@ assertIsInfix xs ys =
 
 -------------------------------------------------------------------------------
 -- Test that plot files and source files are created when the filter is run
-testFileCreationExplicitTarget :: TestTree
-testFileCreationExplicitTarget = testCase "writes output and source files" $ do
-    tempDir <- getCanonicalTemporaryDirectory
-    let codeBlock = ( addTarget (tempDir </> "test.png")  
-                    $ plotCodeBlock "import matplotlib.pyplot as plt\n"
-                    ) 
-    _ <- Filter.makePlot' codeBlock
-    assertFileExists (tempDir </> "test.png")
-    assertFileExists (tempDir </> "test.hires.png")
-    assertFileExists (tempDir </> "test.txt")
+testFileCreation :: TestTree
+testFileCreation = testCase "writes output files in appropriate directory" $ do
+    tempDir <- (</> "test-file-creation") <$> getCanonicalTemporaryDirectory
+    exists <- doesDirectoryExist tempDir
 
--------------------------------------------------------------------------------
--- Test that plot files and source files are created when the filter is run
-testFileCreationNoExplicitTarget :: TestTree
-testFileCreationNoExplicitTarget = testCase "writes output files in appropriate directory" $ do
-    tempDir <- (</> "test-dir") <$> getCanonicalTemporaryDirectory
-    createDirectoryIfMissing True tempDir
+    if exists 
+        then removePathForcibly tempDir
+        else return ()
+
+    createDirectory tempDir
+
     let codeBlock = ( addDirectory tempDir  
                     $ plotCodeBlock "import matplotlib.pyplot as plt\n"
                     )    
     _ <- Filter.makePlot' codeBlock
-    assertDirectoryNotEmpty tempDir
-    removeDirectoryRecursive tempDir
+    filesCreated <- length <$> listDirectory tempDir
+    assertEqual "" filesCreated 3
 
 -------------------------------------------------------------------------------
 -- Test that included files are found within the source
 testFileInclusion :: TestTree
 testFileInclusion = testCase "includes plot inclusions" $ do
-    tempDir <- getCanonicalTemporaryDirectory
-    
-    let codeBlock = ( addTarget (tempDir </> "test.png")
-                    $ addInclusion "test/fixtures/include.py"
+    tempDir <- (</> "test-file-inclusion") <$> getCanonicalTemporaryDirectory
+    exists <- doesDirectoryExist tempDir
+
+    if exists 
+        then removePathForcibly tempDir
+        else return ()
+
+    createDirectory tempDir
+
+    let codeBlock = ( addInclusion "test/fixtures/include.py"
+                    $ addDirectory tempDir
                     $ plotCodeBlock "import matplotlib.pyplot as plt\n"
                     )
     _ <- Filter.makePlot' codeBlock
 
     inclusion <- readFile "test/fixtures/include.py"
-    src <- readFile (tempDir </> "test.txt")
+    sourcePath <- head . filter (isExtensionOf "txt") <$> listDirectory tempDir
+    src <- readFile (tempDir </> sourcePath)
     assertIsInfix inclusion src
 
 -------------------------------------------------------------------------------
@@ -129,9 +133,8 @@ testBlockingCallError :: TestTree
 testBlockingCallError = testCase "raises an exception for blocking calls" $ do
     tempDir <- getCanonicalTemporaryDirectory
 
-    let codeBlock = ( addTarget (tempDir </> "test.png")
-                    $ plotCodeBlock "import matplotlib.pyplot as plt\nplt.show()"
-                    )    
+    let codeBlock = plotCodeBlock "import matplotlib.pyplot as plt\nplt.show()"
+
     result <- Filter.makePlot' codeBlock
     case result of
         Right block -> assertFailure "did not catch the expected blocking call"
