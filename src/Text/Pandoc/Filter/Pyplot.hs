@@ -77,7 +77,7 @@ import           Text.Pandoc.Definition
 import           Text.Pandoc.Walk             (walkM)
 
 import           Text.Pandoc.Filter.Scripting
-import           Text.Pandoc.Filter.Figure   (FigureSpec(..), figurePath)
+import           Text.Pandoc.Filter.FigureSpec    (FigureSpec(..), figurePath)
 
 -- | Possible errors returned by the filter
 data PandocPyplotError = ScriptError Int                -- ^ Running Python script has yielded an error
