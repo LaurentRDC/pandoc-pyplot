@@ -24,20 +24,6 @@ Here is a basic example using the scripting `matplotlib.pyplot` API:
     ```
 ```
 
-By default, this figure will be given a random name and saved as a PNG file. We can control the format of the output file by changing the `target` file extension:
-
-```markdown
-    ```{.pyplot target=myfigure.jpg}
-    import matplotlib.pyplot as plt
-
-    plt.figure()
-    plt.plot([0,1,2,3,4], [1,2,3,4,5])
-    plt.title('This is an example figure')
-    ```
-```
-
-All formats supported by Matplotlib on your machine are available.
-
 Putting the above in `input.md`, we can then generate the plot and embed it:
 
 ```bash
@@ -50,7 +36,9 @@ or
 pandoc --filter pandoc-pyplot input.md --output output.pdf
 ```
 
-or any other output format you want. There are more examples in the source repository, in the `\examples` directory.
+or any other output format you want. `pandoc-pyplot` is efficient, too: it will detect which figures should be re-generated, and skip the others.
+
+There are more examples in the [source repository](https://github.com/LaurentRDC/pandoc-pyplot), in the `\examples` directory.
 
 ### Link to source code
 
@@ -135,7 +123,7 @@ stack install pandoc-pyplot
 Building from source can be done using [`stack`](https://docs.haskellstack.org/en/stable/README/) or [`cabal`](https://www.haskell.org/cabal/):
 
 ```bash
-git clone github.com/LaurentRDC/pandoc-pyplot.git
+git clone https://github.com/LaurentRDC/pandoc-pyplot
 cd pandoc-pylot
 stack install # Alternatively, `cabal install`
 ```
@@ -144,9 +132,9 @@ stack install # Alternatively, `cabal install`
 
 ### Requirements
 
-This filter only works with the Matplotlib plotting library. Therefore, you a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The python interpreter is expected to be discoverable using the name `"python"` (as opposed to `"python3"`, for example)
+This filter only works with the Matplotlib plotting library. Therefore, you a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The Python interpreter is expected to be discoverable using the name `"python"` (as opposed to `"python3"`, for example)
 
-The filter program must be in your `PATH`. In case it is, you can use the filter with Pandoc as follows:
+You can use the filter with Pandoc as follows:
 
 ```bash
 pandoc --filter pandoc-pyplot input.md --output output.html
@@ -191,4 +179,4 @@ makePlotPandocCompiler =
 
 ## Warning
 
-Do not run this filter on unknown documents. There is nothing in `pandoc-pyplot` that can stop a Python script from performing evil actions. This is the reason this package is deemed __unsafe__ in the parlance of [Safe Haskell](https://ghc.haskell.org/trac/ghc/wiki/SafeHaskell).
+Do not run this filter on unknown documents. There is nothing in `pandoc-pyplot` that can stop a Python script from performing **evil actions**. This is the reason this package is deemed __unsafe__ in the parlance of [Safe Haskell](https://ghc.haskell.org/trac/ghc/wiki/SafeHaskell).
