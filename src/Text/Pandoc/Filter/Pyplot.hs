@@ -15,9 +15,10 @@ This module defines a Pandoc filter @makePlot@ that can be
 used to walk over a Pandoc document and generate figures from
 Python code blocks.
 
-The syntax for code blocks is simple, Code blocks with the @plot_target=...@
+The syntax for code blocks is simple, Code blocks with the @.pyplot@
 attribute will trigger the filter. The code block will be reworked into a Python
-script and the output figure will be captured.
+script and the output figure will be captured, along with a high-resolution version
+of the figure and the source code used to generate the figure.
 
 To trigger pandoc-pyplot, the following is __required__:
 
@@ -36,7 +37,7 @@ Here are some example blocks in Markdown:
 @
 This is a paragraph
 
-```{.pyplot target=my_figure.jpg caption="This is a caption."}
+```{.pyplot caption="This is a caption."}
 import matplotlib.pyplot as plt
 
 plt.figure()
@@ -44,6 +45,26 @@ plt.plot([0,1,2,3,4], [1,2,3,4,5])
 plt.title('This is an example figure')
 ```
 @
+
+This filter was originally designed to be used with [Hakyll](https://jaspervdj.be/hakyll/). 
+In case you want to use the filter with your own Hakyll setup, you can use a transform 
+function that works on entire documents:
+
+@
+import Text.Pandoc.Filter.Pyplot (plotTransform)
+
+import Hakyll
+
+-- Unsafe compiler is required because of the interaction
+-- in IO (i.e. running an external Python script).
+makePlotPandocCompiler :: Compiler (Item String)
+makePlotPandocCompiler =
+  pandocCompilerWithTransformM
+    defaultHakyllReaderOptions
+    defaultHakyllWriterOptions
+    (unsafeCompiler . plotTransform)
+@
+
 -}
 module Text.Pandoc.Filter.Pyplot
     ( makePlot
@@ -171,10 +192,8 @@ runScriptIfNecessary spec = do
                     return ScriptSuccess
 
 -- | Main routine to include Matplotlib plots.
--- Code blocks containing the attributes @plot_target@ are considered
+-- Code blocks containing the attributes @.pyplot@ are considered
 -- Python plotting scripts. All other possible blocks are ignored.
--- The source code is also saved in another file, which can be access by
--- clicking the image
 makePlot' :: Block -> IO (Either PandocPyplotError Block)
 makePlot' block = do
     parsed <- parseFigureSpec block
@@ -211,7 +230,7 @@ makePlot' block = do
                             return $ Right $ Para $ [image]
 
 -- | Highest-level function that can be walked over a Pandoc tree.
--- All code blocks that have the 'plot_target' parameter will be considered
+-- All code blocks that have the '.pyplot' parameter will be considered
 -- figures.
 makePlot :: Block -> IO Block
 makePlot = makePlot' >=> either (fail . show) return
