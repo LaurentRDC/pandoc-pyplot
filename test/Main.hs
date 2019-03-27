@@ -11,9 +11,9 @@ import           Data.Text                     (unpack)
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-import qualified Text.Pandoc.Filter.FigureSpec as Filter
-import qualified Text.Pandoc.Filter.Pyplot     as Filter
-import qualified Text.Pandoc.Filter.Scripting  as Filter
+import qualified Text.Pandoc.Filter.FigureSpec as P
+import qualified Text.Pandoc.Filter.Pyplot     as P
+import qualified Text.Pandoc.Filter.Scripting  as P
 import           Text.Pandoc.JSON
 
 import           System.Directory              (createDirectory,
@@ -32,28 +32,28 @@ main =
         "Text.Pandoc.Filter.Pyplot"
         [testFileCreation, testFileInclusion, testSaveFormat, testBlockingCallError]
 
-plotCodeBlock :: Filter.PythonScript -> Block
+plotCodeBlock :: P.PythonScript -> Block
 plotCodeBlock script = CodeBlock (mempty, ["pyplot"], mempty) (unpack script)
 
 addCaption :: String -> Block -> Block
 addCaption caption (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(Filter.captionKey, caption)]) script
+    CodeBlock (id', cls, attrs ++ [(P.captionKey, caption)]) script
 
 addDirectory :: FilePath -> Block -> Block
 addDirectory dir (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(Filter.directoryKey, dir)]) script
+    CodeBlock (id', cls, attrs ++ [(P.directoryKey, dir)]) script
 
 addInclusion :: FilePath -> Block -> Block
 addInclusion inclusionPath (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(Filter.includePathKey, inclusionPath)]) script
+    CodeBlock (id', cls, attrs ++ [(P.includePathKey, inclusionPath)]) script
 
-addSaveFormat :: Filter.SaveFormat -> Block -> Block
+addSaveFormat :: P.SaveFormat -> Block -> Block
 addSaveFormat saveFormat (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(Filter.saveFormatKey, Filter.extension saveFormat)]) script
+    CodeBlock (id', cls, attrs ++ [(P.saveFormatKey, P.extension saveFormat)]) script
 
 addDPI :: Int -> Block -> Block
 addDPI dpi (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(Filter.dpiKey, show dpi)]) script
+    CodeBlock (id', cls, attrs ++ [(P.dpiKey, show dpi)]) script
 
 -- | Assert that a file exists
 assertFileExists :: HasCallStack => FilePath -> Assertion
@@ -87,7 +87,7 @@ testFileCreation =
         tempDir <- (</> "test-file-creation") <$> getCanonicalTemporaryDirectory
         ensureDirectoryExistsAndEmpty tempDir
         let codeBlock = (addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
-        _ <- Filter.makePlot' codeBlock
+        _ <- P.makePlot' codeBlock
         filesCreated <- length <$> listDirectory tempDir
         assertEqual "" filesCreated 3
 
@@ -101,7 +101,7 @@ testFileInclusion =
         let codeBlock =
                 (addInclusion "test/fixtures/include.py" $
                  addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
-        _ <- Filter.makePlot' codeBlock
+        _ <- P.makePlot' codeBlock
         inclusion <- readFile "test/fixtures/include.py"
         sourcePath <- head . filter (isExtensionOf "txt") <$> listDirectory tempDir
         src <- readFile (tempDir </> sourcePath)
@@ -115,13 +115,13 @@ testSaveFormat =
         tempDir <- (</> "test-safe-format") <$> getCanonicalTemporaryDirectory
         ensureDirectoryExistsAndEmpty tempDir
         let codeBlock =
-                (addSaveFormat Filter.JPG $
+                (addSaveFormat P.JPG $
                  addDirectory tempDir $
                  plotCodeBlock
                      "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])")
-        _ <- Filter.makePlot' codeBlock
+        _ <- P.makePlot' codeBlock
         numberjpgFiles <-
-            length <$> filter (isExtensionOf (Filter.extension Filter.JPG)) <$>
+            length <$> filter (isExtensionOf (P.extension P.JPG)) <$>
             listDirectory tempDir
         assertEqual "" numberjpgFiles 2
 
@@ -133,11 +133,11 @@ testBlockingCallError =
     testCase "raises an exception for blocking calls" $ do
         tempDir <- getCanonicalTemporaryDirectory
         let codeBlock = plotCodeBlock "import matplotlib.pyplot as plt\nplt.show()"
-        result <- Filter.makePlot' codeBlock
+        result <- P.makePlot' codeBlock
         case result of
             Right block -> assertFailure "did not catch the expected blocking call"
             Left error ->
-                if error == Filter.BlockingCallError
+                if error == P.BlockingCallError
                     then pure ()
                     else assertFailure "did not catch the expected blocking call"
 -------------------------------------------------------------------------------
