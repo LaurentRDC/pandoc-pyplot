@@ -2,6 +2,19 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+Release 2.0.0.0
+---------------
+
+Many **breaking changes** in this release:
+
+* `pandoc-pyplot` will now determine the filename based on hashing the figure content. Therefore, figures will only be re-generated if necessary.
+* Removed the ability to control the filename and format directly using the `plot_target=...` attribute.
+* Added the ability to control the directory in which figures will be saved using the `directory=...` attribute.
+* Added the possibility to control the figures dots-per-inch (i.e. pixel density) with the `dpi=...` attribute.
+* The confusing `plot_alt=...` attribute has been renamed to `caption=...` for obvious reasons.
+* The `plot_include=...` attribute has been renamed to `include=...`.
+* Added the generation of a higher resolution figure for every figure `pandoc-pyplot` understands.
+
 Release 1.1.0.0
 ---------------
 
