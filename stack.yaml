@@ -37,7 +37,8 @@ packages:
 # Dependency packages to be pulled from upstream that are not in the resolver
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)
-# extra-deps: []
+extra-deps:
+- hindent-5.2.7@sha256:a0a90f7cc160eeba3816e53f310e16942e68d9a09fe092d9835ea6bbbcd2cd91
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

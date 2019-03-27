@@ -69,15 +69,23 @@ import           Data.Version                 (showVersion)
 
 import           Paths_pandoc_pyplot          (version)
 
-import           System.Directory             (createDirectoryIfMissing, doesFileExist)
-import           System.FilePath              (isValid, replaceExtension
-                                              ,takeDirectory, makeValid)
+import           System.Directory             ( createDirectoryIfMissing
+                                              , doesFileExist)
+import           System.FilePath              ( isValid
+                                              , replaceExtension
+                                              , takeDirectory
+                                              , makeValid
+                                              )
 
 import           Text.Pandoc.Definition
 import           Text.Pandoc.Walk             (walkM)
 
 import           Text.Pandoc.Filter.Scripting
-import           Text.Pandoc.Filter.FigureSpec    (FigureSpec(..), figurePath)
+import           Text.Pandoc.Filter.FigureSpec    ( FigureSpec(..)
+                                                  , figurePath
+                                                  , hiresFigurePath
+                                                  , addPlotCapture
+                                                  )
 
 -- | Possible errors returned by the filter
 data PandocPyplotError = ScriptError Int                -- ^ Running Python script has yielded an error
@@ -150,7 +158,7 @@ runScriptIfNecessary spec = do
     if fileAlreadyExists
         then return ScriptSuccess
         else do 
-            result <- runTempPythonScript $ addPlotCapture (figurePath spec) (dpi spec) (script spec)
+            result <- runTempPythonScript $ addPlotCapture spec
             case result of
                 ScriptFailure code -> return $ ScriptFailure code
                 ScriptSuccess -> do
@@ -183,7 +191,7 @@ makePlot' block = do
 
                         let relevantAttrs = blockAttrs spec
                             sourcePath    = replaceExtension (figurePath spec) ".txt"
-                            hiresPath     = toHiresPath (figurePath spec)
+                            hiresPath     = hiresFigurePath spec
                             srcTarget     = Link nullAttr [Str "Source code"] (sourcePath, "")
                             hiresTarget   = Link nullAttr [Str "high res."] (hiresPath, "")
                             caption'      = [Str $ caption spec, Space, Str "(", srcTarget, Str ",", Space, hiresTarget, Str ")"]
