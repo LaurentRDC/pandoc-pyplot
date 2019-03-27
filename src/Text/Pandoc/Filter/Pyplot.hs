@@ -193,6 +193,7 @@ makePlot' block = do
                                 hiresPath = hiresFigurePath spec
                                 srcTarget = Link nullAttr [Str "Source code"] (sourcePath, "")
                                 hiresTarget = Link nullAttr [Str "high res."] (hiresPath, "")
+                                -- TODO: use pandoc-types Builder module
                                 caption' =
                                     [ Str $ caption spec
                                     , Space
