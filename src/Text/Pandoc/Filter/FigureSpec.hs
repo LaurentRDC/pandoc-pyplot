@@ -13,7 +13,7 @@ with keeping track of figure specifications
 -}
 module Text.Pandoc.Filter.FigureSpec
     ( FigureSpec(..)
-    , SaveFormat (..)
+    , SaveFormat(..)
     , saveFormatFromString
     , figurePath
     , hiresFigurePath
@@ -39,7 +39,7 @@ data SaveFormat
 
 -- | Parse an image save format string
 saveFormatFromString :: String -> Maybe SaveFormat
-saveFormatFromString s 
+saveFormatFromString s
     | s `elem` ["png", "PNG", ".png"] = Just PNG
     | s `elem` ["pdf", "PDF", ".pdf"] = Just PDF
     | s `elem` ["svg", "SVG", ".svg"] = Just SVG
@@ -78,9 +78,8 @@ figurePath spec = (directory spec </> stem spec)
 -- | The path to the high-resolution figure.
 hiresFigurePath :: FigureSpec -> FilePath
 hiresFigurePath spec = flip replaceExtension (".hires" <> ext) . figurePath $ spec
-    where
-        ext = extension . saveFormat $ spec
-    
+  where
+    ext = extension . saveFormat $ spec
 
 -- | Modify a Python plotting script to save the figure to a filename.
 -- An additional file (with extension PNG) will also be captured.
