@@ -36,6 +36,7 @@ data SaveFormat
     | PDF
     | SVG
     | JPG
+    | EPS
 
 -- | Parse an image save format string
 saveFormatFromString :: String -> Maybe SaveFormat
@@ -44,6 +45,7 @@ saveFormatFromString s
     | s `elem` ["pdf", "PDF", ".pdf"] = Just PDF
     | s `elem` ["svg", "SVG", ".svg"] = Just SVG
     | s `elem` ["jpg", "jpeg", "JPG", "JPEG", ".jpg", ".jpeg"] = Just JPG
+    | s `elem` ["eps", "EPS", ".eps"] = Just EPS
     | otherwise = Nothing
 
 -- | Save format file extension
@@ -52,6 +54,7 @@ extension PNG = ".png"
 extension PDF = ".pdf"
 extension SVG = ".svg"
 extension JPG = ".jpg"
+extension EPS = ".eps"
 
 -- | Datatype containing all parameters required
 -- to run pandoc-pyplot
