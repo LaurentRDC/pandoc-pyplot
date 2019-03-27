@@ -3,27 +3,27 @@
 
 module Main where
 
-import           Control.Monad                (unless)
+import           Control.Monad                 (unless)
 
-import           Data.List                    (isInfixOf)
-import           Data.Text                    (unpack)
+import           Data.List                     (isInfixOf)
+import           Data.Text                     (unpack)
 
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-import qualified Text.Pandoc.Filter.Pyplot    as Filter
-import qualified Text.Pandoc.Filter.Scripting as Filter
 import qualified Text.Pandoc.Filter.FigureSpec as Filter
+import qualified Text.Pandoc.Filter.Pyplot     as Filter
+import qualified Text.Pandoc.Filter.Scripting  as Filter
 import           Text.Pandoc.JSON
 
-import           System.Directory             (createDirectory,
-                                               createDirectoryIfMissing,
-                                               doesDirectoryExist,
-                                               doesFileExist, listDirectory,
-                                               removeDirectoryRecursive,
-                                               removePathForcibly)
-import           System.FilePath              (isExtensionOf, (</>))
-import           System.IO.Temp               (getCanonicalTemporaryDirectory)
+import           System.Directory              (createDirectory,
+                                                createDirectoryIfMissing,
+                                                doesDirectoryExist,
+                                                doesFileExist, listDirectory,
+                                                removeDirectoryRecursive,
+                                                removePathForcibly)
+import           System.FilePath               (isExtensionOf, (</>))
+import           System.IO.Temp                (getCanonicalTemporaryDirectory)
 
 main :: IO ()
 main =
@@ -116,11 +116,15 @@ testSaveFormat =
         ensureDirectoryExistsAndEmpty tempDir
         let codeBlock =
                 (addSaveFormat Filter.JPG $
-                 addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])")
+                 addDirectory tempDir $
+                 plotCodeBlock
+                     "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])")
         _ <- Filter.makePlot' codeBlock
-        numberjpgFiles <- length <$> filter (isExtensionOf (Filter.extension Filter.JPG)) <$> listDirectory tempDir
-        
+        numberjpgFiles <-
+            length <$> filter (isExtensionOf (Filter.extension Filter.JPG)) <$>
+            listDirectory tempDir
         assertEqual "" numberjpgFiles 2
+
 -------------------------------------------------------------------------------
 -- Test that a script containing a blockign call to matplotlib.pyplot.show
 -- returns the appropriate error
