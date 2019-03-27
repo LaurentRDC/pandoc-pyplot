@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Text.Pandoc.Filter.Figure
+Module      : Text.Pandoc.Filter.FigureSpec
 Copyright   : (c) Laurent P René de Cotret, 2019
 License     : MIT
 Maintainer  : laurent.decotret@outlook.com
