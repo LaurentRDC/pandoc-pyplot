@@ -1,5 +1,6 @@
-{-# LANGUAGE Unsafe            #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE Unsafe            #-}
+
 {-|
 Module      : Text.Pandoc.Filter.Scripting
 Copyright   : (c) Laurent P René de Cotret, 2019
@@ -11,13 +12,12 @@ Portability : portable
 This module defines types and functions that help
 with running Python scripts.
 -}
-
-module Text.Pandoc.Filter.Scripting (
-      runTempPythonScript
+module Text.Pandoc.Filter.Scripting
+    ( runTempPythonScript
     , hasBlockingShowCall
     , PythonScript
     , ScriptResult(..)
-) where
+    ) where
 
 import           Data.Text            (Text)
 import qualified Data.Text            as T
@@ -34,15 +34,18 @@ import           Data.Monoid          (Any (..), (<>))
 type PythonScript = Text
 
 -- | Possible result of running a Python script
-data ScriptResult = ScriptSuccess
-                  | ScriptFailure Int
+data ScriptResult
+    = ScriptSuccess
+    | ScriptFailure Int
 
 -- | Take a python script in string form, write it in a temporary directory,
 -- then execute it.
-runTempPythonScript :: PythonScript    -- ^ Content of the script
-                    -> IO ScriptResult -- ^ Result with exit code.
-runTempPythonScript script = do
+runTempPythonScript ::
+       PythonScript -- ^ Content of the script
+    -> IO ScriptResult -- ^ Result with exit code.
+runTempPythonScript script
     -- Write script to temporary directory
+ = do
     scriptPath <- (</> "pandoc-pyplot.py") <$> getCanonicalTemporaryDirectory
     T.writeFile scriptPath script
     -- Execute script
@@ -53,11 +56,12 @@ runTempPythonScript script = do
 
 -- | Detect the presence of a blocking show call, for example "plt.show()"
 hasBlockingShowCall :: PythonScript -> Bool
-hasBlockingShowCall script = anyOf
+hasBlockingShowCall script =
+    anyOf
         [ "plt.show()" `elem` scriptLines
         , "pyplot.show()" `elem` scriptLines
         , "matplotlib.pyplot.show()" `elem` scriptLines
         ]
-    where
-        scriptLines = T.lines script
-        anyOf xs = getAny $ mconcat $ Any <$> xs
+  where
+    scriptLines = T.lines script
+    anyOf xs = getAny $ mconcat $ Any <$> xs

@@ -1,17 +1,19 @@
 {-# LANGUAGE LambdaCase #-}
+
 module Main where
 
-import System.Environment        (getArgs)
+import           System.Environment        (getArgs)
 
-import Text.Pandoc.JSON          (toJSONFilter)
-import Text.Pandoc.Filter.Pyplot (makePlot)
+import           Text.Pandoc.Filter.Pyplot (makePlot)
+import           Text.Pandoc.JSON          (toJSONFilter)
 
-import qualified Data.Version as V
-import Paths_pandoc_pyplot       (version)
+import qualified Data.Version              as V
+import           Paths_pandoc_pyplot       (version)
 
 -- The formatting is borrowed from Python's argparse library
 help :: String
-help = "\n\
+help =
+    "\n\
     \\n\
     \   usage: pandoc-pyplot [-h, --help] [-v, --version] \n\
     \\n\
@@ -30,12 +32,11 @@ help = "\n\
 
 main :: IO ()
 main = do
-    getArgs >>=
-        \case
-            (arg:_) 
-                | arg `elem` ["-h", "--help"]    -> showHelp
-                | arg `elem` ["-v", "--version"] -> showVersion
-            _ -> toJSONFilter makePlot 
-    where
-        showHelp    = putStrLn help
-        showVersion = putStrLn (V.showVersion version)
+    getArgs >>= \case
+        (arg:_)
+            | arg `elem` ["-h", "--help"] -> showHelp
+            | arg `elem` ["-v", "--version"] -> showVersion
+        _ -> toJSONFilter makePlot
+  where
+    showHelp = putStrLn help
+    showVersion = putStrLn (V.showVersion version)
