@@ -79,8 +79,10 @@ import           System.FilePath               (isValid, makeValid,
 import           Text.Pandoc.Definition
 import           Text.Pandoc.Walk              (walkM)
 
-import           Text.Pandoc.Filter.FigureSpec (FigureSpec (..), SaveFormat(..), saveFormatFromString, 
-                                                addPlotCapture, figurePath, hiresFigurePath)
+import           Text.Pandoc.Filter.FigureSpec (FigureSpec (..),
+                                                SaveFormat (..), addPlotCapture,
+                                                figurePath, hiresFigurePath,
+                                                saveFormatFromString)
 import           Text.Pandoc.Filter.Scripting
 
 -- | Possible errors returned by the filter
@@ -100,9 +102,13 @@ instance Show PandocPyplotError where
 -- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
 directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey :: String
 directoryKey = "directory"
+
 captionKey = "caption"
+
 dpiKey = "dpi"
+
 includePathKey = "include"
+
 saveFormatKey = "format"
 
 -- | list of all keys related to pandoc-pyplot.
@@ -121,7 +127,6 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
     dir = makeValid $ Map.findWithDefault "generated" directoryKey attrs'
     format = fromMaybe (PNG) $ saveFormatFromString $ Map.findWithDefault "png" saveFormatKey attrs'
     includePath = Map.lookup includePathKey attrs'
-
     figureSpec :: IO FigureSpec
     figureSpec = do
         includeScript <- fromMaybe (return "") $ T.readFile <$> includePath
