@@ -23,6 +23,8 @@ import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
 
+import           Data.Hashable        (hash)
+
 import           System.Exit          (ExitCode (..))
 import           System.FilePath      ((</>))
 import           System.IO.Temp       (getCanonicalTemporaryDirectory)
@@ -45,14 +47,18 @@ runTempPythonScript ::
     -> IO ScriptResult -- ^ Result with exit code.
 runTempPythonScript script
     -- Write script to temporary directory
+    -- We involve the script hash as a temporary filename
+    -- so that there is never any collision
  = do
-    scriptPath <- (</> "pandoc-pyplot.py") <$> getCanonicalTemporaryDirectory
+    scriptPath <- (</> hashedPath) <$> getCanonicalTemporaryDirectory
     T.writeFile scriptPath script
     -- Execute script
     ec <- runProcess $ shell $ "python " <> (show scriptPath)
     case ec of
         ExitSuccess      -> return ScriptSuccess
         ExitFailure code -> return $ ScriptFailure code
+    where
+        hashedPath = show . hash $ script
 
 -- | Detect the presence of a blocking show call, for example "plt.show()"
 hasBlockingShowCall :: PythonScript -> Bool
