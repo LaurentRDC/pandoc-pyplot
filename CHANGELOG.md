@@ -11,7 +11,7 @@ Many **breaking changes** in this release:
 * Removed the ability to control the filename and format directly using the `plot_target=...` attribute.
 * Added the ability to control the directory in which figures will be saved using the `directory=...` attribute.
 * Added the possibility to control the figures dots-per-inch (i.e. pixel density) with the `dpi=...` attribute.
-* Added the ability to control the figure format with the `format=...` attribute. Possible values are currently `"png"`, `"svg"`, `"pdf"`, and `"jpg"`/`"jpeg"`.
+* Added the ability to control the figure format with the `format=...` attribute. Possible values are currently `"png"`, `"svg"`, `"pdf"`, `"jpg"`/`"jpeg"` and `"eps"`.
 * The confusing `plot_alt=...` attribute has been renamed to `caption=...` for obvious reasons.
 * The `plot_include=...` attribute has been renamed to `include=...`.
 * Added the generation of a higher resolution figure for every figure `pandoc-pyplot` understands.
