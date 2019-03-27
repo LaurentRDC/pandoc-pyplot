@@ -13,9 +13,13 @@ with keeping track of figure specifications
 -}
 module Text.Pandoc.Filter.FigureSpec
     ( FigureSpec(..)
+    , SaveFormat (..)
+    , saveFormatFromString
     , figurePath
     , hiresFigurePath
     , addPlotCapture
+    -- for testing purposes
+    , extension
     ) where
 
 import           Data.Hashable                (Hashable, hash, hashWithSalt)
@@ -33,11 +37,28 @@ data SaveFormat
     | SVG
     | JPG
 
+-- | Parse an image save format string
+saveFormatFromString :: String -> Maybe SaveFormat
+saveFormatFromString s 
+    | s `elem` ["png", "PNG", ".png"] = Just PNG
+    | s `elem` ["pdf", "PDF", ".pdf"] = Just PDF
+    | s `elem` ["svg", "SVG", ".svg"] = Just SVG
+    | s `elem` ["jpg", "jpeg", "JPG", "JPEG", ".jpg", ".jpeg"] = Just JPG
+    | otherwise = Nothing
+
+-- | Save format file extension
+extension :: SaveFormat -> String
+extension PNG = ".png"
+extension PDF = ".pdf"
+extension SVG = ".svg"
+extension JPG = ".jpg"
+
 -- | Datatype containing all parameters required
 -- to run pandoc-pyplot
 data FigureSpec = FigureSpec
     { caption    :: String -- ^ Figure caption.
     , script     :: PythonScript -- ^ Source code for the figure.
+    , saveFormat :: SaveFormat -- ^ Save format of the figure
     , directory  :: FilePath -- ^ Directory where to save the file
     , dpi        :: Int -- ^ Dots-per-inch of figure
     , blockAttrs :: Attr -- ^ Attributes not related to @pandoc-pyplot@ will be propagated.
@@ -51,11 +72,15 @@ instance Hashable FigureSpec where
 figurePath :: FigureSpec -> FilePath
 figurePath spec = (directory spec </> stem spec)
   where
-    stem = flip addExtension ".png" . show . hash
+    stem = flip addExtension ext . show . hash
+    ext = extension . saveFormat $ spec
 
 -- | The path to the high-resolution figure.
 hiresFigurePath :: FigureSpec -> FilePath
-hiresFigurePath = flip replaceExtension ".hires.png" . figurePath
+hiresFigurePath spec = flip replaceExtension (".hires" <> ext) . figurePath $ spec
+    where
+        ext = extension . saveFormat $ spec
+    
 
 -- | Modify a Python plotting script to save the figure to a filename.
 -- An additional file (with extension PNG) will also be captured.

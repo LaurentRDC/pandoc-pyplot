@@ -13,6 +13,7 @@ import           Test.Tasty.HUnit
 
 import qualified Text.Pandoc.Filter.Pyplot    as Filter
 import qualified Text.Pandoc.Filter.Scripting as Filter
+import qualified Text.Pandoc.Filter.FigureSpec as Filter
 import           Text.Pandoc.JSON
 
 import           System.Directory             (createDirectory,
@@ -29,7 +30,7 @@ main =
     defaultMain $
     testGroup
         "Text.Pandoc.Filter.Pyplot"
-        [testFileCreation, testFileInclusion, testBlockingCallError]
+        [testFileCreation, testFileInclusion, testSaveFormat, testBlockingCallError]
 
 plotCodeBlock :: Filter.PythonScript -> Block
 plotCodeBlock script = CodeBlock (mempty, ["pyplot"], mempty) (unpack script)
@@ -45,6 +46,10 @@ addDirectory dir (CodeBlock (id', cls, attrs) script) =
 addInclusion :: FilePath -> Block -> Block
 addInclusion inclusionPath (CodeBlock (id', cls, attrs) script) =
     CodeBlock (id', cls, attrs ++ [(Filter.includePathKey, inclusionPath)]) script
+
+addSaveFormat :: Filter.SaveFormat -> Block -> Block
+addSaveFormat saveFormat (CodeBlock (id', cls, attrs) script) =
+    CodeBlock (id', cls, attrs ++ [(Filter.saveFormatKey, Filter.extension saveFormat)]) script
 
 addDPI :: Int -> Block -> Block
 addDPI dpi (CodeBlock (id', cls, attrs) script) =
@@ -65,17 +70,22 @@ assertIsInfix xs ys = unless (xs `isInfixOf` ys) (assertFailure msg)
   where
     msg = mconcat ["Expected ", show xs, " to be an infix of ", show ys]
 
+-- Ensure a directory is empty but exists.
+ensureDirectoryExistsAndEmpty :: FilePath -> IO ()
+ensureDirectoryExistsAndEmpty dir = do
+    exists <- doesDirectoryExist dir
+    if exists
+        then removePathForcibly dir
+        else return ()
+    createDirectory dir
+
 -------------------------------------------------------------------------------
 -- Test that plot files and source files are created when the filter is run
 testFileCreation :: TestTree
 testFileCreation =
     testCase "writes output files in appropriate directory" $ do
         tempDir <- (</> "test-file-creation") <$> getCanonicalTemporaryDirectory
-        exists <- doesDirectoryExist tempDir
-        if exists
-            then removePathForcibly tempDir
-            else return ()
-        createDirectory tempDir
+        ensureDirectoryExistsAndEmpty tempDir
         let codeBlock = (addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
         _ <- Filter.makePlot' codeBlock
         filesCreated <- length <$> listDirectory tempDir
@@ -87,11 +97,7 @@ testFileInclusion :: TestTree
 testFileInclusion =
     testCase "includes plot inclusions" $ do
         tempDir <- (</> "test-file-inclusion") <$> getCanonicalTemporaryDirectory
-        exists <- doesDirectoryExist tempDir
-        if exists
-            then removePathForcibly tempDir
-            else return ()
-        createDirectory tempDir
+        ensureDirectoryExistsAndEmpty tempDir
         let codeBlock =
                 (addInclusion "test/fixtures/include.py" $
                  addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
@@ -101,6 +107,20 @@ testFileInclusion =
         src <- readFile (tempDir </> sourcePath)
         assertIsInfix inclusion src
 
+-------------------------------------------------------------------------------
+-- Test that the files are saved in the appropriate format
+testSaveFormat :: TestTree
+testSaveFormat =
+    testCase "saves in the appropriate format" $ do
+        tempDir <- (</> "test-safe-format") <$> getCanonicalTemporaryDirectory
+        ensureDirectoryExistsAndEmpty tempDir
+        let codeBlock =
+                (addSaveFormat Filter.JPG $
+                 addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])")
+        _ <- Filter.makePlot' codeBlock
+        numberjpgFiles <- length <$> filter (isExtensionOf (Filter.extension Filter.JPG)) <$> listDirectory tempDir
+        
+        assertEqual "" numberjpgFiles 2
 -------------------------------------------------------------------------------
 -- Test that a script containing a blockign call to matplotlib.pyplot.show
 -- returns the appropriate error
