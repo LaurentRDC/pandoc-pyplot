@@ -94,16 +94,15 @@ import           Paths_pandoc_pyplot           (version)
 
 import           System.Directory              (createDirectoryIfMissing,
                                                 doesFileExist)
-import           System.FilePath               (isValid, makeValid,
-                                                replaceExtension, takeDirectory)
+import           System.FilePath               (isValid, makeValid, takeDirectory)
 
 import           Text.Pandoc.Definition
 import           Text.Pandoc.Walk              (walkM)
 
 import           Text.Pandoc.Filter.FigureSpec (FigureSpec (..),
                                                 SaveFormat (..), addPlotCapture,
-                                                figurePath, hiresFigurePath,
-                                                saveFormatFromString)
+                                                figurePath, sourceCodePath, saveFormatFromString, 
+                                                toImage)
 import           Text.Pandoc.Filter.Scripting
 
 -- | Possible errors returned by the filter
@@ -148,6 +147,7 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
     dir = makeValid $ Map.findWithDefault "generated" directoryKey attrs'
     format = fromMaybe (PNG) $ saveFormatFromString $ Map.findWithDefault "png" saveFormatKey attrs'
     includePath = Map.lookup includePathKey attrs'
+
     figureSpec :: IO FigureSpec
     figureSpec = do
         includeScript <- fromMaybe (return "") $ T.readFile <$> includePath
@@ -157,6 +157,7 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
             dpi' = read $ Map.findWithDefault "80" dpiKey attrs'
             blockAttrs' = (id', filter (/= "pyplot") cls, filteredAttrs)
         return $ FigureSpec caption' fullScript format dir dpi' blockAttrs'
+        
 parseFigureSpec _ = return Nothing
 
 -- | Check figure specifications for common mistakes
@@ -186,10 +187,7 @@ runScriptIfNecessary spec = do
                     -- so it can be inspected
                     -- Note : using a .txt file allows to view source directly
                     --        in the browser, in the case of HTML output
-                 -> do
-                    let sourcePath = replaceExtension (figurePath spec) ".txt"
-                    T.writeFile sourcePath $ script spec
-                    return ScriptSuccess
+                 -> T.writeFile (sourceCodePath spec) (script spec) >> return ScriptSuccess
 
 -- | Main routine to include Matplotlib plots.
 -- Code blocks containing the attributes @.pyplot@ are considered
@@ -206,28 +204,7 @@ makePlot' block = do
                     result <- runScriptIfNecessary spec
                     case result of
                         ScriptFailure code -> return $ Left $ ScriptError code
-                        ScriptSuccess -> do
-                            let relevantAttrs = blockAttrs spec
-                                sourcePath = replaceExtension (figurePath spec) ".txt"
-                                hiresPath = hiresFigurePath spec
-                                srcTarget = Link nullAttr [Str "Source code"] (sourcePath, "")
-                                hiresTarget = Link nullAttr [Str "high res."] (hiresPath, "")
-                                -- TODO: use pandoc-types Builder module
-                                caption' =
-                                    [ Str $ caption spec
-                                    , Space
-                                    , Str "("
-                                    , srcTarget
-                                    , Str ","
-                                    , Space
-                                    , hiresTarget
-                                    , Str ")"
-                                    ]
-                            -- To render images as figures with captions, the target title
-                            -- must be "fig:"
-                            -- Janky? yes
-                                image = Image relevantAttrs caption' (figurePath spec, "fig:")
-                            return $ Right $ Para $ [image]
+                        ScriptSuccess ->      return $ Right $ toImage spec
 
 -- | Highest-level function that can be walked over a Pandoc tree.
 -- All code blocks that have the '.pyplot' parameter will be considered
