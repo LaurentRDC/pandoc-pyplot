@@ -15,8 +15,9 @@ module Text.Pandoc.Filter.FigureSpec
     ( FigureSpec(..)
     , SaveFormat(..)
     , saveFormatFromString
+    , toImage
+    , sourceCodePath
     , figurePath
-    , hiresFigurePath
     , addPlotCapture
     -- for testing purposes
     , extension
@@ -28,7 +29,8 @@ import qualified Data.Text                    as T
 import           System.FilePath              (FilePath, addExtension,
                                                replaceExtension, (</>))
 
-import           Text.Pandoc.Definition       (Attr)
+import           Text.Pandoc.Definition       (Attr, Block)
+import           Text.Pandoc.Builder          (str, link, toList, imageWith, para)
 import           Text.Pandoc.Filter.Scripting (PythonScript)
 
 data SaveFormat
@@ -71,12 +73,29 @@ instance Hashable FigureSpec where
     hashWithSalt salt spec =
         hashWithSalt salt (caption spec, script spec, directory spec, dpi spec, blockAttrs spec)
 
+-- | Convert a FigureSpec to a Pandoc block component
+toImage :: FigureSpec -> Block
+toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
+    -- To render images as figures with captions, the target title
+    -- must be "fig:"
+    -- Janky? yes
+    where
+        attrs' = blockAttrs spec
+        caption' = mconcat [str . caption $ spec, " (", srcLink, ", ", hiresLink, ")"]
+        target' = figurePath spec
+        srcLink = link (replaceExtension target' ".txt") mempty "Source code" 
+        hiresLink = link (hiresFigurePath spec) mempty "high res."
+
 -- | Determine the path a figure should have.
 figurePath :: FigureSpec -> FilePath
 figurePath spec = (directory spec </> stem spec)
   where
     stem = flip addExtension ext . show . hash
     ext = extension . saveFormat $ spec
+
+-- | Determine the path to the source code that generated the figure.
+sourceCodePath :: FigureSpec -> FilePath
+sourceCodePath = flip replaceExtension ".txt" . figurePath
 
 -- | The path to the high-resolution figure.
 hiresFigurePath :: FigureSpec -> FilePath
