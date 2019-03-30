@@ -30,7 +30,7 @@ import           System.FilePath              (FilePath, addExtension,
                                                replaceExtension, (</>))
 
 import           Text.Pandoc.Definition       (Attr, Block)
-import           Text.Pandoc.Builder          (str, link, toList, imageWith, para)
+import           Text.Pandoc.Builder          (imageWith, link, para, str, toList)
 import           Text.Pandoc.Filter.Scripting (PythonScript)
 
 data SaveFormat
