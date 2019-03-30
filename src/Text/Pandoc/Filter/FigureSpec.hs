@@ -80,10 +80,10 @@ toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
     -- must be "fig:"
     -- Janky? yes
     where
-        attrs' = blockAttrs spec
-        caption' = mconcat [str . caption $ spec, " (", srcLink, ", ", hiresLink, ")"]
-        target' = figurePath spec
-        srcLink = link (replaceExtension target' ".txt") mempty "Source code" 
+        attrs'    = blockAttrs spec
+        caption'  = mconcat [str . caption $ spec, " (", srcLink, ", ", hiresLink, ")"]
+        target'   = figurePath spec
+        srcLink   = link (replaceExtension target' ".txt") mempty "Source code" 
         hiresLink = link (hiresFigurePath spec) mempty "high res."
 
 -- | Determine the path a figure should have.
