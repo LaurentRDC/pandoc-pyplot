@@ -94,7 +94,7 @@ import           Paths_pandoc_pyplot           (version)
 
 import           System.Directory              (createDirectoryIfMissing,
                                                 doesFileExist)
-import           System.FilePath               (isValid, makeValid, takeDirectory)
+import           System.FilePath               (makeValid, takeDirectory)
 
 import           Text.Pandoc.Definition
 import           Text.Pandoc.Walk              (walkM)
@@ -108,16 +108,13 @@ import           Text.Pandoc.Filter.Scripting
 -- | Possible errors returned by the filter
 data PandocPyplotError
     = ScriptError Int             -- ^ Running Python script has yielded an error
-    | InvalidTargetError FilePath -- ^ Invalid figure path
     | BlockingCallError           -- ^ Python script contains a block call to 'show()'
     deriving (Eq)
 
 -- | Translate filter error to an error message
 instance Show PandocPyplotError where
-    show (ScriptError exitcode) =
-        "Script error: plot could not be generated. Exit code " <> (show exitcode)
-    show (InvalidTargetError fname) = "Target filename " <> fname <> " is not valid."
-    show BlockingCallError = "Script contains a blocking call to show, like 'plt.show()'"
+    show (ScriptError exitcode) = "Script error: plot could not be generated. Exit code " <> (show exitcode)
+    show BlockingCallError      = "Script contains a blocking call to show, like 'plt.show()'"
 
 -- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
 directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey :: String
@@ -132,17 +129,17 @@ inclusionKeys :: [String]
 inclusionKeys = [directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey]
 
 -- | Determine inclusion specifications from Block attributes.
--- Note that the target key is required, but all other parameters are optional
+-- Note that the @".pyplot"@ class is required, but all other parameters are optional
 parseFigureSpec :: Block -> IO (Maybe FigureSpec)
 parseFigureSpec (CodeBlock (id', cls, attrs) content)
     | "pyplot" `elem` cls = Just <$> figureSpec
     | otherwise = return Nothing
   where
-    attrs' = Map.fromList attrs
+    attrs'        = Map.fromList attrs
     filteredAttrs = filter (\(k, _) -> k `notElem` inclusionKeys) attrs
-    dir = makeValid $ Map.findWithDefault "generated" directoryKey attrs'
-    format = fromMaybe (PNG) $ saveFormatFromString $ Map.findWithDefault "png" saveFormatKey attrs'
-    includePath = Map.lookup includePathKey attrs'
+    dir           = makeValid $ Map.findWithDefault "generated" directoryKey attrs'
+    format        = fromMaybe (PNG) $ saveFormatFromString $ Map.findWithDefault "png" saveFormatKey attrs'
+    includePath   = Map.lookup includePathKey attrs'
 
     figureSpec :: IO FigureSpec
     figureSpec = do
@@ -156,16 +153,6 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
 
 parseFigureSpec _ = return Nothing
 
--- | Check figure specifications for common mistakes
-validateSpec :: FigureSpec -> Maybe PandocPyplotError
-validateSpec spec
-    | not (isValid path) = Just $ InvalidTargetError path
-    | hasBlockingShowCall rendered = Just $ BlockingCallError
-    | otherwise = Nothing
-  where
-    path = figurePath spec
-    rendered = script spec
-
 -- | Run the Python script. In case the file already exists, we can safely assume
 -- there is no need to re-run it.
 runScriptIfNecessary :: FigureSpec -> IO ScriptResult
@@ -178,29 +165,24 @@ runScriptIfNecessary spec = do
             result <- runTempPythonScript $ addPlotCapture spec
             case result of
                 ScriptFailure code -> return $ ScriptFailure code
-                ScriptSuccess
-                    -- Save the original script into a separate file
-                    -- so it can be inspected
-                    -- Note : using a .txt file allows to view source directly
-                    --        in the browser, in the case of HTML output
-                 -> T.writeFile (sourceCodePath spec) (script spec) >> return ScriptSuccess
+                ScriptSuccess      -> T.writeFile (sourceCodePath spec) (script spec) >> return ScriptSuccess
 
 -- | Main routine to include Matplotlib plots.
 -- Code blocks containing the attributes @.pyplot@ are considered
 -- Python plotting scripts. All other possible blocks are ignored.
 makePlot' :: Block -> IO (Either PandocPyplotError Block)
 makePlot' block = do
-    parsed <- parseFigureSpec block
+    parsed <- parseFigureSpec block  
     case parsed of
         Nothing   -> return $ Right block
         Just spec ->
-            case validateSpec spec of
-                Just err -> return $ Left err
-                Nothing  -> do
-                    result <- runScriptIfNecessary spec
-                    case result of
-                        ScriptFailure code -> return $ Left $ ScriptError code
-                        ScriptSuccess ->      return $ Right $ toImage spec
+            if hasBlockingShowCall (script spec)
+                then return $ Left BlockingCallError
+                else handleResult spec <$> runScriptIfNecessary spec 
+    where
+        handleResult :: FigureSpec -> ScriptResult -> Either PandocPyplotError Block
+        handleResult _   (ScriptFailure code) = Left  $ ScriptError code
+        handleResult spec ScriptSuccess       = Right $ toImage spec
 
 -- | Highest-level function that can be walked over a Pandoc tree.
 -- All code blocks that have the '.pyplot' parameter will be considered
