@@ -23,15 +23,33 @@ module Text.Pandoc.Filter.FigureSpec
     , extension
     ) where
 
+import           Control.Monad                (join)
+
 import           Data.Hashable                (Hashable, hash, hashWithSalt)
+import           Data.Maybe                   (fromMaybe)
 import qualified Data.Text                    as T
 
 import           System.FilePath              (FilePath, addExtension,
                                                replaceExtension, (</>))
 
-import           Text.Pandoc.Definition       (Attr, Block)
-import           Text.Pandoc.Builder          (imageWith, link, para, str, toList)
+import           Text.Pandoc.Definition       
+import           Text.Pandoc.Builder          (imageWith, link, para, fromList, toList)
 import           Text.Pandoc.Filter.Scripting (PythonScript)
+
+import           Text.Pandoc.Class            (runPure)
+import           Text.Pandoc.Readers          (readMarkdown)
+import           Text.Pandoc.Options          (def)
+
+-- | Read a figure caption in Markdown format.
+captionReader :: String -> Maybe [Inline]
+captionReader t = either (const Nothing) (Just . extractFromBlocks) $ runPure $ readMarkdown def (T.pack t)
+    where
+        extractFromBlocks (Pandoc _ blocks) = mconcat $ extractInlines <$> blocks
+
+        extractInlines (Plain inlines) = inlines
+        extractInlines (Para inlines) = inlines
+        extractInlines (LineBlock multiinlines) = join multiinlines
+        extractInlines _ = []
 
 data SaveFormat
     = PNG
@@ -80,11 +98,13 @@ toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
     -- must be "fig:"
     -- Janky? yes
     where
-        attrs'    = blockAttrs spec
-        caption'  = mconcat [str . caption $ spec, " (", srcLink, ", ", hiresLink, ")"]
-        target'   = figurePath spec
-        srcLink   = link (replaceExtension target' ".txt") mempty "Source code" 
-        hiresLink = link (hiresFigurePath spec) mempty "high res."
+        attrs'       = blockAttrs spec
+        target'      = figurePath spec
+        srcLink      = link (replaceExtension target' ".txt") mempty "Source code" 
+        hiresLink    = link (hiresFigurePath spec) mempty "high res."
+        captionText  = fromList $ fromMaybe mempty (captionReader $ caption spec)
+        captionLinks = mconcat [" (", srcLink, ", ", hiresLink, ")"]
+        caption'     = captionText <> captionLinks
 
 -- | Determine the path a figure should have.
 figurePath :: FigureSpec -> FilePath
