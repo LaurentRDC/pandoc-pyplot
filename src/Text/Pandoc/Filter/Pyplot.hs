@@ -107,11 +107,10 @@ import           Text.Pandoc.Filter.Scripting
 
 -- | Possible errors returned by the filter
 data PandocPyplotError
-    = ScriptError Int             -- ^ Running Python script has yielded an error
-    | BlockingCallError           -- ^ Python script contains a block call to 'show()'
+    = ScriptError Int    -- ^ Running Python script has yielded an error
+    | BlockingCallError  -- ^ Python script contains a block call to 'show()'
     deriving (Eq)
 
--- | Translate filter error to an error message
 instance Show PandocPyplotError where
     show (ScriptError exitcode) = "Script error: plot could not be generated. Exit code " <> (show exitcode)
     show BlockingCallError      = "Script contains a blocking call to show, like 'plt.show()'"
@@ -159,13 +158,12 @@ runScriptIfNecessary :: FigureSpec -> IO ScriptResult
 runScriptIfNecessary spec = do
     createDirectoryIfMissing True . takeDirectory $ figurePath spec
     fileAlreadyExists <- doesFileExist $ figurePath spec
-    if fileAlreadyExists
-        then return ScriptSuccess
-        else do
-            result <- runTempPythonScript $ addPlotCapture spec
-            case result of
-                ScriptFailure code -> return $ ScriptFailure code
-                ScriptSuccess      -> T.writeFile (sourceCodePath spec) (script spec) >> return ScriptSuccess
+    result <- if fileAlreadyExists
+                then return ScriptSuccess
+                else runTempPythonScript $ addPlotCapture spec
+    case result of
+        ScriptFailure code -> return $ ScriptFailure code
+        ScriptSuccess      -> T.writeFile (sourceCodePath spec) (script spec) >> return ScriptSuccess
 
 -- | Main routine to include Matplotlib plots.
 -- Code blocks containing the attributes @.pyplot@ are considered
@@ -180,7 +178,6 @@ makePlot' block = do
                 then return $ Left BlockingCallError
                 else handleResult spec <$> runScriptIfNecessary spec 
     where
-        handleResult :: FigureSpec -> ScriptResult -> Either PandocPyplotError Block
         handleResult _   (ScriptFailure code) = Left  $ ScriptError code
         handleResult spec ScriptSuccess       = Right $ toImage spec
 

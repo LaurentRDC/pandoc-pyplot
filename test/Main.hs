@@ -14,7 +14,10 @@ import           Test.Tasty.HUnit
 import qualified Text.Pandoc.Filter.FigureSpec as P
 import qualified Text.Pandoc.Filter.Pyplot     as P
 import qualified Text.Pandoc.Filter.Scripting  as P
+
 import           Text.Pandoc.JSON
+import qualified Text.Pandoc.Builder           as B
+import qualified Text.Pandoc.Definition        as B
 
 import           System.Directory              (createDirectory,
                                                 createDirectoryIfMissing,
@@ -30,7 +33,7 @@ main =
     defaultMain $
     testGroup
         "Text.Pandoc.Filter.Pyplot"
-        [testFileCreation, testFileInclusion, testSaveFormat, testBlockingCallError]
+        [testFileCreation, testFileInclusion, testSaveFormat, testBlockingCallError, testMarkdownFormattingCaption]
 
 plotCodeBlock :: P.PythonScript -> Block
 plotCodeBlock script = CodeBlock (mempty, ["pyplot"], mempty) (unpack script)
@@ -126,12 +129,12 @@ testSaveFormat =
         assertEqual "" numberjpgFiles 2
 
 -------------------------------------------------------------------------------
--- Test that a script containing a blockign call to matplotlib.pyplot.show
+-- Test that a script containing a blocking call to matplotlib.pyplot.show
 -- returns the appropriate error
 testBlockingCallError :: TestTree
 testBlockingCallError =
     testCase "raises an exception for blocking calls" $ do
-        tempDir <- getCanonicalTemporaryDirectory
+        tempDir <- (</> "test-blocking-call-error") <$>getCanonicalTemporaryDirectory
         let codeBlock = plotCodeBlock "import matplotlib.pyplot as plt\nplt.show()"
         result <- P.makePlot' codeBlock
         case result of
@@ -140,4 +143,26 @@ testBlockingCallError =
                 if error == P.BlockingCallError
                     then pure ()
                     else assertFailure "did not catch the expected blocking call"
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+-- Test that Markdown formatting in captions is correctly rendered
+testMarkdownFormattingCaption :: TestTree
+testMarkdownFormattingCaption =
+    testCase "appropriately parses Markdown captions" $ do
+        tempDir <- (</> "test-caption-parsing") <$> getCanonicalTemporaryDirectory
+        -- Note that this test is fragile, in the sense that the expected result must be carefully
+        -- constructed
+        let expected = [B.Strong [B.Str "caption"]]
+            codeBlock = addDirectory tempDir $ addCaption "**caption**" $ plotCodeBlock "import matplotlib.pyplot as plt"
+        result <- P.makePlot' codeBlock
+        case result of
+            Left error -> assertFailure $ "an error occured: " <> show error
+            Right block -> assertIsInfix expected (extractCaption block)
+    where
+        extractCaption (B.Para blocks) = extractImageCaption . head $ blocks
+        extractCaption _ = mempty
+
+        extractImageCaption (Image _ c _) = c
+        extractImageCaption _ = mempty
 -------------------------------------------------------------------------------
