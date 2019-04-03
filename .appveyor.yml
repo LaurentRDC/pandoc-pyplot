@@ -34,6 +34,7 @@ environment:
     TMP: "c:\\tmp"
 
   matrix:
+  - ARGS: "--resolver lts-9"   # GHC 8.0
   - ARGS: "--resolver lts-11"  # GHC 8.2
   - ARGS: "--resolver lts-12"  # GHC 8.4
   - ARGS: "--resolver lts-13"  # GHC 8.6
