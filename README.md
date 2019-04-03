@@ -60,6 +60,8 @@ You can also specify a caption for your image. This is done using the optional `
     ```
 ```
 
+Caption formatting is either plain text or Markdown. LaTeX-style math is also support in captions (using dollar signs $...$).
+
 ### Including scripts
 
 If you find yourself always repeating some steps, inclusion of scripts is possible using the `include` parameter. For example, if you want all plots to have the [`ggplot`](https://matplotlib.org/tutorials/introductory/customizing.html#sphx-glr-tutorials-introductory-customizing-py) style, you can write a very short preamble `style.py` like so:
