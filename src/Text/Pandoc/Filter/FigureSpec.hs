@@ -27,6 +27,7 @@ import           Control.Monad                (join)
 
 import           Data.Hashable                (Hashable, hash, hashWithSalt)
 import           Data.Maybe                   (fromMaybe)
+import           Data.Monoid                  ((<>))
 import qualified Data.Text                    as T
 
 import           System.FilePath              (FilePath, addExtension,
