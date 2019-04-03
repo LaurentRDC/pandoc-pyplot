@@ -37,13 +37,26 @@ import           Text.Pandoc.Builder          (imageWith, link, para, fromList, 
 import           Text.Pandoc.Filter.Scripting (PythonScript)
 
 import           Text.Pandoc.Class            (runPure)
+import           Text.Pandoc.Extensions       (extensionsFromList, Extension(..))
+import           Text.Pandoc.Options          (def, ReaderOptions(..))
 import           Text.Pandoc.Readers          (readMarkdown)
-import           Text.Pandoc.Options          (def)
+
+readerOptions :: ReaderOptions
+readerOptions = def 
+    {readerExtensions = 
+        extensionsFromList 
+            [ Ext_tex_math_dollars
+            , Ext_superscript 
+            , Ext_subscript
+            ] 
+    }
 
 -- | Read a figure caption in Markdown format.
 captionReader :: String -> Maybe [Inline]
-captionReader t = either (const Nothing) (Just . extractFromBlocks) $ runPure $ readMarkdown def (T.pack t)
+captionReader t = either (const Nothing) (Just . extractFromBlocks) $ runPure $ readMarkdown' (T.pack t)
     where
+        readMarkdown' = readMarkdown readerOptions
+
         extractFromBlocks (Pandoc _ blocks) = mconcat $ extractInlines <$> blocks
 
         extractInlines (Plain inlines) = inlines
