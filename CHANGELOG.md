@@ -5,7 +5,7 @@ pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 Release 2.0.1.0
 ---------------
 
-* Preliminary support for Markdown formatting in figure captions.
+* Support for Markdown formatting in figure captions, including LaTeX math.
 
 Release 2.0.0.0
 ---------------
