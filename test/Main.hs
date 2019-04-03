@@ -5,7 +5,7 @@ module Main where
 
 import           Control.Monad                 (unless)
 
-import           Data.List                     (isInfixOf)
+import           Data.List                     (isInfixOf, isSuffixOf)
 import           Data.Text                     (unpack)
 
 import           Test.Tasty
@@ -25,7 +25,7 @@ import           System.Directory              (createDirectory,
                                                 doesFileExist, listDirectory,
                                                 removeDirectoryRecursive,
                                                 removePathForcibly)
-import           System.FilePath               (isExtensionOf, (</>))
+import           System.FilePath               ((</>), takeExtensions)
 import           System.IO.Temp                (getCanonicalTemporaryDirectory)
 
 main :: IO ()
@@ -65,6 +65,14 @@ assertFileExists filepath = do
     unless fileExists (assertFailure msg)
   where
     msg = mconcat ["File ", filepath, " does not exist."]
+
+-- | Not available with GHC < 8.4
+-- since this function was added in filepath-1.4.2
+-- but GHC 8.2.2 comes with filepath-1.4.1.2
+isExtensionOf :: String -> FilePath -> Bool
+isExtensionOf ext@('.':_) = isSuffixOf ext . takeExtensions
+isExtensionOf ext         = isSuffixOf ('.':ext) . takeExtensions
+    
 
 -- | Assert that the first list is contained,
 -- wholly and intact, anywhere within the second.
