@@ -6,6 +6,7 @@ module Main where
 import           Control.Monad                 (unless)
 
 import           Data.List                     (isInfixOf, isSuffixOf)
+import           Data.Monoid                   ((<>))
 import           Data.Text                     (unpack)
 
 import           Test.Tasty
