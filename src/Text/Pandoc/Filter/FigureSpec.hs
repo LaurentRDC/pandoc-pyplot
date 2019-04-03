@@ -137,10 +137,9 @@ hiresFigurePath spec = flip replaceExtension (".hires" <> ext) . figurePath $ sp
     ext = extension . saveFormat $ spec
 
 -- | Modify a Python plotting script to save the figure to a filename.
--- An additional file (with extension PNG) will also be captured.
-addPlotCapture ::
-       FigureSpec -- ^ Path where to save the figure
-    -> PythonScript -- ^ Code block with added capture
+-- An additional file will also be captured.
+addPlotCapture :: FigureSpec   -- ^ Path where to save the figure
+               -> PythonScript -- ^ Code block with added capture
 addPlotCapture spec =
     mconcat
         [ script spec
