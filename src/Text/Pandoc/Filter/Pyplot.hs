@@ -71,6 +71,7 @@ module Text.Pandoc.Filter.Pyplot (
     , makePlotWithConfig
     -- * Operating on whole Pandoc documents
     , plotTransform
+    , plotTransformWithConfig
     -- * For configuration purposes
     , configuration
     , Configuration (..)
@@ -174,15 +175,19 @@ makePlot :: Block -> IO Block
 makePlot = makePlotWithConfig def
 
 -- | like @makePlot@ with with a custom default values.
+--
+-- @since 2.1.0.0
 makePlotWithConfig :: Configuration -> Block -> IO Block
 makePlotWithConfig config = makePlot' config >=> either (fail . show) return
 
 -- | Walk over an entire Pandoc document, changing appropriate code blocks
--- into figures.
+-- into figures. Default configuration is used.
 plotTransform :: Pandoc -> IO Pandoc
-plotTransform doc = do
-    configExists <- doesFileExist ".pandoc-pyplot.yml"
-    config <- if configExists
-                then configuration ".pandoc-pyplot.yml"
-                else def
-    walkM (makePlotWithConfig config) doc
+plotTransform = walkM makePlot
+
+-- | Walk over an entire Pandoc document, changing appropriate code blocks
+-- into figures. The default values are determined by a @Configuration@.
+--
+-- @since 2.1.0.0
+plotTransformWithConfig :: Configuration -> Pandoc -> IO Pandoc
+plotTransformWithConfig = walkM . makePlotWithConfig
