@@ -2,6 +2,11 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+Release 2.1.0.0
+---------------
+
+* Added support for GHC 8.2
+
 Release 2.0.1.0
 ---------------
 
