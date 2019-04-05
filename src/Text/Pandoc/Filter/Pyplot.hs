@@ -65,15 +65,17 @@ makePlotPandocCompiler =
 @
 
 -}
-module Text.Pandoc.Filter.Pyplot
-    ( makePlot
+module Text.Pandoc.Filter.Pyplot (
+    -- * Operating on single Pandoc blocks 
+      makePlot
     , makePlotWithConfig
+    -- * Operating on whole Pandoc documents
     , plotTransform
-    , PandocPyplotError(..)
-    -- For configuration purposes
+    -- * For configuration purposes
     , configuration
     , Configuration (..)
-    -- For testing purposes only
+    -- * For testing purposes only
+    , PandocPyplotError(..)
     , makePlot'
     ) where
 
