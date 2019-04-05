@@ -183,4 +183,4 @@ makePlotPandocCompiler =
 
 ## Warning
 
-Do not run this filter on unknown documents. There is nothing in `pandoc-pyplot` that can stop a Python script from performing **evil actions**. This is the reason this package is deemed __unsafe__ in the parlance of [Safe Haskell](https://ghc.haskell.org/trac/ghc/wiki/SafeHaskell).
+Do not run this filter on unknown documents. There is nothing in `pandoc-pyplot` that can stop a Python script from performing **evil actions**.
