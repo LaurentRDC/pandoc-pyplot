@@ -13,7 +13,7 @@ Configuration for pandoc-pyplot
 module Text.Pandoc.Filter.Pyplot.Configuration (
       Configuration (..)
     , configuration
-    -- For testing purposes only
+    -- * For testing and internal purposes only
     , inclusionKeys
     , directoryKey
     , captionKey
@@ -45,9 +45,18 @@ saveFormatKey  = "format"
 
 -- | list of all keys related to pandoc-pyplot.
 inclusionKeys :: [String]
-inclusionKeys = [directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey]
+inclusionKeys = [ directoryKey
+                , captionKey
+                , dpiKey
+                , includePathKey
+                , saveFormatKey
+                ]
 
-
+-- | Configuration of pandoc-pyplot, describing the default behavior
+-- of the filter. 
+--
+-- A Configuration is useful when dealing with lots of figures; it avoids
+-- repeating the same values.
 data Configuration 
     = Configuration 
         { defaultDirectory     :: FilePath
@@ -64,6 +73,8 @@ instance Default Configuration where
         , defaultDPI           = 80
     }
 
+-- | Building configuration from a YAML file. The
+-- keys are exactly the same as for Markdown code blocks.
 configuration :: FilePath -> IO Configuration
 configuration fp = do
     c <- load fp
