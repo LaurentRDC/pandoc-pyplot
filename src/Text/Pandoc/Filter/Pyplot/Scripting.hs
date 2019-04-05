@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE Unsafe            #-}
 
 {-|
 Module      : Text.Pandoc.Filter.Pyplot.Scripting
