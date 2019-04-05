@@ -6,7 +6,7 @@ import           Data.Default.Class        (def)
 import           System.Environment        (getArgs)
 import           System.Directory          (doesFileExist)
 
-import           Text.Pandoc.Filter.Pyplot (makePlotWithConfig, buildConfiguration)
+import           Text.Pandoc.Filter.Pyplot (makePlotWithConfig, configuration)
 import           Text.Pandoc.JSON          (toJSONFilter)
 
 import qualified Data.Version              as V
@@ -36,7 +36,7 @@ main :: IO ()
 main = do
     configExists <- doesFileExist ".pandoc-pyplot.yml"
     config <- if configExists
-                then buildConfiguration ".pandoc-pyplot.yml"
+                then configuration ".pandoc-pyplot.yml"
                 else def
 
     getArgs >>= \case
