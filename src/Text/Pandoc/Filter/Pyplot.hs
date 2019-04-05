@@ -70,7 +70,7 @@ module Text.Pandoc.Filter.Pyplot
     ( makePlot
     , makePlotWithConfig
     , plotTransform
-    , buildConfiguration
+    , configuration
     , PandocPyplotError(..)
       -- For testing purposes only
     , makePlot'
@@ -199,6 +199,6 @@ plotTransform :: Pandoc -> IO Pandoc
 plotTransform doc = do
     configExists <- doesFileExist ".pandoc-pyplot.yml"
     config <- if configExists
-                then buildConfiguration ".pandoc-pyplot.yml"
+                then configuration ".pandoc-pyplot.yml"
                 else def
     walkM (makePlotWithConfig config) doc
