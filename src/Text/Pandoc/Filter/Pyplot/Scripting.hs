@@ -2,7 +2,7 @@
 {-# LANGUAGE Unsafe            #-}
 
 {-|
-Module      : Text.Pandoc.Filter.Scripting
+Module      : Text.Pandoc.Filter.Pyplot.Scripting
 Copyright   : (c) Laurent P René de Cotret, 2019
 License     : MIT
 Maintainer  : laurent.decotret@outlook.com
@@ -12,7 +12,7 @@ Portability : portable
 This module defines types and functions that help
 with running Python scripts.
 -}
-module Text.Pandoc.Filter.Scripting
+module Text.Pandoc.Filter.Pyplot.Scripting
     ( runTempPythonScript
     , hasBlockingShowCall
     , PythonScript

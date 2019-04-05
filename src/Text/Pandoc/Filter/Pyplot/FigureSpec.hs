@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Text.Pandoc.Filter.FigureSpec
+Module      : Text.Pandoc.Filter.Pyplot.FigureSpec
 Copyright   : (c) Laurent P René de Cotret, 2019
 License     : MIT
 Maintainer  : laurent.decotret@outlook.com
@@ -11,7 +11,7 @@ Portability : portable
 This module defines types and functions that help
 with keeping track of figure specifications
 -}
-module Text.Pandoc.Filter.FigureSpec
+module Text.Pandoc.Filter.Pyplot.FigureSpec
     ( FigureSpec(..)
     , SaveFormat(..)
     , saveFormatFromString
@@ -35,12 +35,13 @@ import           System.FilePath              (FilePath, addExtension,
 
 import           Text.Pandoc.Definition       
 import           Text.Pandoc.Builder          (imageWith, link, para, fromList, toList)
-import           Text.Pandoc.Filter.Scripting (PythonScript)
 
 import           Text.Pandoc.Class            (runPure)
 import           Text.Pandoc.Extensions       (extensionsFromList, Extension(..))
 import           Text.Pandoc.Options          (def, ReaderOptions(..))
 import           Text.Pandoc.Readers          (readMarkdown)
+
+import Text.Pandoc.Filter.Pyplot.Scripting
 
 readerOptions :: ReaderOptions
 readerOptions = def 

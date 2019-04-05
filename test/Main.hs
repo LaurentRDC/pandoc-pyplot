@@ -13,9 +13,8 @@ import           Data.Text                     (unpack)
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-import qualified Text.Pandoc.Filter.FigureSpec as P
 import qualified Text.Pandoc.Filter.Pyplot     as P
-import qualified Text.Pandoc.Filter.Scripting  as P
+import qualified Text.Pandoc.Filter.Pyplot.Internal as P
 
 import           Text.Pandoc.JSON
 import qualified Text.Pandoc.Builder           as B
