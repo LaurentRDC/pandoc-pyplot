@@ -71,6 +71,7 @@ data SaveFormat
     | SVG
     | JPG
     | EPS
+    deriving (Enum)
 
 -- | Parse an image save format string
 saveFormatFromString :: String -> Maybe SaveFormat

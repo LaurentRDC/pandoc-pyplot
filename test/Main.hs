@@ -5,6 +5,7 @@ module Main where
 
 import           Control.Monad                 (unless)
 
+import           Data.Default.Class            (def)
 import           Data.List                     (isInfixOf, isSuffixOf)
 import           Data.Monoid                   ((<>))
 import           Data.Text                     (unpack)
@@ -99,7 +100,7 @@ testFileCreation =
         tempDir <- (</> "test-file-creation") <$> getCanonicalTemporaryDirectory
         ensureDirectoryExistsAndEmpty tempDir
         let codeBlock = (addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
-        _ <- P.makePlot' codeBlock
+        _ <- P.makePlot' def codeBlock
         filesCreated <- length <$> listDirectory tempDir
         assertEqual "" filesCreated 3
 
@@ -113,7 +114,7 @@ testFileInclusion =
         let codeBlock =
                 (addInclusion "test/fixtures/include.py" $
                  addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
-        _ <- P.makePlot' codeBlock
+        _ <- P.makePlot' def codeBlock
         inclusion <- readFile "test/fixtures/include.py"
         sourcePath <- head . filter (isExtensionOf "txt") <$> listDirectory tempDir
         src <- readFile (tempDir </> sourcePath)
@@ -131,7 +132,7 @@ testSaveFormat =
                  addDirectory tempDir $
                  plotCodeBlock
                      "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])")
-        _ <- P.makePlot' codeBlock
+        _ <- P.makePlot' def codeBlock
         numberjpgFiles <-
             length <$> filter (isExtensionOf (P.extension P.JPG)) <$>
             listDirectory tempDir
@@ -145,7 +146,7 @@ testBlockingCallError =
     testCase "raises an exception for blocking calls" $ do
         tempDir <- (</> "test-blocking-call-error") <$>getCanonicalTemporaryDirectory
         let codeBlock = plotCodeBlock "import matplotlib.pyplot as plt\nplt.show()"
-        result <- P.makePlot' codeBlock
+        result <- P.makePlot' def codeBlock
         case result of
             Right block -> assertFailure "did not catch the expected blocking call"
             Left error ->
@@ -164,7 +165,7 @@ testMarkdownFormattingCaption =
         -- constructed
         let expected = [B.Strong [B.Str "caption"]]
             codeBlock = addDirectory tempDir $ addCaption "**caption**" $ plotCodeBlock "import matplotlib.pyplot as plt"
-        result <- P.makePlot' codeBlock
+        result <- P.makePlot' def codeBlock
         case result of
             Left error -> assertFailure $ "an error occured: " <> show error
             Right block -> assertIsInfix expected (extractCaption block)
