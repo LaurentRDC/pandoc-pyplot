@@ -70,9 +70,11 @@ module Text.Pandoc.Filter.Pyplot
     ( makePlot
     , makePlotWithConfig
     , plotTransform
-    , configuration
     , PandocPyplotError(..)
-      -- For testing purposes only
+    -- For configuration purposes
+    , configuration
+    , Configuration (..)
+    -- For testing purposes only
     , makePlot'
     ) where
 
