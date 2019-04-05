@@ -24,12 +24,13 @@ source-repository head
 
 library
     exposed-modules:
-        Text.Pandoc.Filter.Configuration
         Text.Pandoc.Filter.Pyplot
-        Text.Pandoc.Filter.Scripting
-        Text.Pandoc.Filter.FigureSpec
+        Text.Pandoc.Filter.Pyplot.Internal
     other-modules:
         Paths_pandoc_pyplot
+        Text.Pandoc.Filter.Pyplot.Scripting
+        Text.Pandoc.Filter.Pyplot.FigureSpec
+        Text.Pandoc.Filter.Pyplot.Configuration
     hs-source-dirs:
         src
     ghc-options: -Wall -Wcompat
