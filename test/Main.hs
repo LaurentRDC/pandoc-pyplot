@@ -40,6 +40,7 @@ main =
         , testBlockingCallError
         , testMarkdownFormattingCaption
         , testWithConfiguration
+        , testOverridingConfiguration
         ]
 
 plotCodeBlock :: P.PythonScript -> Block
@@ -191,9 +192,33 @@ testConfig = do
     ensureDirectoryExistsAndEmpty tempDir
     return $ def {P.defaultDirectory = tempDir, P.defaultSaveFormat = P.JPG}
 
+testOverridingConfiguration :: TestTree
+testOverridingConfiguration =
+    testCase "follows the configuration options" $ do
+        config <- testConfig
+
+        -- The default from config says the save format should be JPG
+        -- but the code block save format="png"
+        let codeBlock = (addSaveFormat P.PNG $ 
+                         plotCodeBlock 
+                            "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])")
+        _ <- P.makePlot' config codeBlock
+
+        numberjpgFiles <-
+            length <$> filter (isExtensionOf (P.extension P.JPG)) <$>
+            listDirectory (P.defaultDirectory config)
+        numberpngFiles <-
+            length <$> filter (isExtensionOf (P.extension P.PNG)) <$>
+            listDirectory (P.defaultDirectory config)
+        assertEqual "" numberjpgFiles 0
+        assertEqual "" numberpngFiles 2
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+-- Test that values in code blocks will override the defaults in configuration
 testWithConfiguration :: TestTree
 testWithConfiguration =
-    testCase "follows the configuration options" $ do
+    testCase "code block attributes override configuration defaults" $ do
         config <- testConfig
 
         let codeBlock = plotCodeBlock "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])"
