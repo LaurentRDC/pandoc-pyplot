@@ -57,6 +57,8 @@ inclusionKeys = [ directoryKey
 --
 -- A Configuration is useful when dealing with lots of figures; it avoids
 -- repeating the same values.
+-- 
+-- @since 2.1.0.0
 data Configuration 
     = Configuration 
         { defaultDirectory     :: FilePath
@@ -75,6 +77,8 @@ instance Default Configuration where
 
 -- | Building configuration from a YAML file. The
 -- keys are exactly the same as for Markdown code blocks.
+--
+-- @since 2.1.0.0
 configuration :: FilePath -> IO Configuration
 configuration fp = do
     c <- load fp
