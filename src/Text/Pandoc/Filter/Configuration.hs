@@ -12,7 +12,7 @@ Configuration for pandoc-pyplot
 
 module Text.Pandoc.Filter.Configuration (
       Configuration (..)
-    , buildConfiguration
+    , configuration
 ) where
 
 import           Prelude                       hiding (lookup)
@@ -23,8 +23,6 @@ import           Data.Maybe                    (fromMaybe)
 import           Data.Default.Class            (Default, def)
 import qualified Data.Text.IO                  as T
 import           Data.Yaml.Config              (lookupDefault, lookup, load)
-
-import           System.Directory              (doesFileExist)
 
 import           Text.Pandoc.Filter.FigureSpec (SaveFormat(..), saveFormatFromString)
 import           Text.Pandoc.Filter.Scripting  (PythonScript)
@@ -45,8 +43,8 @@ instance Default Configuration where
         , defaultDPI           = 80
     }
 
-buildConfiguration :: FilePath -> IO Configuration
-buildConfiguration fp = do
+configuration :: FilePath -> IO Configuration
+configuration fp = do
     c <- load fp
     inc <- fromMaybe (return $ defaultIncludeScript def) $ T.readFile <$> lookup "include" c
     
