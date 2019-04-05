@@ -74,11 +74,6 @@ module Text.Pandoc.Filter.Pyplot
     , PandocPyplotError(..)
       -- For testing purposes only
     , makePlot'
-    , directoryKey
-    , captionKey
-    , dpiKey
-    , includePathKey
-    , saveFormatKey
     ) where
 
 import           Control.Monad                 ((>=>), join)
@@ -102,9 +97,7 @@ import           System.FilePath               (makeValid, takeDirectory)
 import           Text.Pandoc.Definition
 import           Text.Pandoc.Walk              (walkM)
 
-import           Text.Pandoc.Filter.Configuration
-import           Text.Pandoc.Filter.FigureSpec
-import           Text.Pandoc.Filter.Scripting
+import           Text.Pandoc.Filter.Pyplot.Internal
 
 
 -- | Possible errors returned by the filter
@@ -116,18 +109,6 @@ data PandocPyplotError
 instance Show PandocPyplotError where
     show (ScriptError exitcode) = "Script error: plot could not be generated. Exit code " <> (show exitcode)
     show BlockingCallError      = "Script contains a blocking call to show, like 'plt.show()'"
-
--- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
-directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey :: String
-directoryKey   = "directory"
-captionKey     = "caption"
-dpiKey         = "dpi"
-includePathKey = "include"
-saveFormatKey  = "format"
-
--- | list of all keys related to pandoc-pyplot.
-inclusionKeys :: [String]
-inclusionKeys = [directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey]
 
 -- | Determine inclusion specifications from Block attributes.
 -- Note that the @".pyplot"@ class is required, but all other parameters are optional
