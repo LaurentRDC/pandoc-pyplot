@@ -34,7 +34,13 @@ main =
     defaultMain $
     testGroup
         "Text.Pandoc.Filter.Pyplot"
-        [testFileCreation, testFileInclusion, testSaveFormat, testBlockingCallError, testMarkdownFormattingCaption]
+        [ testFileCreation
+        , testFileInclusion
+        , testSaveFormat
+        , testBlockingCallError
+        , testMarkdownFormattingCaption
+        , testWithConfiguration
+        ]
 
 plotCodeBlock :: P.PythonScript -> Block
 plotCodeBlock script = CodeBlock (mempty, ["pyplot"], mempty) (unpack script)
@@ -160,6 +166,7 @@ testMarkdownFormattingCaption :: TestTree
 testMarkdownFormattingCaption =
     testCase "appropriately parses Markdown captions" $ do
         tempDir <- (</> "test-caption-parsing") <$> getCanonicalTemporaryDirectory
+        ensureDirectoryExistsAndEmpty tempDir
         -- Note that this test is fragile, in the sense that the expected result must be carefully
         -- constructed
         let expected = [B.Strong [B.Str "caption"]]
@@ -174,4 +181,26 @@ testMarkdownFormattingCaption =
 
         extractImageCaption (Image _ c _) = c
         extractImageCaption _ = mempty
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+-- Test with configuration
+testConfig :: IO P.Configuration
+testConfig = do
+    tempDir <- (</> "test-with-config") <$> getCanonicalTemporaryDirectory
+    ensureDirectoryExistsAndEmpty tempDir
+    return $ def {P.defaultDirectory = tempDir, P.defaultSaveFormat = P.JPG}
+
+testWithConfiguration :: TestTree
+testWithConfiguration =
+    testCase "follows the configuration options" $ do
+        config <- testConfig
+
+        let codeBlock = plotCodeBlock "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])"
+        _ <- P.makePlot' config codeBlock
+
+        numberjpgFiles <-
+            length <$> filter (isExtensionOf (P.extension P.JPG)) <$>
+            listDirectory (P.defaultDirectory config)
+        assertEqual "" numberjpgFiles 2
 -------------------------------------------------------------------------------
