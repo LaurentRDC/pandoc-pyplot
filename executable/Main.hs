@@ -2,9 +2,11 @@
 
 module Main where
 
+import           Data.Default.Class        (def)
 import           System.Environment        (getArgs)
+import           System.Directory          (doesFileExist)
 
-import           Text.Pandoc.Filter.Pyplot (makePlot)
+import           Text.Pandoc.Filter.Pyplot (makePlotWithConfig, buildConfiguration)
 import           Text.Pandoc.JSON          (toJSONFilter)
 
 import qualified Data.Version              as V
@@ -32,11 +34,16 @@ help =
 
 main :: IO ()
 main = do
+    configExists <- doesFileExist ".pandoc-pyplot.yml"
+    config <- if configExists
+                then buildConfiguration ".pandoc-pyplot.yml"
+                else def
+
     getArgs >>= \case
         (arg:_)
             | arg `elem` ["-h", "--help"] -> showHelp
             | arg `elem` ["-v", "--version"] -> showVersion
-        _ -> toJSONFilter makePlot
+        _ -> toJSONFilter (makePlotWithConfig config)
   where
     showHelp = putStrLn help
     showVersion = putStrLn (V.showVersion version)
