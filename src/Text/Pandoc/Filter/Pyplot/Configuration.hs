@@ -22,15 +22,12 @@ module Text.Pandoc.Filter.Pyplot.Configuration (
     , saveFormatKey
 ) where
 
-import           Prelude                       hiding (lookup)
-
-import           Control.Monad                 (join)
-
 import           Data.Maybe                    (fromMaybe)
 import           Data.Default.Class            (Default, def)
 import qualified Data.Text                     as T
 import qualified Data.Text.IO                  as T
-import           Data.Yaml.Config              (lookupDefault, lookup, load)
+import           Data.Yaml         
+import           Data.Yaml.Config              (loadYamlSettings, ignoreEnv)
 
 import Text.Pandoc.Filter.Pyplot.FigureSpec
 import Text.Pandoc.Filter.Pyplot.Scripting
@@ -56,7 +53,7 @@ inclusionKeys = [ directoryKey
 -- of the filter. 
 --
 -- A Configuration is useful when dealing with lots of figures; it avoids
--- repeating the same values.
+-- repeating the same values.sta
 -- 
 -- @since 2.1.0.0
 data Configuration 
@@ -66,6 +63,7 @@ data Configuration
         , defaultSaveFormat    :: SaveFormat
         , defaultDPI           :: Int
         }
+    deriving (Eq, Show)
 
 instance Default Configuration where
     def = Configuration {
@@ -75,18 +73,47 @@ instance Default Configuration where
         , defaultDPI           = 80
     }
 
+-- A @Configuration@ cannot be directly created from a YAML file
+-- for two reasons:
+--
+--     * we want to store an include script. However, it makes more sense to 
+--       specify the script path in a YAML file.
+--     * Save format is best specified by a string, and this must be parsed later 
+data ConfigPrecursor
+    = ConfigPrecursor
+        { defaultDirectory_     :: FilePath
+        , defaultIncludePath_   :: Maybe FilePath
+        , defaultSaveFormat_    :: String
+        , defaultDPI_           :: Int
+        } 
+
+instance FromJSON ConfigPrecursor where
+    parseJSON (Object v) = do
+        d <- v .:? (T.pack directoryKey) .!= (defaultDirectory def)
+        i <- v .:? (T.pack includePathKey)
+        f <- v .:? (T.pack saveFormatKey) .!= (extension $ defaultSaveFormat def)
+        p <- v .:? (T.pack dpiKey) .!= (defaultDPI def)
+        return $ ConfigPrecursor d i f p
+    
+    parseJSON _ = fail "Could not parse the configuration"
+
+renderConfiguration :: ConfigPrecursor -> IO Configuration
+renderConfiguration prec = do
+    includeScript <- fromMaybe mempty $ T.readFile <$> defaultIncludePath_ prec
+    let saveFormat' = fromMaybe (defaultSaveFormat def) $ saveFormatFromString $ defaultSaveFormat_ prec
+    return $ Configuration { defaultDirectory     = defaultDirectory_ prec
+                           , defaultIncludeScript = includeScript
+                           , defaultSaveFormat    = saveFormat'
+                           , defaultDPI           = defaultDPI_ prec
+                           }
+
+
 -- | Building configuration from a YAML file. The
 -- keys are exactly the same as for Markdown code blocks.
 --
+-- If keys are either not present or unreadable, its value will be set
+-- to the default values of pandoc-pyplot.
+--
 -- @since 2.1.0.0
 configuration :: FilePath -> IO Configuration
-configuration fp = do
-    c <- load fp
-    inc <- fromMaybe (return $ defaultIncludeScript def) $ T.readFile <$> lookup (T.pack includePathKey) c
-    
-    let dir = lookupDefault (T.pack directoryKey) (defaultDirectory def) c
-        fmt = fromMaybe (defaultSaveFormat def) $ join $ saveFormatFromString <$> lookup (T.pack saveFormatKey) c
-        dpi' = lookupDefault (T.pack dpiKey) (defaultDPI def) c
-    
-    
-    return $ Configuration  dir inc fmt dpi'
+configuration fp = loadYamlSettings [fp] [] ignoreEnv >>= renderConfiguration
