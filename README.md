@@ -96,6 +96,29 @@ Which is equivalent to writing the following markdown:
 
 This `include` parameter is perfect for longer documents with many plots. Simply define the style you want in a separate script! You can also import packages this way, or define functions you often use.
 
+### Configurable
+
+* New in version 2.1.0.0*
+
+To avoid repetition, `pandoc-pyplot` can be configured using simple YAML syntax. `pandoc-pyplot` will look for a `pandoc-pyplot.yml` file in the current working directory:
+
+```yaml
+# You can specify any or all of the following
+# parameters
+directory=mydirectory/
+dpi=150
+format=jpeg
+include=mystyle.py
+```
+
+These values override the default values, which are equivalent to:
+
+```yaml
+directory=generated/
+dpi=80
+format=png
+```
+
 ## Installation
 
 ### Binaries
