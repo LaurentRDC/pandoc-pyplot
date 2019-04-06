@@ -98,7 +98,7 @@ This `include` parameter is perfect for longer documents with many plots. Simply
 
 ### Configurable
 
-* New in version 2.1.0.0*
+*New in version 2.1.0.0*
 
 To avoid repetition, `pandoc-pyplot` can be configured using simple YAML syntax. `pandoc-pyplot` will look for a `pandoc-pyplot.yml` file in the current working directory:
 
