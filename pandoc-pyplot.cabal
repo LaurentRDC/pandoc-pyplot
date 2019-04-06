@@ -46,7 +46,7 @@ library
         , temporary
         , text
         , typed-process
-        , yaml >= 0.11
+        , yaml >= 0.8.16
     default-language: Haskell2010
 
 executable pandoc-pyplot
