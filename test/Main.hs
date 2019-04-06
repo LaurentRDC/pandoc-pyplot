@@ -41,6 +41,7 @@ main =
         , testMarkdownFormattingCaption
         , testWithConfiguration
         , testOverridingConfiguration
+        , testBuildConfiguration
         ]
 
 plotCodeBlock :: P.PythonScript -> Block
@@ -229,3 +230,13 @@ testWithConfiguration =
             listDirectory (P.defaultDirectory config)
         assertEqual "" numberjpgFiles 2
 -------------------------------------------------------------------------------
+
+testBuildConfiguration :: TestTree
+testBuildConfiguration = 
+    testCase "configuration is correctly parsed" $ do
+        let config = def { P.defaultDirectory = "generated/other"
+                         , P.defaultSaveFormat = P.JPG
+                         , P.defaultDPI = 150
+                         }
+        parsedConfig <- P.configuration "test/fixtures/.pandoc-pyplot.yml"
+        assertEqual "" config parsedConfig
