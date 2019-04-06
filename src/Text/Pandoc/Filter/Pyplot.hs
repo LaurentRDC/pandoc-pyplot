@@ -75,7 +75,7 @@ module Text.Pandoc.Filter.Pyplot (
     -- * For configuration purposes
     , configuration
     , Configuration (..)
-    -- * For testing purposes only
+    -- * For testing and internal purposes only
     , PandocPyplotError(..)
     , makePlot'
     ) where
