@@ -105,18 +105,18 @@ To avoid repetition, `pandoc-pyplot` can be configured using simple YAML syntax.
 ```yaml
 # You can specify any or all of the following
 # parameters
-directory=mydirectory/
-dpi=150
-format=jpeg
-include=mystyle.py
+directory: mydirectory/
+dpi: 150
+format: jpeg
+include: mystyle.py
 ```
 
 These values override the default values, which are equivalent to:
 
 ```yaml
-directory=generated/
-dpi=80
-format=png
+directory: generated/
+dpi: 80
+format: png
 ```
 
 ## Installation
