@@ -53,7 +53,8 @@ readerOptions = def
             ] 
     }
 
--- | Read a figure caption in Markdown format.
+-- | Read a figure caption in Markdown format. LaTeX math @$...$@ is supported,
+-- as are Markdown subscripts and superscripts.
 captionReader :: String -> Maybe [Inline]
 captionReader t = either (const Nothing) (Just . extractFromBlocks) $ runPure $ readMarkdown' (T.pack t)
     where
@@ -72,7 +73,8 @@ data SaveFormat
     | SVG
     | JPG
     | EPS
-    deriving (Enum, Eq, Show)
+    | GIF
+    deriving (Bounded, Enum, Eq, Show)
 
 -- | Parse an image save format string
 saveFormatFromString :: String -> Maybe SaveFormat
@@ -82,6 +84,7 @@ saveFormatFromString s
     | s `elem` ["svg", "SVG", ".svg"] = Just SVG
     | s `elem` ["jpg", "jpeg", "JPG", "JPEG", ".jpg", ".jpeg"] = Just JPG
     | s `elem` ["eps", "EPS", ".eps"] = Just EPS
+    | s `elem` ["gif", "GIF", ".gif"] = Just GIF
     | otherwise = Nothing
 
 -- | Save format file extension
@@ -91,16 +94,17 @@ extension PDF = ".pdf"
 extension SVG = ".svg"
 extension JPG = ".jpg"
 extension EPS = ".eps"
+extension GIF = ".gif"
 
 -- | Datatype containing all parameters required
 -- to run pandoc-pyplot
 data FigureSpec = FigureSpec
-    { caption    :: String -- ^ Figure caption.
+    { caption    :: String       -- ^ Figure caption.
     , script     :: PythonScript -- ^ Source code for the figure.
-    , saveFormat :: SaveFormat -- ^ Save format of the figure
-    , directory  :: FilePath -- ^ Directory where to save the file
-    , dpi        :: Int -- ^ Dots-per-inch of figure
-    , blockAttrs :: Attr -- ^ Attributes not related to @pandoc-pyplot@ will be propagated.
+    , saveFormat :: SaveFormat   -- ^ Save format of the figure
+    , directory  :: FilePath     -- ^ Directory where to save the file
+    , dpi        :: Int          -- ^ Dots-per-inch of figure
+    , blockAttrs :: Attr         -- ^ Attributes not related to @pandoc-pyplot@ will be propagated.
     }
 
 instance Hashable FigureSpec where
