@@ -32,7 +32,7 @@ or
 pandoc --filter pandoc-pyplot input.md --output output.pdf
 ```
 
-or any other output format you want. `pandoc-pyplot` is efficient, too: it will detect which figures should be re-generated, and skip the others.
+or any other output format you want.
 
 There are more examples in the [source repository](https://github.com/LaurentRDC/pandoc-pyplot), in the `\examples` directory.
 
