@@ -13,8 +13,8 @@ import           Data.Text                     (unpack)
 import           Test.Tasty
 import           Test.Tasty.HUnit
 
-import qualified Text.Pandoc.Filter.Pyplot     as P
-import qualified Text.Pandoc.Filter.Pyplot.Internal as P
+import           Text.Pandoc.Filter.Pyplot
+import           Text.Pandoc.Filter.Pyplot.Internal
 
 import           Text.Pandoc.JSON
 import qualified Text.Pandoc.Builder           as B
@@ -44,28 +44,28 @@ main =
         , testBuildConfiguration
         ]
 
-plotCodeBlock :: P.PythonScript -> Block
+plotCodeBlock :: PythonScript -> Block
 plotCodeBlock script = CodeBlock (mempty, ["pyplot"], mempty) (unpack script)
 
 addCaption :: String -> Block -> Block
 addCaption caption (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(P.captionKey, caption)]) script
+    CodeBlock (id', cls, attrs ++ [(captionKey, caption)]) script
 
 addDirectory :: FilePath -> Block -> Block
 addDirectory dir (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(P.directoryKey, dir)]) script
+    CodeBlock (id', cls, attrs ++ [(directoryKey, dir)]) script
 
 addInclusion :: FilePath -> Block -> Block
 addInclusion inclusionPath (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(P.includePathKey, inclusionPath)]) script
+    CodeBlock (id', cls, attrs ++ [(includePathKey, inclusionPath)]) script
 
-addSaveFormat :: P.SaveFormat -> Block -> Block
+addSaveFormat :: SaveFormat -> Block -> Block
 addSaveFormat saveFormat (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(P.saveFormatKey, P.extension saveFormat)]) script
+    CodeBlock (id', cls, attrs ++ [(saveFormatKey, extension saveFormat)]) script
 
 addDPI :: Int -> Block -> Block
 addDPI dpi (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(P.dpiKey, show dpi)]) script
+    CodeBlock (id', cls, attrs ++ [(dpiKey, show dpi)]) script
 
 -- | Assert that a file exists
 assertFileExists :: HasCallStack => FilePath -> Assertion
@@ -107,7 +107,7 @@ testFileCreation =
         tempDir <- (</> "test-file-creation") <$> getCanonicalTemporaryDirectory
         ensureDirectoryExistsAndEmpty tempDir
         let codeBlock = (addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
-        _ <- P.makePlot' def codeBlock
+        _ <- makePlot' def codeBlock
         filesCreated <- length <$> listDirectory tempDir
         assertEqual "" filesCreated 3
 
@@ -121,7 +121,7 @@ testFileInclusion =
         let codeBlock =
                 (addInclusion "test/fixtures/include.py" $
                  addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
-        _ <- P.makePlot' def codeBlock
+        _ <- makePlot' def codeBlock
         inclusion <- readFile "test/fixtures/include.py"
         sourcePath <- head . filter (isExtensionOf "txt") <$> listDirectory tempDir
         src <- readFile (tempDir </> sourcePath)
@@ -135,13 +135,13 @@ testSaveFormat =
         tempDir <- (</> "test-safe-format") <$> getCanonicalTemporaryDirectory
         ensureDirectoryExistsAndEmpty tempDir
         let codeBlock =
-                (addSaveFormat P.JPG $
+                (addSaveFormat JPG $
                  addDirectory tempDir $
                  plotCodeBlock
                      "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])")
-        _ <- P.makePlot' def codeBlock
+        _ <- makePlot' def codeBlock
         numberjpgFiles <-
-            length <$> filter (isExtensionOf (P.extension P.JPG)) <$>
+            length <$> filter (isExtensionOf (extension JPG)) <$>
             listDirectory tempDir
         assertEqual "" numberjpgFiles 2
 
@@ -153,11 +153,11 @@ testBlockingCallError =
     testCase "raises an exception for blocking calls" $ do
         tempDir <- (</> "test-blocking-call-error") <$>getCanonicalTemporaryDirectory
         let codeBlock = plotCodeBlock "import matplotlib.pyplot as plt\nplt.show()"
-        result <- P.makePlot' def codeBlock
+        result <- makePlot' def codeBlock
         case result of
             Right block -> assertFailure "did not catch the expected blocking call"
             Left error ->
-                if error == P.BlockingCallError
+                if error == BlockingCallError
                     then pure ()
                     else assertFailure "did not catch the expected blocking call"
 -------------------------------------------------------------------------------
@@ -173,7 +173,7 @@ testMarkdownFormattingCaption =
         -- constructed
         let expected = [B.Strong [B.Str "caption"]]
             codeBlock = addDirectory tempDir $ addCaption "**caption**" $ plotCodeBlock "import matplotlib.pyplot as plt"
-        result <- P.makePlot' def codeBlock
+        result <- makePlot' def codeBlock
         case result of
             Left error -> assertFailure $ "an error occured: " <> show error
             Right block -> assertIsInfix expected (extractCaption block)
@@ -187,11 +187,11 @@ testMarkdownFormattingCaption =
 
 -------------------------------------------------------------------------------
 -- Test with configuration
-testConfig :: IO P.Configuration
+testConfig :: IO Configuration
 testConfig = do
     tempDir <- (</> "test-with-config") <$> getCanonicalTemporaryDirectory
     ensureDirectoryExistsAndEmpty tempDir
-    return $ def {P.defaultDirectory = tempDir, P.defaultSaveFormat = P.JPG}
+    return $ def {defaultDirectory = tempDir, defaultSaveFormat = JPG}
 
 testOverridingConfiguration :: TestTree
 testOverridingConfiguration =
@@ -200,17 +200,17 @@ testOverridingConfiguration =
 
         -- The default from config says the save format should be JPG
         -- but the code block save format="png"
-        let codeBlock = (addSaveFormat P.PNG $ 
+        let codeBlock = (addSaveFormat PNG $ 
                          plotCodeBlock 
                             "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])")
-        _ <- P.makePlot' config codeBlock
+        _ <- makePlot' config codeBlock
 
         numberjpgFiles <-
-            length <$> filter (isExtensionOf (P.extension P.JPG)) <$>
-            listDirectory (P.defaultDirectory config)
+            length <$> filter (isExtensionOf (extension JPG)) <$>
+            listDirectory (defaultDirectory config)
         numberpngFiles <-
-            length <$> filter (isExtensionOf (P.extension P.PNG)) <$>
-            listDirectory (P.defaultDirectory config)
+            length <$> filter (isExtensionOf (extension PNG)) <$>
+            listDirectory (defaultDirectory config)
         assertEqual "" numberjpgFiles 0
         assertEqual "" numberpngFiles 2
 -------------------------------------------------------------------------------
@@ -223,20 +223,20 @@ testWithConfiguration =
         config <- testConfig
 
         let codeBlock = plotCodeBlock "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])"
-        _ <- P.makePlot' config codeBlock
+        _ <- makePlot' config codeBlock
 
         numberjpgFiles <-
-            length <$> filter (isExtensionOf (P.extension P.JPG)) <$>
-            listDirectory (P.defaultDirectory config)
+            length <$> filter (isExtensionOf (extension JPG)) <$>
+            listDirectory (defaultDirectory config)
         assertEqual "" numberjpgFiles 2
 -------------------------------------------------------------------------------
 
 testBuildConfiguration :: TestTree
 testBuildConfiguration = 
     testCase "configuration is correctly parsed" $ do
-        let config = def { P.defaultDirectory = "generated/other"
-                         , P.defaultSaveFormat = P.JPG
-                         , P.defaultDPI = 150
+        let config = def { defaultDirectory = "generated/other"
+                         , defaultSaveFormat = JPG
+                         , defaultDPI = 150
                          }
-        parsedConfig <- P.configuration "test/fixtures/.pandoc-pyplot.yml"
+        parsedConfig <- configuration "test/fixtures/.pandoc-pyplot.yml"
         assertEqual "" config parsedConfig
