@@ -1,6 +1,6 @@
 # pandoc-pyplot - A Pandoc filter to generate Matplotlib figures directly in documents
 
-[![Hackage version](https://img.shields.io/hackage/v/pandoc-pyplot.svg)](http://hackage.haskell.org/package/pandoc-pyplot) [![Stackage version (LTS)](http://stackage.org/package/pandoc-pyplot/badge/lts)](http://stackage.org/nightly/package/pandoc-pyplot) [![Stackage version (nightly)](http://stackage.org/package/pandoc-pyplot/badge/nightly)](http://stackage.org/nightly/package/pandoc-pyplot) [![Build status](https://ci.appveyor.com/api/projects/status/qbmq9cyks5jup48e?svg=true)](https://ci.appveyor.com/project/LaurentRDC/pandoc-pyplot) ![](https://img.shields.io/badge/license-MIT-green.svg)
+[![Hackage version](https://img.shields.io/hackage/v/pandoc-pyplot.svg)](http://hackage.haskell.org/package/pandoc-pyplot) [![Stackage version (LTS)](http://stackage.org/package/pandoc-pyplot/badge/lts)](http://stackage.org/nightly/package/pandoc-pyplot) [![Stackage version (nightly)](http://stackage.org/package/pandoc-pyplot/badge/nightly)](http://stackage.org/nightly/package/pandoc-pyplot) [![Build status](https://ci.appveyor.com/api/projects/status/qbmq9cyks5jup48e?svg=true)](https://ci.appveyor.com/project/LaurentRDC/pandoc-pyplot) ![GitHub](https://img.shields.io/github/license/LaurentRDC/pandoc-pyplot.svg)
 
 `pandoc-pyplot` turns Python code present in your documents to embedded Matplotlib figures.
 
