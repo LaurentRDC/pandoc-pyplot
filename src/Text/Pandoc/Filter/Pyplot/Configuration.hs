@@ -11,8 +11,7 @@ Configuration for pandoc-pyplot
 -}
 
 module Text.Pandoc.Filter.Pyplot.Configuration (
-      Configuration (..)
-    , configuration
+      configuration
     -- * For testing and internal purposes only
     , inclusionKeys
     , directoryKey
@@ -23,14 +22,13 @@ module Text.Pandoc.Filter.Pyplot.Configuration (
 ) where
 
 import           Data.Maybe                    (fromMaybe)
-import           Data.Default.Class            (Default, def)
+import           Data.Default.Class            (def)
 import qualified Data.Text                     as T
 import qualified Data.Text.IO                  as T
 import           Data.Yaml         
 import           Data.Yaml.Config              (loadYamlSettings, ignoreEnv)
 
-import Text.Pandoc.Filter.Pyplot.FigureSpec
-import Text.Pandoc.Filter.Pyplot.Scripting
+import Text.Pandoc.Filter.Pyplot.Types
 
 -- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
 directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey :: String
@@ -48,32 +46,6 @@ inclusionKeys = [ directoryKey
                 , includePathKey
                 , saveFormatKey
                 ]
-
--- | Configuration of pandoc-pyplot, describing the default behavior
--- of the filter. 
---
--- A Configuration is useful when dealing with lots of figures; it avoids
--- repeating the same values.sta
--- 
--- @since 2.1.0.0
-data Configuration 
-    = Configuration 
-        { defaultDirectory     :: FilePath     -- ^ The default directory where figures will be saved.
-        , defaultIncludeScript :: PythonScript -- ^ The default script to run before other instructions.
-        , defaultSaveFormat    :: SaveFormat   -- ^ The default save format of generated figures.
-        , defaultDPI           :: Int          -- ^ The default dots-per-inch value for generated figures.
-        , interpreter          :: String       -- ^ The name of the interpreter to use to render figures.
-        }
-    deriving (Eq, Show)
-
-instance Default Configuration where
-    def = Configuration {
-          defaultDirectory     = "generated/"
-        , defaultIncludeScript = mempty
-        , defaultSaveFormat    = PNG
-        , defaultDPI           = 80
-        , interpreter          = "python"
-    }
 
 -- A @Configuration@ cannot be directly created from a YAML file
 -- for two reasons:
