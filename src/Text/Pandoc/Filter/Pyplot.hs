@@ -25,8 +25,8 @@ To trigger pandoc-pyplot, the following is __required__:
 
 Here are the possible attributes what pandoc-pyplot understands:
 
-    * @target=...@: Filepath where the resulting figure should be saved.
     * @directory=...@ : Directory where to save the figure.
+    * @format=...@: Format of the generated figure. This can be an extension or an acronym, e.g. @format=png@.
     * @caption="..."@: Specify a plot caption (or alternate text).
     * @dpi=...@: Specify a value for figure resolution, or dots-per-inch. Default is 80DPI.
     * @include=...@: Path to a Python script to include before the code block. Ideal to avoid repetition over many figures.
