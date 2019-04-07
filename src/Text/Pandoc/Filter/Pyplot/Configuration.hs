@@ -62,6 +62,7 @@ data Configuration
         , defaultIncludeScript :: PythonScript
         , defaultSaveFormat    :: SaveFormat
         , defaultDPI           :: Int
+        , interpreter          :: String
         }
     deriving (Eq, Show)
 
@@ -71,6 +72,7 @@ instance Default Configuration where
         , defaultIncludeScript = mempty
         , defaultSaveFormat    = PNG
         , defaultDPI           = 80
+        , interpreter          = "python"
     }
 
 -- A @Configuration@ cannot be directly created from a YAML file
@@ -88,6 +90,7 @@ data ConfigPrecursor
         , defaultIncludePath_ :: Maybe FilePath
         , defaultSaveFormat_  :: String
         , defaultDPI_         :: Int
+        , interpreter_         :: String
         } 
 
 instance FromJSON ConfigPrecursor where
@@ -96,6 +99,7 @@ instance FromJSON ConfigPrecursor where
         <*> v .:? (T.pack includePathKey)
         <*> v .:? (T.pack saveFormatKey) .!= (extension $ defaultSaveFormat def)
         <*> v .:? (T.pack dpiKey) .!= (defaultDPI def)
+        <*> v .:? "interpreter" .!= (interpreter def)
     
     parseJSON _ = fail "Could not parse the configuration"
 
@@ -107,6 +111,7 @@ renderConfiguration prec = do
                            , defaultIncludeScript = includeScript
                            , defaultSaveFormat    = saveFormat'
                            , defaultDPI           = defaultDPI_ prec
+                           , interpreter          = interpreter_ prec
                            }
 
 
