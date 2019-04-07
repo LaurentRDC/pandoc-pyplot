@@ -6,7 +6,7 @@ Release 2.1.0.0
 ---------------
 
 * Added support for config files ".pandoc-pyplot.yml", which specify different default values. This is mirrored in the new `Configuration` type.
-* Added support for GIFs.
+* Added support for GIF and TIF files.
 * Added the "-f"/"--formats" command to show supported output figure formats.
 * Added support for GHC 8.2
 * Moved internal modules to `Text.Pandoc.Filter.Pyplot.Internal` module.
