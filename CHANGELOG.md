@@ -5,7 +5,7 @@ pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 Release 2.1.0.0
 ---------------
 
-* Added support for config files ".pandoc-pyplot.yml", which specify different default values. This is mirrored in the new `Configuration` type.
+* Added support for config files ".pandoc-pyplot.yml", which specify different default values. This is mirrored in the new `Configuration` type and new functions, `makePlotWithConfig` and `plotTransformWithConfig`.
 * Added the ability to specify a different Python interpreter to use.
 * Added support for GIF and TIF files.
 * Added the "-f"/"--formats" command to show supported output figure formats.
