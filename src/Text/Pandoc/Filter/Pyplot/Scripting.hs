@@ -19,7 +19,7 @@ module Text.Pandoc.Filter.Pyplot.Scripting
     ) where
 
 import           Data.Hashable        (hash)
-import           Data.Monoid          (Any (..), (<>))
+import           Data.Monoid          (Any(..))
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
@@ -39,15 +39,16 @@ data ScriptResult
 
 -- | Take a python script in string form, write it in a temporary directory,
 -- then execute it.
-runTempPythonScript :: PythonScript    -- ^ Content of the script
+runTempPythonScript :: String          -- ^ Interpreter (e.g. "python" or "python35")
+                    -> PythonScript    -- ^ Content of the script
                     -> IO ScriptResult -- ^ Result with exit code.
-runTempPythonScript script = do
+runTempPythonScript interpreter script = do
     -- We involve the script hash as a temporary filename
     -- so that there is never any collision
     scriptPath <- (</> hashedPath) <$> getCanonicalTemporaryDirectory
     T.writeFile scriptPath script
 
-    ec <- runProcess $ shell $ "python " <> (show scriptPath)
+    ec <- runProcess $ shell $ mconcat [interpreter, " ", show scriptPath]
     case ec of
         ExitSuccess      -> return   ScriptSuccess
         ExitFailure code -> return $ ScriptFailure code

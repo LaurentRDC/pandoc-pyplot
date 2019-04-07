@@ -6,7 +6,7 @@
 
 ## Usage
 
-The filter recognizes code blocks with the `pyplot` class present. It will run the script in the associated code block in a Python interpreter and capture the generated Matplotlib figure.
+The filter recognizes code blocks with the `.pyplot` class present. It will run the script in the associated code block in a Python interpreter and capture the generated Matplotlib figure.
 
 Here is a basic example using the scripting `matplotlib.pyplot` API:
 
@@ -103,12 +103,12 @@ This `include` parameter is perfect for longer documents with many plots. Simply
 To avoid repetition, `pandoc-pyplot` can be configured using simple YAML syntax. `pandoc-pyplot` will look for a `pandoc-pyplot.yml` file in the current working directory:
 
 ```yaml
-# You can specify any or all of the following
-# parameters
+# You can specify any or all of the following parameters
 directory: mydirectory/
 dpi: 150
 format: jpeg
 include: mystyle.py
+interpreter: python36
 ```
 
 These values override the default values, which are equivalent to:
@@ -117,6 +117,7 @@ These values override the default values, which are equivalent to:
 directory: generated/
 dpi: 80
 format: png
+interpreter: python
 ```
 
 ## Installation
@@ -159,7 +160,7 @@ stack install # Alternatively, `cabal install`
 
 ### Requirements
 
-This filter only works with the Matplotlib plotting library. Therefore, you a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The Python interpreter is expected to be discoverable using the name `"python"` (as opposed to `"python3"`, for example)
+This filter only works with the Matplotlib plotting library. Therefore, you a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The name of the Python interpreter to use can be specified in a `.pandoc-pyplot.yml` file; by default, `pandoc-pyplot` will use the `"python"` name.
 
 You can use the filter with Pandoc as follows:
 

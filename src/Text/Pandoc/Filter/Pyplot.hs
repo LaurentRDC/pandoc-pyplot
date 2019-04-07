@@ -141,13 +141,13 @@ parseFigureSpec _ _ = return Nothing
 
 -- | Run the Python script. In case the file already exists, we can safely assume
 -- there is no need to re-run it.
-runScriptIfNecessary :: FigureSpec -> IO ScriptResult
-runScriptIfNecessary spec = do
+runScriptIfNecessary :: Configuration -> FigureSpec -> IO ScriptResult
+runScriptIfNecessary config spec = do
     createDirectoryIfMissing True . takeDirectory $ figurePath spec
     fileAlreadyExists <- doesFileExist $ figurePath spec
     result <- if fileAlreadyExists
                 then return ScriptSuccess
-                else runTempPythonScript $ addPlotCapture spec
+                else runTempPythonScript (interpreter config) (addPlotCapture spec)
     case result of
         ScriptFailure code -> return $ ScriptFailure code
         ScriptSuccess      -> T.writeFile (sourceCodePath spec) (script spec) >> return ScriptSuccess
@@ -163,7 +163,7 @@ makePlot' config block = do
         Just spec ->
             if hasBlockingShowCall (script spec)
                 then return $ Left BlockingCallError
-                else handleResult spec <$> runScriptIfNecessary spec 
+                else handleResult spec <$> runScriptIfNecessary config spec 
     where
         handleResult _   (ScriptFailure code) = Left  $ ScriptError code
         handleResult spec ScriptSuccess       = Right $ toImage spec
