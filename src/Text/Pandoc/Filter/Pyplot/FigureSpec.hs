@@ -25,8 +25,7 @@ module Text.Pandoc.Filter.Pyplot.FigureSpec
 
 import           Control.Monad                (join)
 
-import           Data.Char                    (toLower)
-import           Data.Hashable                (Hashable, hash, hashWithSalt)
+import           Data.Hashable                (hash)
 import           Data.Maybe                   (fromMaybe)
 import           Data.Monoid                  ((<>))
 import qualified Data.Text                    as T
@@ -42,7 +41,7 @@ import           Text.Pandoc.Extensions       (extensionsFromList, Extension(..)
 import           Text.Pandoc.Options          (def, ReaderOptions(..))
 import           Text.Pandoc.Readers          (readMarkdown)
 
-import Text.Pandoc.Filter.Pyplot.Scripting
+import Text.Pandoc.Filter.Pyplot.Types
 
 readerOptions :: ReaderOptions
 readerOptions = def 
@@ -67,61 +66,6 @@ captionReader t = either (const Nothing) (Just . extractFromBlocks) $ runPure $ 
         extractInlines (Para inlines) = inlines
         extractInlines (LineBlock multiinlines) = join multiinlines
         extractInlines _ = []
-
--- | Generated figure file format supported by pandoc-pyplot. 
-data SaveFormat
-    = PNG
-    | PDF
-    | SVG
-    | JPG
-    | EPS
-    | GIF
-    | TIF
-    deriving (Bounded, Enum, Eq, Show)
-
--- | Parse an image save format string
---
--- >>> saveFormatFromString ".png"
--- Just PNG
---
--- >>> saveFormatFromString "jpeg"
--- Just JPEG
---
--- >>> SaveFormatFromString "arbitrary"
--- Nothing
-saveFormatFromString :: String -> Maybe SaveFormat
-saveFormatFromString s
-    | s `elem` ["png", "PNG", ".png"] = Just PNG
-    | s `elem` ["pdf", "PDF", ".pdf"] = Just PDF
-    | s `elem` ["svg", "SVG", ".svg"] = Just SVG
-    | s `elem` ["eps", "EPS", ".eps"] = Just EPS
-    | s `elem` ["gif", "GIF", ".gif"] = Just GIF
-    | s `elem` ["jpg", "jpeg", "JPG", "JPEG", ".jpg", ".jpeg"] = Just JPG
-    | s `elem` ["tif", "tiff", "TIF", "TIFF", ".tif", ".tiff"] = Just TIF
-    | otherwise = Nothing
-
--- | Save format file extension
-extension :: SaveFormat -> String
-extension fmt = mconcat [".", fmap toLower . show $ fmt]
-
--- | Datatype containing all parameters required to run pandoc-pyplot
-data FigureSpec = FigureSpec
-    { caption    :: String       -- ^ Figure caption.
-    , script     :: PythonScript -- ^ Source code for the figure.
-    , saveFormat :: SaveFormat   -- ^ Save format of the figure
-    , directory  :: FilePath     -- ^ Directory where to save the file
-    , dpi        :: Int          -- ^ Dots-per-inch of figure
-    , blockAttrs :: Attr         -- ^ Attributes not related to @pandoc-pyplot@ will be propagated.
-    }
-
-instance Hashable FigureSpec where
-    hashWithSalt salt spec =
-        hashWithSalt salt ( caption spec
-                          , script spec
-                          , fromEnum . saveFormat $ spec
-                          , directory spec, dpi spec
-                          , blockAttrs spec
-                          )
 
 -- | Convert a FigureSpec to a Pandoc block component
 toImage :: FigureSpec -> Block
