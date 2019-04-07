@@ -94,8 +94,7 @@ saveFormatFromString s
 extension :: SaveFormat -> String
 extension fmt = mconcat [".", fmap toLower . show $ fmt]
 
--- | Datatype containing all parameters required
--- to run pandoc-pyplot
+-- | Datatype containing all parameters required to run pandoc-pyplot
 data FigureSpec = FigureSpec
     { caption    :: String       -- ^ Figure caption.
     , script     :: PythonScript -- ^ Source code for the figure.
@@ -107,7 +106,12 @@ data FigureSpec = FigureSpec
 
 instance Hashable FigureSpec where
     hashWithSalt salt spec =
-        hashWithSalt salt (caption spec, script spec, directory spec, dpi spec, blockAttrs spec)
+        hashWithSalt salt ( caption spec
+                          , script spec
+                          , fromEnum . saveFormat $ spec
+                          , directory spec, dpi spec
+                          , blockAttrs spec
+                          )
 
 -- | Convert a FigureSpec to a Pandoc block component
 toImage :: FigureSpec -> Block
@@ -129,7 +133,7 @@ figurePath :: FigureSpec -> FilePath
 figurePath spec = (directory spec </> stem spec)
   where
     stem = flip addExtension ext . show . hash
-    ext = extension . saveFormat $ spec
+    ext  = extension . saveFormat $ spec
 
 -- | Determine the path to the source code that generated the figure.
 sourceCodePath :: FigureSpec -> FilePath

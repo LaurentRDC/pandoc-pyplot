@@ -39,20 +39,17 @@ data ScriptResult
 
 -- | Take a python script in string form, write it in a temporary directory,
 -- then execute it.
-runTempPythonScript ::
-       PythonScript -- ^ Content of the script
-    -> IO ScriptResult -- ^ Result with exit code.
-runTempPythonScript script
-    -- Write script to temporary directory
+runTempPythonScript :: PythonScript    -- ^ Content of the script
+                    -> IO ScriptResult -- ^ Result with exit code.
+runTempPythonScript script = do
     -- We involve the script hash as a temporary filename
     -- so that there is never any collision
- = do
     scriptPath <- (</> hashedPath) <$> getCanonicalTemporaryDirectory
     T.writeFile scriptPath script
-    -- Execute script
+
     ec <- runProcess $ shell $ "python " <> (show scriptPath)
     case ec of
-        ExitSuccess      -> return ScriptSuccess
+        ExitSuccess      -> return   ScriptSuccess
         ExitFailure code -> return $ ScriptFailure code
     where
         hashedPath = show . hash $ script
