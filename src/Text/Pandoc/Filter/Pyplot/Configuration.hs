@@ -79,21 +79,23 @@ instance Default Configuration where
 --     * we want to store an include script. However, it makes more sense to 
 --       specify the script path in a YAML file.
 --     * Save format is best specified by a string, and this must be parsed later 
+--
+-- Therefore, we have another type, ConfigPrecursor, which CAN be created directly from
+-- a YAML file.
 data ConfigPrecursor
     = ConfigPrecursor
-        { defaultDirectory_     :: FilePath
-        , defaultIncludePath_   :: Maybe FilePath
-        , defaultSaveFormat_    :: String
-        , defaultDPI_           :: Int
+        { defaultDirectory_   :: FilePath
+        , defaultIncludePath_ :: Maybe FilePath
+        , defaultSaveFormat_  :: String
+        , defaultDPI_         :: Int
         } 
 
 instance FromJSON ConfigPrecursor where
-    parseJSON (Object v) = do
-        d <- v .:? (T.pack directoryKey) .!= (defaultDirectory def)
-        i <- v .:? (T.pack includePathKey)
-        f <- v .:? (T.pack saveFormatKey) .!= (extension $ defaultSaveFormat def)
-        p <- v .:? (T.pack dpiKey) .!= (defaultDPI def)
-        return $ ConfigPrecursor d i f p
+    parseJSON (Object v) = ConfigPrecursor
+        <$> v .:? (T.pack directoryKey) .!= (defaultDirectory def)
+        <*> v .:? (T.pack includePathKey)
+        <*> v .:? (T.pack saveFormatKey) .!= (extension $ defaultSaveFormat def)
+        <*> v .:? (T.pack dpiKey) .!= (defaultDPI def)
     
     parseJSON _ = fail "Could not parse the configuration"
 
@@ -111,8 +113,8 @@ renderConfiguration prec = do
 -- | Building configuration from a YAML file. The
 -- keys are exactly the same as for Markdown code blocks.
 --
--- If keys are either not present or unreadable, its value will be set
--- to the default values of pandoc-pyplot.
+-- If a key is either not present or unreadable, its value will be set
+-- to the default value.
 --
 -- @since 2.1.0.0
 configuration :: FilePath -> IO Configuration
