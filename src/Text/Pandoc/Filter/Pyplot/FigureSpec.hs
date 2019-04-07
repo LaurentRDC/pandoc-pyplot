@@ -68,6 +68,7 @@ captionReader t = either (const Nothing) (Just . extractFromBlocks) $ runPure $ 
         extractInlines (LineBlock multiinlines) = join multiinlines
         extractInlines _ = []
 
+-- | Generated figure file format supported by pandoc-pyplot. 
 data SaveFormat
     = PNG
     | PDF
@@ -79,6 +80,15 @@ data SaveFormat
     deriving (Bounded, Enum, Eq, Show)
 
 -- | Parse an image save format string
+--
+-- >>> saveFormatFromString ".png"
+-- Just PNG
+--
+-- >>> saveFormatFromString "jpeg"
+-- Just JPEG
+--
+-- >>> SaveFormatFromString "arbitrary"
+-- Nothing
 saveFormatFromString :: String -> Maybe SaveFormat
 saveFormatFromString s
     | s `elem` ["png", "PNG", ".png"] = Just PNG

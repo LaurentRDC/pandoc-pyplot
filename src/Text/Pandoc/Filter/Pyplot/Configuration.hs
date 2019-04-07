@@ -58,11 +58,11 @@ inclusionKeys = [ directoryKey
 -- @since 2.1.0.0
 data Configuration 
     = Configuration 
-        { defaultDirectory     :: FilePath
-        , defaultIncludeScript :: PythonScript
-        , defaultSaveFormat    :: SaveFormat
-        , defaultDPI           :: Int
-        , interpreter          :: String
+        { defaultDirectory     :: FilePath     -- ^ The default directory where figures will be saved.
+        , defaultIncludeScript :: PythonScript -- ^ The default script to run before other instructions.
+        , defaultSaveFormat    :: SaveFormat   -- ^ The default save format of generated figures.
+        , defaultDPI           :: Int          -- ^ The default dots-per-inch value for generated figures.
+        , interpreter          :: String       -- ^ The name of the interpreter to use to render figures.
         }
     deriving (Eq, Show)
 
@@ -90,16 +90,16 @@ data ConfigPrecursor
         , defaultIncludePath_ :: Maybe FilePath
         , defaultSaveFormat_  :: String
         , defaultDPI_         :: Int
-        , interpreter_         :: String
+        , interpreter_        :: String
         } 
 
 instance FromJSON ConfigPrecursor where
     parseJSON (Object v) = ConfigPrecursor
-        <$> v .:? (T.pack directoryKey) .!= (defaultDirectory def)
+        <$> v .:? (T.pack directoryKey)  .!= (defaultDirectory def)
         <*> v .:? (T.pack includePathKey)
         <*> v .:? (T.pack saveFormatKey) .!= (extension $ defaultSaveFormat def)
-        <*> v .:? (T.pack dpiKey) .!= (defaultDPI def)
-        <*> v .:? "interpreter" .!= (interpreter def)
+        <*> v .:? (T.pack dpiKey)        .!= (defaultDPI def)
+        <*> v .:? "interpreter"          .!= (interpreter def)
     
     parseJSON _ = fail "Could not parse the configuration"
 
