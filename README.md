@@ -204,6 +204,8 @@ makePlotPandocCompiler =
     (unsafeCompiler . plotTransform)
 ```
 
+The `plotTransformWithConfig` is also available for a more configurable set-up.
+
 ## Warning
 
 Do not run this filter on unknown documents. There is nothing in `pandoc-pyplot` that can stop a Python script from performing **evil actions**.
