@@ -18,18 +18,16 @@ module Text.Pandoc.Filter.Pyplot.Scripting
     , ScriptResult(..)
     ) where
 
+import           Data.Hashable        (hash)
+import           Data.Monoid          (Any (..), (<>))
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
-
-import           Data.Hashable        (hash)
 
 import           System.Exit          (ExitCode (..))
 import           System.FilePath      ((</>))
 import           System.IO.Temp       (getCanonicalTemporaryDirectory)
 import           System.Process.Typed (runProcess, shell)
-
-import           Data.Monoid          (Any (..), (<>))
 
 -- | String representation of a Python script
 type PythonScript = Text

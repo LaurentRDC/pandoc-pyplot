@@ -25,6 +25,7 @@ module Text.Pandoc.Filter.Pyplot.FigureSpec
 
 import           Control.Monad                (join)
 
+import           Data.Char                    (toLower)
 import           Data.Hashable                (Hashable, hash, hashWithSalt)
 import           Data.Maybe                   (fromMaybe)
 import           Data.Monoid                  ((<>))
@@ -74,6 +75,7 @@ data SaveFormat
     | JPG
     | EPS
     | GIF
+    | TIF
     deriving (Bounded, Enum, Eq, Show)
 
 -- | Parse an image save format string
@@ -82,19 +84,15 @@ saveFormatFromString s
     | s `elem` ["png", "PNG", ".png"] = Just PNG
     | s `elem` ["pdf", "PDF", ".pdf"] = Just PDF
     | s `elem` ["svg", "SVG", ".svg"] = Just SVG
-    | s `elem` ["jpg", "jpeg", "JPG", "JPEG", ".jpg", ".jpeg"] = Just JPG
     | s `elem` ["eps", "EPS", ".eps"] = Just EPS
     | s `elem` ["gif", "GIF", ".gif"] = Just GIF
+    | s `elem` ["jpg", "jpeg", "JPG", "JPEG", ".jpg", ".jpeg"] = Just JPG
+    | s `elem` ["tif", "tiff", "TIF", "TIFF", ".tif", ".tiff"] = Just TIF
     | otherwise = Nothing
 
 -- | Save format file extension
 extension :: SaveFormat -> String
-extension PNG = ".png"
-extension PDF = ".pdf"
-extension SVG = ".svg"
-extension JPG = ".jpg"
-extension EPS = ".eps"
-extension GIF = ".gif"
+extension fmt = mconcat [".", fmap toLower . show $ fmt]
 
 -- | Datatype containing all parameters required
 -- to run pandoc-pyplot
