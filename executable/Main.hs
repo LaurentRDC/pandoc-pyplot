@@ -31,10 +31,10 @@ help =
     \   Optional arguments:\n\
     \       -h, --help     Show this help message and exit\n\
     \       -v, --version  Show version number and exit \n\
-    \       -f, --formats  Show available output figure formats and exit \n\
+    \       -f, --formats  Show supported output figure formats and exit \n\
     \\n\
     \   To use with pandoc: \n\
-    \       pandoc --filter pandoc-pyplot input.md --output output.html\n\
+    \       pandoc -s --filter pandoc-pyplot input.md --output output.html\n\
     \\n\
     \   More information can be found in the repository README, located at \n\
     \       https://github.com/LaurentRDC/pandoc-pyplot\n"
