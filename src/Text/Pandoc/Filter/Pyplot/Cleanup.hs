@@ -10,7 +10,7 @@ This module defines functions to clean-up the pandoc-pyplot generated outputs
 by walking over a document and gathering all figure directories.
 -}
 
-module Text.Pandoc.Pyplot.Filter.Cleanup where
+module Text.Pandoc.Filter.Pyplot.Cleanup where
 
 import           Control.Monad                 (forM_)     
 import qualified Data.Map.Strict               as Map
@@ -31,7 +31,7 @@ type Directory = FilePath
 -- | Get the target directory of every Pandoc block that could
 -- become a pandoc-pyplot figure
 figureSpecDirectory :: Configuration -> Block -> [Directory]
-figureSpecDirectory config (CodeBlock (id', cls, attrs) content)
+figureSpecDirectory config (CodeBlock (_, cls, attrs) _)
     | "pyplot" `elem` cls = [dir]
     | otherwise = []
     where
@@ -43,7 +43,7 @@ figureSpecDirectory _ _ = []
 figureDirectories :: Configuration -> Pandoc -> [Directory]
 figureDirectories config = query (figureSpecDirectory config)
 
--- | Cleanup directories in 
+-- | Delete directories and subdirectories recursively.
 cleanup :: [Directory] -> IO ()
 cleanup dirs = forM_ dirs  
     (\d -> do     
