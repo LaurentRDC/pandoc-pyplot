@@ -2,6 +2,12 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+Release 2.1.0.1
+---------------
+
+* Fixed outdated documentation (referencing "target" parameter)
+* Fixed types required to build Configuration values that were not exported (SaveFormat, PythonScript)
+
 Release 2.1.0.0
 ---------------
 
