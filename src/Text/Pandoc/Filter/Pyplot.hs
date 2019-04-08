@@ -27,7 +27,7 @@ Here are the possible attributes what pandoc-pyplot understands:
 
     * @directory=...@ : Directory where to save the figure.
     * @format=...@: Format of the generated figure. This can be an extension or an acronym, e.g. @format=png@.
-    * @caption="..."@: Specify a plot caption (or alternate text).
+    * @caption="..."@: Specify a plot caption (or alternate text). Captions support Markdown formatting and LaTeX math (@$...$@).
     * @dpi=...@: Specify a value for figure resolution, or dots-per-inch. Default is 80DPI.
     * @include=...@: Path to a Python script to include before the code block. Ideal to avoid repetition over many figures.
 
@@ -42,6 +42,34 @@ import matplotlib.pyplot as plt
 plt.figure()
 plt.plot([0,1,2,3,4], [1,2,3,4,5])
 plt.title('This is an example figure')
+```
+
+This is another paragraph
+
+```{.pyplot dpi=150 format=SVG}
+# This example was taken from the Matplotlib gallery
+# https://matplotlib.org/examples/pylab_examples/bar_stacked.html
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+N = 5
+menMeans = (20, 35, 30, 35, 27)
+womenMeans = (25, 32, 34, 20, 25)
+menStd = (2, 3, 4, 1, 2)
+womenStd = (3, 5, 2, 3, 3)
+ind = np.arange(N)    # the x locations for the groups
+width = 0.35       # the width of the bars: can also be len(x) sequence
+
+p1 = plt.bar(ind, menMeans, width, color='#d62728', yerr=menStd)
+p2 = plt.bar(ind, womenMeans, width,
+             bottom=menMeans, yerr=womenStd)
+
+plt.ylabel('Scores')
+plt.title('Scores by group and gender')
+plt.xticks(ind, ('G1', 'G2', 'G3', 'G4', 'G5'))
+plt.yticks(np.arange(0, 81, 10))
+plt.legend((p1[0], p2[0]), ('Men', 'Women'))
 ```
 @
 
@@ -64,6 +92,8 @@ makePlotPandocCompiler =
     (unsafeCompiler . plotTransform)
 @
 
+Custom configurations are possible via the @Configuration@ type and the filter 
+functions @plotTransformWithConfig@ and @makePlotWithConfig@. 
 -}
 module Text.Pandoc.Filter.Pyplot (
     -- * Operating on single Pandoc blocks 
@@ -75,6 +105,8 @@ module Text.Pandoc.Filter.Pyplot (
     -- * For configuration purposes
     , configuration
     , Configuration (..)
+    , PythonScript
+    , SaveFormat (..)
     -- * For testing and internal purposes only
     , PandocPyplotError(..)
     , makePlot'
