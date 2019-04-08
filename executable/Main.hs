@@ -8,8 +8,7 @@ import           Data.List                 (intersperse)
 import           System.Environment        (getArgs)
 import           System.Directory          (doesFileExist)
 
-import           Text.Pandoc.Filter.Pyplot (plotTransformWithConfig, configuration)
-import           Text.Pandoc.Filter.Pyplot.Internal (SaveFormat(..))
+import           Text.Pandoc.Filter.Pyplot (plotTransformWithConfig, configuration, SaveFormat(..))
 import           Text.Pandoc.JSON          (toJSONFilter)
 
 import qualified Data.Version              as V
