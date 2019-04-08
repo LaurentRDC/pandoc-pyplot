@@ -8,7 +8,7 @@ import           Data.List                 (intersperse)
 import           System.Environment        (getArgs)
 import           System.Directory          (doesFileExist)
 
-import           Text.Pandoc.Filter.Pyplot (makePlotWithConfig, configuration)
+import           Text.Pandoc.Filter.Pyplot (plotTransformWithConfig, configuration)
 import           Text.Pandoc.Filter.Pyplot.Internal (SaveFormat(..))
 import           Text.Pandoc.JSON          (toJSONFilter)
 
@@ -51,7 +51,7 @@ main = do
             | arg `elem` ["-h", "--help"] -> showHelp
             | arg `elem` ["-v", "--version"] -> showVersion
             | arg `elem` ["-f", "--formats"] -> showFormats
-        _ -> toJSONFilter (makePlotWithConfig config)
+        _ -> toJSONFilter (plotTransformWithConfig config)
   where
     showHelp    = putStrLn help
     showVersion = putStrLn (V.showVersion version)
