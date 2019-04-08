@@ -11,7 +11,6 @@ This module re-exports internal pandoc-pyplot functionality.
 -}
 
 module Text.Pandoc.Filter.Pyplot.Internal (
-      module Text.Pandoc.Filter.Pyplot.Cleanup
     , module Text.Pandoc.Filter.Pyplot.Configuration
     , module Text.Pandoc.Filter.Pyplot.FigureSpec
     , module Text.Pandoc.Filter.Pyplot.Scripting
