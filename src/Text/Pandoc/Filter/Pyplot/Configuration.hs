@@ -17,6 +17,7 @@ module Text.Pandoc.Filter.Pyplot.Configuration (
     , directoryKey
     , captionKey
     , dpiKey
+    , labelKey
     , includePathKey
     , saveFormatKey
 ) where
@@ -31,12 +32,13 @@ import           Data.Yaml.Config              (loadYamlSettings, ignoreEnv)
 import Text.Pandoc.Filter.Pyplot.Types
 
 -- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
-directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey :: String
+directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey, labelKey :: String
 directoryKey   = "directory"
 captionKey     = "caption"
 dpiKey         = "dpi"
 includePathKey = "include"
 saveFormatKey  = "format"
+labelKey       = "label"
 
 -- | list of all keys related to pandoc-pyplot.
 inclusionKeys :: [String]
@@ -45,6 +47,7 @@ inclusionKeys = [ directoryKey
                 , dpiKey
                 , includePathKey
                 , saveFormatKey
+                , labelKey
                 ]
 
 -- A @Configuration@ cannot be directly created from a YAML file
