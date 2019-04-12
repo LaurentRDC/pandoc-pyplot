@@ -37,6 +37,10 @@ data SaveFormat
     | TIF
     deriving (Bounded, Enum, Eq, Show)
 
+-- | Label a figure with a name, e.g. LaTeX \label{...}.
+-- This can be used to link to the figure later
+type Label = String
+
 -- | Parse an image save format string
 --
 -- >>> saveFormatFromString ".png"
@@ -92,6 +96,7 @@ instance Default Configuration where
 data FigureSpec = FigureSpec
     { caption    :: String       -- ^ Figure caption.
     , script     :: PythonScript -- ^ Source code for the figure.
+    , label      :: Label    -- ^ Label to refer to this figure from elsewhere in document. @since 2.1.1.0
     , saveFormat :: SaveFormat   -- ^ Save format of the figure
     , directory  :: FilePath     -- ^ Directory where to save the file
     , dpi        :: Int          -- ^ Dots-per-inch of figure
