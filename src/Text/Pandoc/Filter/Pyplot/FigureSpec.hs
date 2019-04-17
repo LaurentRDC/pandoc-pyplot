@@ -84,7 +84,7 @@ toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
 
 -- | Determine the path a figure should have.
 figurePath :: FigureSpec -> FilePath
-figurePath spec = (directory spec </> stem spec)
+figurePath spec = directory spec </> stem spec
   where
     stem = flip addExtension ext . show . hash
     ext  = extension . saveFormat $ spec
