@@ -2,11 +2,6 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-Release 2.1.1.0
----------------
-
-* Added the "label" parameter to label figures with a name. This can be used to refer to the figure from elsewhere in the document, just like LaTeX's `\label{...}`.
-
 Release 2.1.0.1
 ---------------
 
