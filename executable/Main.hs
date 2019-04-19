@@ -28,6 +28,37 @@ supportedSaveFormats = enumFromTo minBound maxBound
 manualHtml :: T.Text
 manualHtml = T.pack $(embedManualHtml)
 
+data Flag = Help
+          | Version
+          | Formats
+          | Manual
+          | InvalidFlag
+    deriving (Eq)
+
+parseFlag :: [String] -> Maybe Flag
+parseFlag s
+    | null s                               = Nothing 
+    | head s `elem` ["-h", "--help"]       = Just Help
+    | head s `elem` ["-v", "--version"]    = Just Version
+    | head s `elem` ["-f", "--formats"]    = Just Formats
+    | head s `elem` ["-m", "--manual"]     = Just Manual
+    | otherwise                            = Just InvalidFlag
+
+flagAction :: Flag -> IO ()
+flagAction f
+    | f == Help    = showHelp
+    | f == Version = showVersion
+    | f == Formats = showFormats
+    | f == Manual  = showManual
+    | otherwise    = showError    -- Includes InvalidFlag
+    where   
+        showHelp    = putStrLn help
+        showVersion = putStrLn (V.showVersion version)
+        showFormats = putStrLn . mconcat . intersperse ", " . fmap show $ supportedSaveFormats
+        showManual  = writeSystemTempFile "pandoc-pyplot-manual.html" (T.unpack manualHtml) 
+                        >>= \fp -> openBrowser ("file:///" <> fp) >> return ()
+        showError   = putStrLn "Invalid flag. Please read `pandoc-pyplot --help` for information on valid flags."
+
 help :: String
 help =
     "\n\
@@ -46,6 +77,9 @@ help =
     \   To use with pandoc: \n\
     \       pandoc -s --filter pandoc-pyplot input.md --output output.html\n\
     \\n\
+    \   If you use pandoc-pyplot in combination with other filters, you probably want\n\
+    \   to run pandoc-pyplot first. See the manual (`pandoc-pyplot --manual`) for details.\n\
+    \\n\
     \   More information can be found in the repository README, located at \n\
     \       https://github.com/LaurentRDC/pandoc-pyplot\n"
 
@@ -56,16 +90,6 @@ main = do
                 then configuration ".pandoc-pyplot.yml"
                 else def
 
-    getArgs >>= \case
-        (arg:_)
-            | arg `elem` ["-h", "--help"]    -> showHelp
-            | arg `elem` ["-v", "--version"] -> showVersion
-            | arg `elem` ["-f", "--formats"] -> showFormats
-            | arg `elem` ["-m", "--manual"]  -> showManual
-        _ -> toJSONFilter (plotTransformWithConfig config)
-  where
-    showHelp    = putStrLn help
-    showVersion = putStrLn (V.showVersion version)
-    showFormats = putStrLn . mconcat . intersperse ", " . fmap show $ supportedSaveFormats
-    showManual  = writeSystemTempFile "pandoc-pyplot-manual.html" (T.unpack manualHtml) 
-                    >>= \fp -> openBrowser ("file:///" <> fp) >> return ()
+    getArgs >>= \args -> case parseFlag args of
+        Just f  -> flagAction f
+        Nothing -> toJSONFilter (plotTransformWithConfig config)
