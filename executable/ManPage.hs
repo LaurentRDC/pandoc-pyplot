@@ -1,4 +1,7 @@
 {-# LANGUAGE TemplateHaskellQuotes #-}
+{-|
+This module was inspired by pandoc-crossref
+|-}
 
 module ManPage ( embedManualHtml ) where
 
