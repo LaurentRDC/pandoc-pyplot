@@ -1,9 +1,6 @@
 {-# LANGUAGE TemplateHaskellQuotes #-}
 
-module ManPage 
-        ( embedManualText
-        , embedManualHtml
-        ) where
+module ManPage ( embedManualHtml ) where
 
 import           Control.DeepSeq            (($!!))
 
@@ -42,9 +39,6 @@ embedManual fmt = do
     where
         strToExp :: String -> Q Exp
         strToExp s = return $ VarE 'fromString `AppE` LitE (StringL s)
-
-embedManualText :: Q Exp
-embedManualText = embedManual $ P.writePlain P.def
 
 embedManualHtml :: Q Exp
 embedManualHtml = do
