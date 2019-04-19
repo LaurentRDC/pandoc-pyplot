@@ -31,16 +31,16 @@ help :: String
 help =
     "\n\
     \\n\
-    \   usage: pandoc-pyplot [-h, --help] [-v, --version] [-f, --formats] [-m, --manual] \n\
+    \   usage: pandoc-pyplot [-h, --help] [-v, --version] [-f, --formats] [-m, --manual]\n\
     \\n\
-    \   This pandoc filter generates plots from Python code blocks using Matplotlib. \n\
+    \   This pandoc filter generates plots from Python code blocks using Matplotlib.\n\
     \   This allows to keep documentation and figures in perfect synchronicity.\n\
     \\n\
     \   Optional arguments:\n\
-    \       -h, --help       Show this help message and exit\n\
-    \       -v, --version    Show version number and exit \n\
-    \       -f, --formats    Show supported output figure formats and exit \n\
-    \       -m, --manual     Open the manual page in the default web browser \n\
+    \       -h, --help       Show this help message and exit.\n\
+    \       -v, --version    Show version number and exit.\n\
+    \       -f, --formats    Show supported output figure formats and exit.\n\
+    \       -m, --manual     Open the manual page in the default web browser and exit.\n\
     \\n\
     \   To use with pandoc: \n\
     \       pandoc -s --filter pandoc-pyplot input.md --output output.html\n\
