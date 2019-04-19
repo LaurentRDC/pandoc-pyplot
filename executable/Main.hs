@@ -5,6 +5,7 @@ module Main where
 
 import           Data.Default.Class        (def)
 import           Data.List                 (intersperse)
+import           Data.Monoid               ((<>))
 import qualified Data.Text                 as T
 
 import           System.Environment        (getArgs)
