@@ -120,6 +120,24 @@ format: png
 dpi: 80
 ```
 
+### Compatibility with pandoc-crossref
+
+You can use `pandoc-crossref` in conjunction with `pandoc-pyplot` for the ultimate figure-making pipeline. You can combine both in a figure like so:
+
+```markdown
+    ```{#fig:myexample .pyplot caption="This is a caption"}
+    # Insert figure script here
+    ```
+
+    As you can see in @fig:myexample, ...
+```
+
+If the above source is located in file `myfile.md`, you can render the figure and references by applying `pandoc-pyplot` **first**, and then `pandoc-crossref`. For example:
+
+```bash
+pandoc --filter pandoc-pyplot --filter pandoc-crossref -i myfile.md -o myfile.html
+```
+
 ## Installation
 
 ### Binaries
