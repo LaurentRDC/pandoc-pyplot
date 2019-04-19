@@ -96,6 +96,26 @@ Which is equivalent to writing the following markdown:
 
 This `include` parameter is perfect for longer documents with many plots. Simply define the style you want in a separate script! You can also import packages this way, or define functions you often use.
 
+### Compatibility with pandoc-crossref
+
+[`pandoc-crossref`](https://github.com/lierdakil/pandoc-crossref) is a pandoc filter that makes it effortless to cross-reference objects on documents. 
+
+You can use `pandoc-crossref` in conjunction with `pandoc-pyplot` for the ultimate figure-making pipeline. You can combine both in a figure like so:
+
+```markdown
+    ```{#fig:myexample .pyplot caption="This is a caption"}
+    # Insert figure script here
+    ```
+
+    As you can see in @fig:myexample, ...
+```
+
+If the above source is located in file `myfile.md`, you can render the figure and references by applying `pandoc-pyplot` **first**, and then `pandoc-crossref`. For example:
+
+```bash
+pandoc --filter pandoc-pyplot --filter pandoc-crossref -i myfile.md -o myfile.html
+```
+
 ### Configurable
 
 *New in version 2.1.0.0*
@@ -118,24 +138,6 @@ interpreter: python
 directory: generated/
 format: png
 dpi: 80
-```
-
-### Compatibility with pandoc-crossref
-
-You can use `pandoc-crossref` in conjunction with `pandoc-pyplot` for the ultimate figure-making pipeline. You can combine both in a figure like so:
-
-```markdown
-    ```{#fig:myexample .pyplot caption="This is a caption"}
-    # Insert figure script here
-    ```
-
-    As you can see in @fig:myexample, ...
-```
-
-If the above source is located in file `myfile.md`, you can render the figure and references by applying `pandoc-pyplot` **first**, and then `pandoc-crossref`. For example:
-
-```bash
-pandoc --filter pandoc-pyplot --filter pandoc-crossref -i myfile.md -o myfile.html
 ```
 
 ## Installation
