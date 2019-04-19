@@ -6,27 +6,27 @@ module Main where
 import           Data.Default.Class        (def)
 import           Data.List                 (intersperse)
 import qualified Data.Text                 as T
-import qualified Data.Text.IO              as T
 
 import           System.Environment        (getArgs)
 import           System.Directory          (doesFileExist)
+import           System.IO.Temp            (writeSystemTempFile)
 
 import           Text.Pandoc.Filter.Pyplot (plotTransformWithConfig, configuration, SaveFormat(..))
 import           Text.Pandoc.JSON          (toJSONFilter)
 
+import           Web.Browser               (openBrowser)
+
 import qualified Data.Version              as V
 import           Paths_pandoc_pyplot       (version)
 
-import           ManPage                   (embedManualText, embedManualHtml)
+import           ManPage                   (embedManualHtml)
 
 supportedSaveFormats :: [SaveFormat]
 supportedSaveFormats = enumFromTo minBound maxBound
 
-manualText, manualHtml :: T.Text
-manualText = T.pack $(embedManualText)
+manualHtml :: T.Text
 manualHtml = T.pack $(embedManualHtml)
 
--- The formatting is borrowed from Python's argparse library
 help :: String
 help =
     "\n\
@@ -37,10 +37,10 @@ help =
     \   This allows to keep documentation and figures in perfect synchronicity.\n\
     \\n\
     \   Optional arguments:\n\
-    \       -h, --help     Show this help message and exit\n\
-    \       -v, --version  Show version number and exit \n\
-    \       -f, --formats  Show supported output figure formats and exit \n\
-    \       -m, --manual   Show the manual page \n\
+    \       -h, --help       Show this help message and exit\n\
+    \       -v, --version    Show version number and exit \n\
+    \       -f, --formats    Show supported output figure formats and exit \n\
+    \       -m, --manual     Open the manual page in the default web browser \n\
     \\n\
     \   To use with pandoc: \n\
     \       pandoc -s --filter pandoc-pyplot input.md --output output.html\n\
@@ -66,4 +66,5 @@ main = do
     showHelp    = putStrLn help
     showVersion = putStrLn (V.showVersion version)
     showFormats = putStrLn . mconcat . intersperse ", " . fmap show $ supportedSaveFormats
-    showManual  = T.putStrLn manualText
+    showManual  = writeSystemTempFile "pandoc-pyplot-manual.html" (T.unpack manualHtml) 
+                    >>= \fp -> openBrowser ("file:///" <> fp) >> return ()
