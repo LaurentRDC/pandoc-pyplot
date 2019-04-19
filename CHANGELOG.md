@@ -2,6 +2,11 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+Release 2.1.1.0
+---------------
+
+* Added a command-line option to open the HTML manual in the default web browser.
+
 Release 2.1.0.1
 ---------------
 
