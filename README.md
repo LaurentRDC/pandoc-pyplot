@@ -4,6 +4,14 @@
 
 `pandoc-pyplot` turns Python code present in your documents into embedded Matplotlib figures.
 
+Table of contents
+
+* [Usage](#usage)
+* [Features](#features)
+* [Installation](#installation)
+* [Running the filter](#running-the-filter)
+* [Usage as a Haskell library](#usage-as-a-haskell-library)
+
 ## Usage
 
 The filter recognizes code blocks with the `.pyplot` class present. It will run the script in the associated code block in a Python interpreter and capture the generated Matplotlib figure.
