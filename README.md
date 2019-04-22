@@ -4,8 +4,6 @@
 
 `pandoc-pyplot` turns Python code present in your documents into embedded Matplotlib figures.
 
-Table of contents
-
 * [Usage](#usage)
 * [Features](#features)
 * [Installation](#installation)
