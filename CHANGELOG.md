@@ -6,6 +6,7 @@ Release 2.1.1.0
 ---------------
 
 * Added a command-line option to open the HTML manual in the default web browser.
+* Added documentation regarding compatibility with pandoc-crossref. This was always supported but not explicitly documented.
 
 Release 2.1.0.1
 ---------------
