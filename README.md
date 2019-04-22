@@ -120,7 +120,7 @@ pandoc --filter pandoc-pyplot --filter pandoc-crossref -i myfile.md -o myfile.ht
 
 *New in version 2.1.0.0*
 
-To avoid repetition, `pandoc-pyplot` can be configured using simple YAML syntax. `pandoc-pyplot` will look for a `pandoc-pyplot.yml` file in the current working directory:
+To avoid repetition, `pandoc-pyplot` can be configured using simple YAML syntax. `pandoc-pyplot` will look for a `.pandoc-pyplot.yml` file in the current working directory:
 
 ```yaml
 # You can specify any or all of the following parameters
@@ -134,6 +134,7 @@ dpi: 150
 These values override the default values, which are equivalent to:
 
 ```yaml
+# Defaults if no configuration is provided.
 interpreter: python
 directory: generated/
 format: png
