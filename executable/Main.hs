@@ -37,12 +37,11 @@ data Flag = Help
 
 parseFlag :: [String] -> Maybe Flag
 parseFlag s
-    | null s                               = Nothing 
     | head s `elem` ["-h", "--help"]       = Just Help
     | head s `elem` ["-v", "--version"]    = Just Version
     | head s `elem` ["-f", "--formats"]    = Just Formats
     | head s `elem` ["-m", "--manual"]     = Just Manual
-    | otherwise                            = Just InvalidFlag
+    | otherwise                            = Nothing -- This is the regular input from pandoc
 
 flagAction :: Flag -> IO ()
 flagAction f
