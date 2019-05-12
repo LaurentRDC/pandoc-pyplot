@@ -2,6 +2,11 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+Release 2.1.1.1
+---------------
+
+* Fixed a critical bug where pandoc-pyplot would interpret input from pandoc as a malformed command-line flag.
+
 Release 2.1.1.0
 ---------------
 
