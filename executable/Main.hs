@@ -32,7 +32,6 @@ data Flag = Help
           | Version
           | Formats
           | Manual
-          | InvalidFlag
     deriving (Eq)
 
 parseFlag :: [String] -> Maybe Flag
@@ -49,14 +48,13 @@ flagAction f
     | f == Version = showVersion
     | f == Formats = showFormats
     | f == Manual  = showManual
-    | otherwise    = showError    -- Includes InvalidFlag
+    | otherwise    = error "Unknown flag"
     where   
         showHelp    = putStrLn help
         showVersion = putStrLn (V.showVersion version)
         showFormats = putStrLn . mconcat . intersperse ", " . fmap show $ supportedSaveFormats
         showManual  = writeSystemTempFile "pandoc-pyplot-manual.html" (T.unpack manualHtml) 
                         >>= \fp -> openBrowser ("file:///" <> fp) >> return ()
-        showError   = putStrLn "Invalid flag. Please read `pandoc-pyplot --help` for information on valid flags."
 
 help :: String
 help =
