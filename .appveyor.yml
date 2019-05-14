@@ -9,7 +9,6 @@ build: off
 before_test:
 # http://help.appveyor.com/discussions/problems/6312-curl-command-not-found
 - set PATH=C:\Program Files\Git\mingw64\bin;%PATH%
-- set PATH=C:\
 
 - curl -sS -ostack.zip -L --insecure https://get.haskellstack.org/stable/windows-x86_64.zip
 - 7z x stack.zip stack.exe
