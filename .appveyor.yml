@@ -50,10 +50,16 @@ test_script:
 # Python is preinstalled on Appveyor images
 # https://www.appveyor.com/docs/windows-images-software/#python
 # The default is unfortunately Python 2.7
-# Note that pillow is required to save images to jpg
+# Pillow is required to save images to jpg
 - python -m pip install --upgrade matplotlib 
 - python -m pip install --upgrade pillow
 
 # The ugly echo "" hack is to avoid complaints about 0 being an invalid file
 # descriptor
 - echo "" | stack %ARGS% --no-terminal test --fast --ghc-options=-Werror
+
+# Integration testing
+# In the past, executables were built that misparsed input flags (see Issue #2)
+# Therefore, we have some integration test that works on some test file
+- echo "" | stack %ARGS% --no-terminal install . pandoc
+- stack %ARGS% exec -- pandoc --filter pandoc-pyplot -i ./test/fixtures/integration.md -o ./generated/test.html
