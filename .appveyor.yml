@@ -62,4 +62,4 @@ test_script:
 # In the past, executables were built that misparsed input flags (see Issue #2)
 # Therefore, we have some integration test that works on some test file
 - echo "" | stack %ARGS% --no-terminal install . pandoc
-- pandoc --filter pandoc-pyplot -i ./test/fixtures/integration.md -o ./generated/test.html
+- stack exec -- pandoc --filter pandoc-pyplot -i ./test/fixtures/integration.md -o ./generated/test.html
