@@ -63,6 +63,7 @@ data ConfigPrecursor
         , defaultSaveFormat_  :: String
         , defaultDPI_         :: Int
         , interpreter_        :: String
+        , flags_              :: [String]
         } 
 
 instance FromJSON ConfigPrecursor where
@@ -72,6 +73,7 @@ instance FromJSON ConfigPrecursor where
         <*> v .:? (T.pack saveFormatKey) .!= (extension $ defaultSaveFormat def)
         <*> v .:? (T.pack dpiKey)        .!= (defaultDPI def)
         <*> v .:? "interpreter"          .!= (interpreter def)
+        <*> v .:? "flags"                .!= (flags def)
     
     parseJSON _ = fail "Could not parse the configuration"
 
@@ -84,6 +86,7 @@ renderConfiguration prec = do
                            , defaultSaveFormat    = saveFormat'
                            , defaultDPI           = defaultDPI_ prec
                            , interpreter          = interpreter_ prec
+                           , flags                = flags_ prec
                            }
 
 
