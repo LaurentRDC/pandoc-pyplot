@@ -237,6 +237,7 @@ testBuildConfiguration =
         let config = def { defaultDirectory = "generated/other"
                          , defaultSaveFormat = JPG
                          , defaultDPI = 150
+                         , flags = ["-Wignore"]
                          }
         parsedConfig <- configuration "test/fixtures/.pandoc-pyplot.yml"
         assertEqual "" config parsedConfig

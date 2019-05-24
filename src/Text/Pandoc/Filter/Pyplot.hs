@@ -126,9 +126,7 @@ import           Data.Version                  (showVersion)
 
 import           Paths_pandoc_pyplot           (version)
 
-import           System.Directory              (createDirectoryIfMissing,
-                                                doesFileExist)
-import           System.FilePath               (makeValid, takeDirectory)
+import           System.FilePath               (makeValid)
 
 import           Text.Pandoc.Definition
 import           Text.Pandoc.Walk              (walkM)
@@ -170,19 +168,6 @@ parseFigureSpec config (CodeBlock (id', cls, attrs) content)
         return $ FigureSpec caption' fullScript format dir dpi' blockAttrs'
 
 parseFigureSpec _ _ = return Nothing
-
--- | Run the Python script. In case the file already exists, we can safely assume
--- there is no need to re-run it.
-runScriptIfNecessary :: Configuration -> FigureSpec -> IO ScriptResult
-runScriptIfNecessary config spec = do
-    createDirectoryIfMissing True . takeDirectory $ figurePath spec
-    fileAlreadyExists <- doesFileExist $ figurePath spec
-    result <- if fileAlreadyExists
-                then return ScriptSuccess
-                else runTempPythonScript (interpreter config) (addPlotCapture spec)
-    case result of
-        ScriptFailure code -> return $ ScriptFailure code
-        ScriptSuccess      -> T.writeFile (sourceCodePath spec) (script spec) >> return ScriptSuccess
 
 -- | Main routine to include Matplotlib plots.
 -- Code blocks containing the attributes @.pyplot@ are considered

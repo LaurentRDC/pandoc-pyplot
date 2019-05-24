@@ -1,3 +1,4 @@
 directory: generated/other
 format: jpg
 dpi: 150
+flags: [-Wignore]
