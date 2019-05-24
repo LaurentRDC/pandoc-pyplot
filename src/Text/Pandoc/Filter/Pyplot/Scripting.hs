@@ -19,7 +19,7 @@ module Text.Pandoc.Filter.Pyplot.Scripting
 
 import           Data.Hashable        (hash)
 import           Data.List            (intersperse)
-import           Data.Monoid          (Any(..))
+import           Data.Monoid          (Any(..), (<>))
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
 
