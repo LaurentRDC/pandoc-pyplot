@@ -135,6 +135,7 @@ directory: mydirectory/
 include: mystyle.py
 format: jpeg
 dpi: 150
+flags: [-O, -Wignore]
 ```
 
 These values override the default values, which are equivalent to:
@@ -142,6 +143,7 @@ These values override the default values, which are equivalent to:
 ```yaml
 # Defaults if no configuration is provided.
 interpreter: python
+flags: []
 directory: generated/
 format: png
 dpi: 80

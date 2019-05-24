@@ -76,6 +76,7 @@ data Configuration
         , defaultSaveFormat    :: SaveFormat   -- ^ The default save format of generated figures.
         , defaultDPI           :: Int          -- ^ The default dots-per-inch value for generated figures.
         , interpreter          :: String       -- ^ The name of the interpreter to use to render figures.
+        , flags                :: [String]     -- ^ Command-line flags to be passed to the Python interpreger, e.g. ["-O", "-Wignore"]
         }
     deriving (Eq, Show)
 
@@ -86,6 +87,7 @@ instance Default Configuration where
         , defaultSaveFormat    = PNG
         , defaultDPI           = 80
         , interpreter          = "python"
+        , flags                = mempty
     }
 
 -- | Datatype containing all parameters required to run pandoc-pyplot
