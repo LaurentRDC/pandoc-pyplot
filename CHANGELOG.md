@@ -2,6 +2,11 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+Release 2.1.2.0
+---------------
+
+* Added the "flags" configuration option, which allows to pass command-line flags to the Python interpreter. For example, warnings can be suppressed using the `-Wignore` flag.
+
 Release 2.1.1.1
 ---------------
 
