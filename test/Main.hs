@@ -106,6 +106,7 @@ testFileCreation =
     testCase "writes output files in appropriate directory" $ do
         tempDir <- (</> "test-file-creation") <$> getCanonicalTemporaryDirectory
         ensureDirectoryExistsAndEmpty tempDir
+
         let codeBlock = (addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
         _ <- makePlot' def codeBlock
         filesCreated <- length <$> listDirectory tempDir
@@ -118,6 +119,7 @@ testFileInclusion =
     testCase "includes plot inclusions" $ do
         tempDir <- (</> "test-file-inclusion") <$> getCanonicalTemporaryDirectory
         ensureDirectoryExistsAndEmpty tempDir
+
         let codeBlock =
                 (addInclusion "test/fixtures/include.py" $
                  addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
@@ -134,6 +136,7 @@ testSaveFormat =
     testCase "saves in the appropriate format" $ do
         tempDir <- (</> "test-safe-format") <$> getCanonicalTemporaryDirectory
         ensureDirectoryExistsAndEmpty tempDir
+
         let codeBlock =
                 (addSaveFormat JPG $
                  addDirectory tempDir $
@@ -151,15 +154,20 @@ testSaveFormat =
 testBlockingCallError :: TestTree
 testBlockingCallError =
     testCase "raises an exception for blocking calls" $ do
-        tempDir <- (</> "test-blocking-call-error") <$>getCanonicalTemporaryDirectory
-        let codeBlock = plotCodeBlock "import matplotlib.pyplot as plt\nplt.show()"
+        tempDir <- (</> "test-blocking-call-error") <$> getCanonicalTemporaryDirectory
+        ensureDirectoryExistsAndEmpty tempDir
+
+        let codeBlock = addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\nplt.show()"
         result <- makePlot' def codeBlock
         case result of
             Right block -> assertFailure "did not catch the expected blocking call"
             Left error ->
-                if error == BlockingCallError
+                if isCheckError error
                     then pure ()
-                    else assertFailure "did not catch the expected blocking call"
+                    else assertFailure "An error was caught but not the expected blocking call"
+    where
+        isCheckError (ScriptChecksFailedError msg) = True
+        isCheckError _ = False
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -169,6 +177,7 @@ testMarkdownFormattingCaption =
     testCase "appropriately parses Markdown captions" $ do
         tempDir <- (</> "test-caption-parsing") <$> getCanonicalTemporaryDirectory
         ensureDirectoryExistsAndEmpty tempDir
+
         -- Note that this test is fragile, in the sense that the expected result must be carefully
         -- constructed
         let expected = [B.Strong [B.Str "caption"]]
@@ -191,6 +200,7 @@ testConfig :: IO Configuration
 testConfig = do
     tempDir <- (</> "test-with-config") <$> getCanonicalTemporaryDirectory
     ensureDirectoryExistsAndEmpty tempDir
+
     return $ def {defaultDirectory = tempDir, defaultSaveFormat = JPG}
 
 testOverridingConfiguration :: TestTree

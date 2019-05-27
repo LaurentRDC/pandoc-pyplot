@@ -136,13 +136,13 @@ import           Text.Pandoc.Filter.Pyplot.Internal
 
 -- | Possible errors returned by the filter
 data PandocPyplotError
-    = ScriptError Int    -- ^ Running Python script has yielded an error
-    | BlockingCallError  -- ^ Python script contains a block call to 'show()'
+    = ScriptError Int                 -- ^ Running Python script has yielded an error
+    | ScriptChecksFailedError String  -- ^ Python script did not pass all checks
     deriving (Eq)
 
 instance Show PandocPyplotError where
-    show (ScriptError exitcode) = "Script error: plot could not be generated. Exit code " <> (show exitcode)
-    show BlockingCallError      = "Script contains a blocking call to show, like 'plt.show()'"
+    show (ScriptError exitcode)        = "Script error: plot could not be generated. Exit code " <> (show exitcode)
+    show (ScriptChecksFailedError msg) = "Script did not pass all checks: " <> msg
 
 -- | Determine inclusion specifications from Block attributes.
 -- Note that the @".pyplot"@ class is required, but all other parameters are optional
@@ -177,13 +177,12 @@ makePlot' config block = do
     parsed <- parseFigureSpec config block  
     case parsed of
         Nothing   -> return $ Right block
-        Just spec ->
-            if hasBlockingShowCall (script spec)
-                then return $ Left BlockingCallError
-                else handleResult spec <$> runScriptIfNecessary config spec 
+        Just spec -> handleResult spec <$> runScriptIfNecessary config spec
+
     where
-        handleResult _   (ScriptFailure code) = Left  $ ScriptError code
-        handleResult spec ScriptSuccess       = Right $ toImage spec
+        handleResult _ (ScriptChecksFailed msg) = Left  $ ScriptChecksFailedError msg
+        handleResult _ (ScriptFailure code)     = Left  $ ScriptError code
+        handleResult spec ScriptSuccess         = Right $ toImage spec
 
 -- | Highest-level function that can be walked over a Pandoc tree.
 -- All code blocks that have the '.pyplot' parameter will be considered
