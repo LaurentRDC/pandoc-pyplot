@@ -41,6 +41,18 @@ instance Semigroup CheckResult where
 instance Monoid CheckResult where
     mempty = CheckPassed
 
+
+-- | Possible errors returned by the filter
+data PandocPyplotError
+    = ScriptError Int                 -- ^ Running Python script has yielded an error
+    | ScriptChecksFailedError String  -- ^ Python script did not pass all checks
+    deriving (Eq)
+
+    
+instance Show PandocPyplotError where
+    show (ScriptError exitcode)        = "Script error: plot could not be generated. Exit code " <> (show exitcode)
+    show (ScriptChecksFailedError msg) = "Script did not pass all checks: " <> msg
+
 -- | Generated figure file format supported by pandoc-pyplot. 
 data SaveFormat
     = PNG

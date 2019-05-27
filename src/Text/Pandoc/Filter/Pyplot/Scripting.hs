@@ -47,6 +47,7 @@ checkBlockingShowCall script' =
             ]
 
 -- | List of all script checks
+-- This might be overkill right now but extension to other languages will be easier
 scriptChecks :: [PythonScript -> CheckResult]
 scriptChecks = [checkBlockingShowCall]
 
