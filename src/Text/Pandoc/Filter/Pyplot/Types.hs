@@ -24,7 +24,22 @@ type PythonScript = Text
 -- | Possible result of running a Python script
 data ScriptResult
     = ScriptSuccess
+    | ScriptChecksFailed String
     | ScriptFailure Int
+
+-- | Result of checking scripts for problems
+data CheckResult 
+    = CheckPassed
+    | CheckFailed String
+    deriving (Eq)
+
+instance Semigroup CheckResult where
+    (<>) CheckPassed a = a
+    (<>) a CheckPassed = a
+    (<>) (CheckFailed msg1) (CheckFailed msg2) = CheckFailed (msg1 <> msg2)
+
+instance Monoid CheckResult where
+    mempty = CheckPassed
 
 -- | Generated figure file format supported by pandoc-pyplot. 
 data SaveFormat
