@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-|
 Module      : Text.Pandoc.Filter.Pyplot.Types
 Copyright   : (c) Laurent P René de Cotret, 2019
@@ -14,6 +15,7 @@ module Text.Pandoc.Filter.Pyplot.Types where
 import Data.Char              (toLower)
 import Data.Default.Class     (Default, def)
 import Data.Hashable          (Hashable, hashWithSalt)
+import Data.Semigroup         as Sem
 import Data.Text              (Text)
 
 import Text.Pandoc.Definition (Attr)   
@@ -33,14 +35,17 @@ data CheckResult
     | CheckFailed String
     deriving (Eq)
 
-instance Semigroup CheckResult where
+instance Sem.Semigroup CheckResult where
     (<>) CheckPassed a = a
     (<>) a CheckPassed = a
     (<>) (CheckFailed msg1) (CheckFailed msg2) = CheckFailed (msg1 <> msg2)
 
 instance Monoid CheckResult where
     mempty = CheckPassed
-
+    
+#if !(MIN_VERSION_base(4,11,0))
+    mappend = (<>)
+#endif
 
 -- | Possible errors returned by the filter
 data PandocPyplotError
