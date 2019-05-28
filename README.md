@@ -142,6 +142,7 @@ These values override the default values, which are equivalent to:
 
 ```yaml
 # Defaults if no configuration is provided.
+# Note that the default interpreter name on MacOS and Unix is python3
 interpreter: python
 flags: []
 directory: generated/
@@ -189,7 +190,7 @@ stack install # Alternatively, `cabal install`
 
 ### Requirements
 
-This filter only works with the Matplotlib plotting library. Therefore, you a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The name of the Python interpreter to use can be specified in a `.pandoc-pyplot.yml` file; by default, `pandoc-pyplot` will use the `"python"` name.
+This filter only works with the Matplotlib plotting library. Therefore, you a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The name of the Python interpreter to use can be specified in a `.pandoc-pyplot.yml` file; by default, `pandoc-pyplot` will use the `"python"` name on Windows, and `"python3"` otherwise.
 
 You can use the filter with Pandoc as follows:
 
