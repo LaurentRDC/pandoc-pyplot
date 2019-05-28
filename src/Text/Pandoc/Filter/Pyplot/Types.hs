@@ -20,6 +20,7 @@ import Data.Text              (Text)
 
 import Text.Pandoc.Definition (Attr)   
 
+
 -- | String representation of a Python script
 type PythonScript = Text
 
@@ -97,6 +98,16 @@ saveFormatFromString s
 extension :: SaveFormat -> String
 extension fmt = mconcat [".", fmap toLower . show $ fmt]
 
+-- | Default interpreter should be Python 3, which has a different 
+-- name on Windows ("python") vs Unix ("python3")
+--
+-- @since 2.1.2.0
+defaultPlatformInterpreter :: String
+#if defined(mingw32_HOST_OS)
+defaultPlatformInterpreter = "python"
+#else
+defaultPlatformInterpreter = "python3"
+#endif
 
 -- | Configuration of pandoc-pyplot, describing the default behavior
 -- of the filter. 
@@ -122,7 +133,7 @@ instance Default Configuration where
         , defaultIncludeScript = mempty
         , defaultSaveFormat    = PNG
         , defaultDPI           = 80
-        , interpreter          = "python"
+        , interpreter          = defaultPlatformInterpreter
         , flags                = mempty
     }
 
