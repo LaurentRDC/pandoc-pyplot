@@ -71,13 +71,17 @@ help =
     \       -f, --formats    Show supported output figure formats and exit.\n\
     \       -m, --manual     Open the manual page in the default web browser and exit.\n\
     \\n\
-    \   To use with pandoc: \n\
-    \       pandoc -s --filter pandoc-pyplot input.md --output output.html\n\
+    \   Example usage with pandoc: \n\
+    \\n\
+    \       > pandoc --filter pandoc-pyplot input.md --output output.html\n\
     \\n\
     \   If you use pandoc-pyplot in combination with other filters, you probably want\n\
-    \   to run pandoc-pyplot first. See the manual (`pandoc-pyplot --manual`) for details.\n\
+    \   to run pandoc-pyplot first. Here is an example with pandoc-crossref: \n\
     \\n\
-    \   More information can be found in the repository README, located at \n\
+    \       > pandoc --filter pandoc-pyplot --filter pandoc-crossref -i input.md -o output.pdf\n\
+    \\n\
+    \   More information can be found via the manual (pandoc-pyplot --manual) or the\n\ 
+    \   repository README, located at \n\
     \       https://github.com/LaurentRDC/pandoc-pyplot\n"
 
 main :: IO ()

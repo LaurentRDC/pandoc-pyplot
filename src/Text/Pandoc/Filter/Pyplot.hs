@@ -133,12 +133,15 @@ import           Text.Pandoc.Walk              (walkM)
 
 import           Text.Pandoc.Filter.Pyplot.Internal
 
+-- | Code block class that will trigger the filter
+filterClass :: String
+filterClass = "pyplot"
 
 -- | Determine inclusion specifications from Block attributes.
 -- Note that the @".pyplot"@ class is required, but all other parameters are optional
 parseFigureSpec :: Configuration -> Block -> IO (Maybe FigureSpec)
 parseFigureSpec config (CodeBlock (id', cls, attrs) content)
-    | "pyplot" `elem` cls = Just <$> figureSpec
+    | filterClass `elem` cls = Just <$> figureSpec
     | otherwise = return Nothing
   where
     attrs'        = Map.fromList attrs
@@ -154,7 +157,7 @@ parseFigureSpec config (CodeBlock (id', cls, attrs) content)
             format      = fromMaybe (defaultSaveFormat config) $ join $ saveFormatFromString <$> Map.lookup saveFormatKey attrs'
             dir         = makeValid $ Map.findWithDefault (defaultDirectory config) directoryKey attrs'
             dpi'        = fromMaybe (defaultDPI config) $ read <$> Map.lookup dpiKey attrs'
-            blockAttrs' = (id', filter (/= "pyplot") cls, filteredAttrs)
+            blockAttrs' = (id', filter (/= filterClass) cls, filteredAttrs)
         return $ FigureSpec caption' fullScript format dir dpi' blockAttrs'
 
 parseFigureSpec _ _ = return Nothing

@@ -23,11 +23,13 @@ import Text.Pandoc.Definition (Attr)
 -- | String representation of a Python script
 type PythonScript = Text
 
+
 -- | Possible result of running a Python script
 data ScriptResult
     = ScriptSuccess
     | ScriptChecksFailed String
     | ScriptFailure Int
+
 
 -- | Result of checking scripts for problems
 data CheckResult 
@@ -47,16 +49,17 @@ instance Monoid CheckResult where
     mappend = (<>)
 #endif
 
+
 -- | Possible errors returned by the filter
 data PandocPyplotError
     = ScriptError Int                 -- ^ Running Python script has yielded an error
     | ScriptChecksFailedError String  -- ^ Python script did not pass all checks
     deriving (Eq)
-
     
 instance Show PandocPyplotError where
     show (ScriptError exitcode)        = "Script error: plot could not be generated. Exit code " <> (show exitcode)
     show (ScriptChecksFailedError msg) = "Script did not pass all checks: " <> msg
+
 
 -- | Generated figure file format supported by pandoc-pyplot. 
 data SaveFormat
@@ -94,6 +97,7 @@ saveFormatFromString s
 extension :: SaveFormat -> String
 extension fmt = mconcat [".", fmap toLower . show $ fmt]
 
+
 -- | Configuration of pandoc-pyplot, describing the default behavior
 -- of the filter. 
 --
@@ -122,6 +126,7 @@ instance Default Configuration where
         , flags                = mempty
     }
 
+    
 -- | Datatype containing all parameters required to run pandoc-pyplot
 data FigureSpec = FigureSpec
     { caption    :: String       -- ^ Figure caption.
