@@ -7,6 +7,7 @@ Release 2.1.2.0
 
 * Added the "flags" configuration option, which allows to pass command-line flags to the Python interpreter. For example, warnings can be suppressed using the `-Wignore` flag.
 * Refactoring of the script check mechanism. It will be much easier to extend in the future.
+* Updated the command-line help with an example combining pandoc-pyplot and pandoc-crossref
 
 Release 2.1.1.1
 ---------------
