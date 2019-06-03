@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define AppName "pandoc-pyplot"
-#define AppVersion "2.1.3.0"
+#define AppVersion "2.2.0.0"
 #define AppPublisher "Laurent P. René de Cotret"
 #define AppURL "https://github.com/LaurentRDC/pandoc-pyplot"
 #define AppEXEName "pandoc-pyplot.exe"

@@ -20,6 +20,7 @@ module Text.Pandoc.Filter.Pyplot.Configuration (
     , dpiKey
     , includePathKey
     , saveFormatKey
+    , withLinksKey
 ) where
 
 import           Data.Maybe                    (fromMaybe)
@@ -34,12 +35,13 @@ import           System.Directory              (doesFileExist)
 import Text.Pandoc.Filter.Pyplot.Types
 
 -- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
-directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey :: String
+directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey, withLinksKey :: String
 directoryKey   = "directory"
 captionKey     = "caption"
 dpiKey         = "dpi"
 includePathKey = "include"
 saveFormatKey  = "format"
+withLinksKey   = "with-links"
 
 -- | list of all keys related to pandoc-pyplot.
 inclusionKeys :: [String]
@@ -48,6 +50,7 @@ inclusionKeys = [ directoryKey
                 , dpiKey
                 , includePathKey
                 , saveFormatKey
+                , withLinksKey
                 ]
 
 -- A @Configuration@ cannot be directly created from a YAML file
@@ -63,6 +66,7 @@ data ConfigPrecursor
     = ConfigPrecursor
         { defaultDirectory_   :: FilePath
         , defaultIncludePath_ :: Maybe FilePath
+        , defaultWithLinks_   :: Bool
         , defaultSaveFormat_  :: String
         , defaultDPI_         :: Int
         , interpreter_        :: String
@@ -73,6 +77,7 @@ instance FromJSON ConfigPrecursor where
     parseJSON (Object v) = ConfigPrecursor
         <$> v .:? (T.pack directoryKey)  .!= (defaultDirectory def)
         <*> v .:? (T.pack includePathKey)
+        <*> v .:? (T.pack withLinksKey)  .!= (defaultWithLinks def)
         <*> v .:? (T.pack saveFormatKey) .!= (extension $ defaultSaveFormat def)
         <*> v .:? (T.pack dpiKey)        .!= (defaultDPI def)
         <*> v .:? "interpreter"          .!= (interpreter def)
@@ -87,6 +92,7 @@ renderConfiguration prec = do
     return $ Configuration { defaultDirectory     = defaultDirectory_ prec
                            , defaultIncludeScript = includeScript
                            , defaultSaveFormat    = saveFormat'
+                           , defaultWithLinks     = defaultWithLinks_ prec
                            , defaultDPI           = defaultDPI_ prec
                            , interpreter          = interpreter_ prec
                            , flags                = flags_ prec

@@ -122,6 +122,7 @@ data Configuration
     = Configuration 
         { defaultDirectory     :: FilePath     -- ^ The default directory where figures will be saved.
         , defaultIncludeScript :: PythonScript -- ^ The default script to run before other instructions.
+        , defaultWithLinks     :: Bool         -- ^ The default behavior of whether or not to include links to source code and high-res
         , defaultSaveFormat    :: SaveFormat   -- ^ The default save format of generated figures.
         , defaultDPI           :: Int          -- ^ The default dots-per-inch value for generated figures.
         , interpreter          :: String       -- ^ The name of the interpreter to use to render figures.
@@ -133,6 +134,7 @@ instance Default Configuration where
     def = Configuration {
           defaultDirectory     = "generated/"
         , defaultIncludeScript = mempty
+        , defaultWithLinks     = True
         , defaultSaveFormat    = PNG
         , defaultDPI           = 80
         , interpreter          = defaultPlatformInterpreter
@@ -140,11 +142,12 @@ instance Default Configuration where
     }
 
 instance ToJSON Configuration where
-    toJSON (Configuration dir' _ savefmt' dpi' interp' flags') = 
+    toJSON (Configuration dir' _ withLinks' savefmt' dpi' interp' flags') = 
         -- We ignore the include script as we want to examplify that
         -- this is for a filepath
             object [ "directory"    .= dir'
                     , "include"     .= ("example.py" :: FilePath)
+                    , "with-links"  .= withLinks'
                     , "dpi"         .= dpi'
                     , "format"      .= (toLower <$> show savefmt')
                     , "interpreter" .= interp'
@@ -155,6 +158,7 @@ instance ToJSON Configuration where
 -- | Datatype containing all parameters required to run pandoc-pyplot
 data FigureSpec = FigureSpec
     { caption    :: String       -- ^ Figure caption.
+    , withLinks  :: Bool         -- ^ Append links to source code and high-dpi figure to caption
     , script     :: PythonScript -- ^ Source code for the figure.
     , saveFormat :: SaveFormat   -- ^ Save format of the figure
     , directory  :: FilePath     -- ^ Directory where to save the file
@@ -164,6 +168,8 @@ data FigureSpec = FigureSpec
 
 instance Hashable FigureSpec where
     hashWithSalt salt spec =
+        -- Some things are not included in the hash because they do not affect the outcome 
+        -- of running scripts, e.g. whether links should be shown or not.
         hashWithSalt salt ( caption spec
                           , script spec
                           , fromEnum . saveFormat $ spec

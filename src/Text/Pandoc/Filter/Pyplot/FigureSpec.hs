@@ -76,11 +76,12 @@ toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
     where
         attrs'       = blockAttrs spec
         target'      = figurePath spec
+        withLinks'   = withLinks spec
         srcLink      = link (replaceExtension target' ".txt") mempty "Source code" 
         hiresLink    = link (hiresFigurePath spec) mempty "high res."
         captionText  = fromList $ fromMaybe mempty (captionReader $ caption spec)
         captionLinks = mconcat [" (", srcLink, ", ", hiresLink, ")"]
-        caption'     = captionText <> captionLinks
+        caption'     = if withLinks' then captionText <> captionLinks else captionText
 
 -- | Determine the path a figure should have.
 figurePath :: FigureSpec -> FilePath
