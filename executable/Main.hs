@@ -1,9 +1,11 @@
 {-# LANGUAGE LambdaCase      #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ApplicativeDo   #-}
 
 module Main where
 
 import           Control.Applicative       ((<|>))
+import           Control.Monad             (join)
 
 import           Data.Default.Class        (def)
 import           Data.List                 (intersperse)
@@ -27,72 +29,55 @@ import           Paths_pandoc_pyplot       (version)
 import           ManPage                   (embedManualHtml)
 
 main :: IO ()
-main = do
+main = join $ execParser opts
+    where
+        opts = info (run <**> helper)
+            (fullDesc
+            <> progDesc "This pandoc filter generates plots from Python code blocks using Matplotlib. This allows to keep documentation and figures in perfect synchronicity."
+            <> header "pandoc-pyplot - generate Matplotlib figures directly in documents."
+            <> footerDoc (Just footer')
+            )
+    
+
+toJSONFilterWithConfig :: IO ()
+toJSONFilterWithConfig = do
     configExists <- doesFileExist ".pandoc-pyplot.yml"
     config <- if configExists
                 then configuration ".pandoc-pyplot.yml"
                 else def
-    
-    options <- execParser opts
-    case options of
-        Just f  -> flagAction f
-        Nothing -> toJSONFilter (plotTransformWithConfig config)
-        
+    toJSONFilter (plotTransformWithConfig config)
+
 
 data Flag = Version
           | Formats
           | Manual
     deriving (Eq)
 
-versionP :: Parser (Maybe Flag)
-versionP = flag Nothing (Just Version) 
-    (long "version" 
-    <> short 'v' 
-    <> help "Show version number and exit."
-    )
 
-formatsP :: Parser (Maybe Flag)
-formatsP = flag Nothing (Just Formats) 
-    (long "formats" 
-    <> short 'f' 
-    <> help "Show supported output figure formats and exit."
-    )
+run :: Parser (IO ())
+run = do
+    versionP <- flag Nothing (Just Version) (long "version" <> short 'v' <> help "Show version number and exit.")
+    formatsP <- flag Nothing (Just Formats) (long "formats" <> short 'f' <> help "Show supported output figure formats and exit.")
+    manualP  <- flag Nothing (Just Manual)  (long "manual"  <> short 'm' <> help "Open the manual page in the default web browser and exit.")
+    input    <- optional $ strArgument (metavar "AST")
+    return $ go (versionP <|> formatsP <|> manualP) input
+    where
+        go :: Maybe Flag -> Maybe String -> IO ()
+        go (Just Version) _ = putStrLn (V.showVersion version)
+        go (Just Formats) _ = putStrLn . mconcat . intersperse ", " . fmap show $ supportedSaveFormats
+        go (Just Manual)  _ = writeSystemTempFile "pandoc-pyplot-manual.html" (T.unpack manualHtml) 
+                                >>= \fp -> openBrowser ("file:///" <> fp) 
+                                >> return ()
+        go Nothing _ = toJSONFilterWithConfig
 
-manualP :: Parser (Maybe Flag)
-manualP = flag Nothing (Just Manual) 
-    (long "manual" 
-    <> short 'm' 
-    <> help "Open the manual page in the default web browser and exit."
-    )
-
-optionsParser :: Parser (Maybe Flag)
-optionsParser = versionP <|> formatsP <|> manualP
-
-opts :: ParserInfo (Maybe Flag)
-opts = info (optionsParser <**> helper)
-    (fullDesc
-    <> progDesc "This pandoc filter generates plots from Python code blocks using Matplotlib. This allows to keep documentation and figures in perfect synchronicity."
-    <> header "pandoc-pyplot - generate Matplotlib figures directly in documents."
-    <> footerDoc (Just footer')
-    )
-
-flagAction :: Flag -> IO ()
-flagAction f
-    | f == Version = showVersion
-    | f == Formats = showFormats
-    | f == Manual  = showManual
-    | otherwise    = error "Unknown flag"
-    where   
-        showVersion = putStrLn (V.showVersion version)
-        showFormats = putStrLn . mconcat . intersperse ", " . fmap show $ supportedSaveFormats
-        showManual  = writeSystemTempFile "pandoc-pyplot-manual.html" (T.unpack manualHtml) 
-                        >>= \fp -> openBrowser ("file:///" <> fp) >> return ()
 
 supportedSaveFormats :: [SaveFormat]
 supportedSaveFormats = enumFromTo minBound maxBound
 
+
 manualHtml :: T.Text
 manualHtml = T.pack $(embedManualHtml)
+
 
 -- | Use Doc type directly because of newline formatting
 footer' :: P.Doc
