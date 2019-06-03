@@ -13,6 +13,7 @@ Configuration for pandoc-pyplot
 module Text.Pandoc.Filter.Pyplot.Configuration (
       configuration
     -- * For testing and internal purposes only
+    , writeConfig
     , inclusionKeys
     , directoryKey
     , captionKey
@@ -27,6 +28,8 @@ import qualified Data.Text                     as T
 import qualified Data.Text.IO                  as T
 import           Data.Yaml         
 import           Data.Yaml.Config              (loadYamlSettings, ignoreEnv)
+
+import           System.Directory              (doesFileExist)
 
 import Text.Pandoc.Filter.Pyplot.Types
 
@@ -99,3 +102,14 @@ renderConfiguration prec = do
 -- @since 2.1.0.0
 configuration :: FilePath -> IO Configuration
 configuration fp = loadYamlSettings [fp] [] ignoreEnv >>= renderConfiguration
+
+
+-- | Write a configuration to file. An exception will be raised in case the file would be overwritten.
+--
+-- @since 2.1.3.0
+writeConfig :: FilePath -> Configuration -> IO ()
+writeConfig fp config = do
+    fileExists <- doesFileExist fp
+    if fileExists
+        then error $ mconcat ["File ", fp, " already exists."]
+        else encodeFile fp config
