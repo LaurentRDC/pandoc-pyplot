@@ -1,4 +1,5 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP               #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-|
 Module      : Text.Pandoc.Filter.Pyplot.Types
 Copyright   : (c) Laurent P René de Cotret, 2019
@@ -17,6 +18,7 @@ import Data.Default.Class     (Default, def)
 import Data.Hashable          (Hashable, hashWithSalt)
 import Data.Semigroup         as Sem
 import Data.Text              (Text)
+import Data.Yaml
 
 import Text.Pandoc.Definition (Attr)   
 
@@ -136,6 +138,18 @@ instance Default Configuration where
         , interpreter          = defaultPlatformInterpreter
         , flags                = mempty
     }
+
+instance ToJSON Configuration where
+    toJSON (Configuration dir' _ savefmt' dpi' interp' flags') = 
+        -- We ignore the include script as we want to examplify that
+        -- this is for a filepath
+            object [ "directory"    .= dir'
+                    , "include"     .= ("example.py" :: FilePath)
+                    , "dpi"         .= dpi'
+                    , "format"      .= (toLower <$> show savefmt')
+                    , "interpreter" .= interp'
+                    , "flags"       .= flags'
+                    ]
 
     
 -- | Datatype containing all parameters required to run pandoc-pyplot
