@@ -39,6 +39,7 @@ main =
         , testSaveFormat
         , testBlockingCallError
         , testMarkdownFormattingCaption
+        , testWithLinks
         , testWithConfiguration
         , testOverridingConfiguration
         , testBuildConfiguration
@@ -66,6 +67,11 @@ addSaveFormat saveFormat (CodeBlock (id', cls, attrs) script) =
 addDPI :: Int -> Block -> Block
 addDPI dpi (CodeBlock (id', cls, attrs) script) =
     CodeBlock (id', cls, attrs ++ [(dpiKey, show dpi)]) script
+
+addWithLinks :: Bool -> Block -> Block
+addWithLinks yn (CodeBlock (id', cls, attrs) script) =
+    CodeBlock (id', cls, attrs ++ [(withLinksKey, show yn)]) script
+
 
 -- | Assert that a file exists
 assertFileExists :: HasCallStack => FilePath -> Assertion
@@ -193,6 +199,31 @@ testMarkdownFormattingCaption =
         extractImageCaption (Image _ c _) = c
         extractImageCaption _ = mempty
 -------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+-- Test that it is possible to not render links in captions
+testWithLinks :: TestTree
+testWithLinks =
+    testCase "appropriately omits links to source code and high-res image" $ do
+        tempDir <- (</> "test-caption-links") <$> getCanonicalTemporaryDirectory
+        ensureDirectoryExistsAndEmpty tempDir
+
+        -- Note that this test is fragile, in the sense that the expected result must be carefully
+        -- constructed
+        let expected = mempty
+            codeBlock = addWithLinks False $ addDirectory tempDir $ addCaption mempty $ plotCodeBlock "import matplotlib.pyplot as plt"
+        result <- makePlot' def codeBlock
+        case result of
+            Left error -> assertFailure $ "an error occured: " <> show error
+            Right block -> assertIsInfix expected (extractCaption block)
+    where
+        extractCaption (B.Para blocks) = extractImageCaption . head $ blocks
+        extractCaption _ = mempty
+
+        extractImageCaption (Image _ c _) = c
+        extractImageCaption _ = mempty
+-------------------------------------------------------------------------------
+
 
 -------------------------------------------------------------------------------
 -- Test with configuration
