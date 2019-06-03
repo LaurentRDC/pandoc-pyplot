@@ -6,6 +6,7 @@ Release 2.1.3.0
 ---------------
 
 * Switched to using [optparse-applicative](https://github.com/pcapriotti/optparse-applicative#arguments) for command-line argument parsing.
+* Added a command-line options, "--write-example-config", which will write a config file ".pandoc-pyplot.yml" to show all available configuration options.
 
 Release 2.1.2.0
 ---------------
