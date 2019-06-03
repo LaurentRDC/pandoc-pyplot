@@ -2,7 +2,7 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-Release 2.1.3.0
+Release 2.2.0.0
 ---------------
 
 * Switched to using [optparse-applicative](https://github.com/pcapriotti/optparse-applicative#arguments) for command-line argument parsing.
