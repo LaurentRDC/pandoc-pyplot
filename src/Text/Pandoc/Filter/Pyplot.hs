@@ -137,6 +137,13 @@ import           Text.Pandoc.Filter.Pyplot.Internal
 filterClass :: String
 filterClass = "pyplot"
 
+
+-- | Flexible boolean parsing
+readBool :: String -> Bool
+readBool s | s `elem` ["True",  "true",  "'True'",  "'true'",  "1"] = True
+           | s `elem` ["False", "false", "'False'", "'false'", "0"] = False
+           | otherwise = error $ mconcat ["Could not parse '", s, "' into a boolean. Please use 'True' or 'False'"] 
+
 -- | Determine inclusion specifications from Block attributes.
 -- Note that the @".pyplot"@ class is required, but all other parameters are optional
 parseFigureSpec :: Configuration -> Block -> IO (Maybe FigureSpec)
@@ -157,9 +164,10 @@ parseFigureSpec config (CodeBlock (id', cls, attrs) content)
             format      = fromMaybe (defaultSaveFormat config) $ join $ saveFormatFromString <$> Map.lookup saveFormatKey attrs'
             dir         = makeValid $ Map.findWithDefault (defaultDirectory config) directoryKey attrs'
             dpi'        = fromMaybe (defaultDPI config) $ read <$> Map.lookup dpiKey attrs'
+            withLinks'  = fromMaybe (defaultWithLinks config) $ readBool <$> Map.lookup withLinksKey attrs'
             blockAttrs' = (id', filter (/= filterClass) cls, filteredAttrs)
-        return $ FigureSpec caption' fullScript format dir dpi' blockAttrs'
-
+        return $ FigureSpec caption' withLinks' fullScript format dir dpi' blockAttrs'
+    
 parseFigureSpec _ _ = return Nothing
 
 -- | Main routine to include Matplotlib plots.
