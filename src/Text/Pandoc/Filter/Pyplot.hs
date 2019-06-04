@@ -30,6 +30,8 @@ Here are the possible attributes what pandoc-pyplot understands:
     * @caption="..."@: Specify a plot caption (or alternate text). Captions support Markdown formatting and LaTeX math (@$...$@).
     * @dpi=...@: Specify a value for figure resolution, or dots-per-inch. Default is 80DPI.
     * @include=...@: Path to a Python script to include before the code block. Ideal to avoid repetition over many figures.
+    * @with-links=true|false@: Add links to source code and high-resolution version of this figure. 
+      This is @true@ by default, but you may wish to disable this for PDF output
 
 Here are some example blocks in Markdown:
 
