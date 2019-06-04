@@ -41,6 +41,10 @@ environment:
   - ARGS: "--resolver lts-13"  # GHC 8.6
   - ARGS: "--resolver nightly"
 
+platform:
+  - x86
+  - x64
+
 matrix:
   fast_finish: true
 
