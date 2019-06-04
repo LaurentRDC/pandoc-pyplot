@@ -16,6 +16,7 @@ Release 2.1.3.0
     plt.plot([1,2,3,4,5],[1,2,3,4,5])
     ```
   ```
+* Added automated builds on macOS and Linux via Azure-Pipelines. Windows build will stay on Appveyor for now.
 
 Release 2.1.2.0
 ---------------
