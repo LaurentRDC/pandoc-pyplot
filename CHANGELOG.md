@@ -7,7 +7,15 @@ Release 2.1.3.0
 
 * Switched to using [optparse-applicative](https://github.com/pcapriotti/optparse-applicative#arguments) for command-line argument parsing.
 * Added a command-line options, "--write-example-config", which will write a config file ".pandoc-pyplot.yml" to show all available configuration options.
-* Links to source code and high-res images can be suppressed using `{.pyplot with-links=false ...}` (or via the configuration file with `with-links: false`). This is to get cleaner output in technical documentation (e.g. PDF).
+* Links to source code and high-res images can be suppressed using `{.pyplot with-links=false ...}` (or via the configuration file with `with-links: false`). This is to get cleaner output in technical documentation (e.g. PDF). Example:
+
+  ```markdown
+    ```{.pyplot caption="This is a caption" with-links=false}
+    import matplotlib.pyplot as plt
+    plt.figure()
+    plt.plot([1,2,3,4,5],[1,2,3,4,5])
+    ```
+  ```
 
 Release 2.1.2.0
 ---------------
