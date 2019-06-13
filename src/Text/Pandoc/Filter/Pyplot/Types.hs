@@ -155,7 +155,10 @@ instance ToJSON Configuration where
                     ]
 
     
--- | Datatype containing all parameters required to run pandoc-pyplot
+-- | Datatype containing all parameters required to run pandoc-pyplot. 
+--
+-- It is assumed that once a @FigureSpec@ has been created, no configuration
+-- can overload it; hence, a @FigureSpec@ completely encodes a particular figure.
 data FigureSpec = FigureSpec
     { caption    :: String       -- ^ Figure caption.
     , withLinks  :: Bool         -- ^ Append links to source code and high-dpi figure to caption

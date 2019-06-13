@@ -152,7 +152,8 @@ These values override the default values, which are equivalent to:
 
 ```yaml
 # Defaults if no configuration is provided.
-# Note that the default interpreter name on MacOS and Unix is python3
+# Note that the default interpreter name on MacOS and Unix is 'python3'
+# and 'python' on Windows.
 interpreter: python
 flags: []
 directory: generated/
