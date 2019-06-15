@@ -147,7 +147,7 @@ instance ToJSON Configuration where
         -- this is for a filepath
             object [ "directory"    .= dir'
                     , "include"     .= ("example.py" :: FilePath)
-                    , "with-links"  .= withLinks'
+                    , "links"       .= withLinks'
                     , "dpi"         .= dpi'
                     , "format"      .= (toLower <$> show savefmt')
                     , "interpreter" .= interp'
