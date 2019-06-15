@@ -2,6 +2,12 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+Release 2.1.4.0
+---------------
+
+* Added examples and documentation on how to use `pandoc-pyplot` on LaTeX documents.
+* `with-links` key changed to `links`. I'm sorry. Pandoc doesn't support LaTeX tokens with `-`.
+
 Release 2.1.3.0
 ---------------
 
