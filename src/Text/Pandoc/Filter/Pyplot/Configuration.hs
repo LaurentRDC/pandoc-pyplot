@@ -41,7 +41,7 @@ captionKey     = "caption"
 dpiKey         = "dpi"
 includePathKey = "include"
 saveFormatKey  = "format"
-withLinksKey   = "with-links"
+withLinksKey   = "links"
 
 -- | list of all keys related to pandoc-pyplot.
 inclusionKeys :: [String]
