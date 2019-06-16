@@ -43,6 +43,7 @@ import           Text.Pandoc.Readers          (readMarkdown)
 
 import Text.Pandoc.Filter.Pyplot.Types
 
+
 readerOptions :: ReaderOptions
 readerOptions = def 
     {readerExtensions = 
@@ -74,7 +75,7 @@ toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
     -- must be "fig:"
     -- Janky? yes
     where
-        attrs'       = blockAttrs spec
+        attrs'       = withPossibleLabel spec
         target'      = figurePath spec
         withLinks'   = withLinks spec
         srcLink      = link (replaceExtension target' ".txt") mempty "Source code" 
@@ -82,6 +83,12 @@ toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
         captionText  = fromList $ fromMaybe mempty (captionReader $ caption spec)
         captionLinks = mconcat [" (", srcLink, ", ", hiresLink, ")"]
         caption'     = if withLinks' then captionText <> captionLinks else captionText
+
+-- | Extra attributes, making sure the identifier is appropriate.
+withPossibleLabel :: FigureSpec -> Attr
+withPossibleLabel spec = (fromMaybe id' (label spec), cls, kv)
+    where
+        (id', cls, kv) = blockAttrs spec
 
 -- | Determine the path a figure should have.
 figurePath :: FigureSpec -> FilePath
