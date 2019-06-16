@@ -53,47 +53,11 @@ import Text.Pandoc.Filter.Pyplot.Types
 import Text.Pandoc.Filter.Pyplot.Configuration
 
 
-readerOptions :: ReaderOptions
-readerOptions = def 
-    {readerExtensions = 
-        extensionsFromList 
-            [ Ext_tex_math_dollars
-            , Ext_superscript 
-            , Ext_subscript
-            ] 
-    }
-
--- | Read a figure caption in Markdown format. LaTeX math @$...$@ is supported,
--- as are Markdown subscripts and superscripts.
-captionReader :: String -> Maybe [Inline]
-captionReader t = either (const Nothing) (Just . extractFromBlocks) $ runPure $ readMarkdown' (T.pack t)
-    where
-        readMarkdown' = readMarkdown readerOptions
-
-        extractFromBlocks (Pandoc _ blocks) = mconcat $ extractInlines <$> blocks
-
-        extractInlines (Plain inlines) = inlines
-        extractInlines (Para inlines) = inlines
-        extractInlines (LineBlock multiinlines) = join multiinlines
-        extractInlines _ = []
-
-
--- | Code block class that will trigger the filter
-filterClass :: String
-filterClass = "pyplot"
-
-
--- | Flexible boolean parsing
-readBool :: String -> Bool
-readBool s | s `elem` ["True",  "true",  "'True'",  "'true'",  "1"] = True
-           | s `elem` ["False", "false", "'False'", "'false'", "0"] = False
-           | otherwise = error $ mconcat ["Could not parse '", s, "' into a boolean. Please use 'True' or 'False'"] 
-
 -- | Determine inclusion specifications from Block attributes.
 -- Note that the @".pyplot"@ class is required, but all other parameters are optional
 parseFigureSpec :: Configuration -> Block -> IO (Maybe FigureSpec)
 parseFigureSpec config (CodeBlock (id', cls, attrs) content)
-    | filterClass `elem` cls = Just <$> figureSpec
+    | "pyplot" `elem` cls = Just <$> figureSpec
     | otherwise = return Nothing
   where
     attrs'        = Map.fromList attrs
@@ -111,7 +75,7 @@ parseFigureSpec config (CodeBlock (id', cls, attrs) content)
             dir         = makeValid $ Map.findWithDefault (defaultDirectory config) directoryKey attrs'
             dpi'        = fromMaybe (defaultDPI config) $ read <$> Map.lookup dpiKey attrs'
             withLinks'  = fromMaybe (defaultWithLinks config) $ readBool <$> Map.lookup withLinksKey attrs'
-            blockAttrs' = (fromMaybe id' label', filter (/= filterClass) cls, filteredAttrs)
+            blockAttrs' = (fromMaybe id' label', filter (/= "pyplot") cls, filteredAttrs)
         return $ FigureSpec caption' withLinks' fullScript format dir dpi' label' blockAttrs'
     
 parseFigureSpec _ _ = return Nothing
@@ -123,7 +87,7 @@ toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
     -- must be "fig:"
     -- Janky? yes
     where
-        attrs'       = blockAttrs spec
+        attrs'       = blockAttrs spec -- The label has been inserted into the block attrs (see parseFigureSpec)
         target'      = figurePath spec
         withLinks'   = withLinks spec
         srcLink      = link (replaceExtension target' ".txt") mempty "Source code" 
@@ -169,3 +133,34 @@ addPlotCapture spec =
             , T.pack $ show dpi'
             , ")"
             ]
+
+readerOptions :: ReaderOptions
+readerOptions = def 
+    {readerExtensions = 
+        extensionsFromList 
+            [ Ext_tex_math_dollars
+            , Ext_superscript 
+            , Ext_subscript
+            ] 
+    }
+
+-- | Read a figure caption in Markdown format. LaTeX math @$...$@ is supported,
+-- as are Markdown subscripts and superscripts.
+captionReader :: String -> Maybe [Inline]
+captionReader t = either (const Nothing) (Just . extractFromBlocks) $ runPure $ readMarkdown' (T.pack t)
+    where
+        readMarkdown' = readMarkdown readerOptions
+
+        extractFromBlocks (Pandoc _ blocks) = mconcat $ extractInlines <$> blocks
+
+        extractInlines (Plain inlines) = inlines
+        extractInlines (Para inlines) = inlines
+        extractInlines (LineBlock multiinlines) = join multiinlines
+        extractInlines _ = []
+
+
+-- | Flexible boolean parsing
+readBool :: String -> Bool
+readBool s | s `elem` ["True",  "true",  "'True'",  "'true'",  "1"] = True
+           | s `elem` ["False", "false", "'False'", "'false'", "0"] = False
+           | otherwise = error $ mconcat ["Could not parse '", s, "' into a boolean. Please use 'True' or 'False'"] 
