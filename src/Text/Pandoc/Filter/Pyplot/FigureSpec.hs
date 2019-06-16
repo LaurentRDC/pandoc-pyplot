@@ -111,7 +111,7 @@ parseFigureSpec config (CodeBlock (id', cls, attrs) content)
             dir         = makeValid $ Map.findWithDefault (defaultDirectory config) directoryKey attrs'
             dpi'        = fromMaybe (defaultDPI config) $ read <$> Map.lookup dpiKey attrs'
             withLinks'  = fromMaybe (defaultWithLinks config) $ readBool <$> Map.lookup withLinksKey attrs'
-            blockAttrs' = (id', filter (/= filterClass) cls, filteredAttrs)
+            blockAttrs' = (fromMaybe id' label', filter (/= filterClass) cls, filteredAttrs)
         return $ FigureSpec caption' withLinks' fullScript format dir dpi' label' blockAttrs'
     
 parseFigureSpec _ _ = return Nothing
@@ -123,7 +123,7 @@ toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
     -- must be "fig:"
     -- Janky? yes
     where
-        attrs'       = withPossibleLabel spec
+        attrs'       = blockAttrs spec
         target'      = figurePath spec
         withLinks'   = withLinks spec
         srcLink      = link (replaceExtension target' ".txt") mempty "Source code" 
@@ -131,12 +131,6 @@ toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
         captionText  = fromList $ fromMaybe mempty (captionReader $ caption spec)
         captionLinks = mconcat [" (", srcLink, ", ", hiresLink, ")"]
         caption'     = if withLinks' then captionText <> captionLinks else captionText
-
--- | Extra attributes, making sure the identifier is appropriate.
-withPossibleLabel :: FigureSpec -> Attr
-withPossibleLabel spec = (fromMaybe id' (label spec), cls, kv)
-    where
-        (id', cls, kv) = blockAttrs spec
 
 -- | Determine the path a figure should have.
 figurePath :: FigureSpec -> FilePath
