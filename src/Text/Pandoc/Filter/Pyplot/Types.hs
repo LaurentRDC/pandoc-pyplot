@@ -166,7 +166,6 @@ data FigureSpec = FigureSpec
     , saveFormat :: SaveFormat   -- ^ Save format of the figure
     , directory  :: FilePath     -- ^ Directory where to save the file
     , dpi        :: Int          -- ^ Dots-per-inch of figure
-    , label      :: Maybe String -- ^ Possible identifier to this image (equivalent of LaTeX \label{})
     , blockAttrs :: Attr         -- ^ Attributes not related to @pandoc-pyplot@ will be propagated.
     }
 
