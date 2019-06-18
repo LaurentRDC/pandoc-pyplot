@@ -10,8 +10,8 @@ Maintainer  : laurent.decotret@outlook.com
 Stability   : stable
 Portability : portable
 
-This module defines a Pandoc filter @makePlot@ that can be
-used to walk over a Pandoc document and generate figures from
+This module defines a Pandoc filter @makePlot@ and related functions 
+that can be used to walk over a Pandoc document and generate figures from
 Python code blocks.
 
 The syntax for code blocks is simple, Code blocks with the @.pyplot@
@@ -33,67 +33,6 @@ Here are the possible attributes what pandoc-pyplot understands:
     * @links=true|false@: Add links to source code and high-resolution version of this figure. 
       This is @true@ by default, but you may wish to disable this for PDF output.
       
-Here are some example blocks in Markdown:
-
-@
-This is a paragraph
-
-```{.pyplot caption="This is a caption."}
-import matplotlib.pyplot as plt
-
-plt.figure()
-plt.plot([0,1,2,3,4], [1,2,3,4,5])
-plt.title('This is an example figure')
-```
-
-This is another paragraph
-
-```{.pyplot dpi=150 format=SVG}
-# This example was taken from the Matplotlib gallery
-# https://matplotlib.org/examples/pylab_examples/bar_stacked.html
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-N = 5
-menMeans = (20, 35, 30, 35, 27)
-womenMeans = (25, 32, 34, 20, 25)
-menStd = (2, 3, 4, 1, 2)
-womenStd = (3, 5, 2, 3, 3)
-ind = np.arange(N)    # the x locations for the groups
-width = 0.35       # the width of the bars: can also be len(x) sequence
-
-p1 = plt.bar(ind, menMeans, width, color='#d62728', yerr=menStd)
-p2 = plt.bar(ind, womenMeans, width,
-             bottom=menMeans, yerr=womenStd)
-
-plt.ylabel('Scores')
-plt.title('Scores by group and gender')
-plt.xticks(ind, ('G1', 'G2', 'G3', 'G4', 'G5'))
-plt.yticks(np.arange(0, 81, 10))
-plt.legend((p1[0], p2[0]), ('Men', 'Women'))
-```
-@
-
-This filter was originally designed to be used with [Hakyll](https://jaspervdj.be/hakyll/). 
-In case you want to use the filter with your own Hakyll setup, you can use a transform 
-function that works on entire documents:
-
-@
-import Text.Pandoc.Filter.Pyplot (plotTransform)
-
-import Hakyll
-
--- Unsafe compiler is required because of the interaction
--- in IO (i.e. running an external Python script).
-makePlotPandocCompiler :: Compiler (Item String)
-makePlotPandocCompiler =
-  pandocCompilerWithTransformM
-    defaultHakyllReaderOptions
-    defaultHakyllWriterOptions
-    (unsafeCompiler . plotTransform)
-@
-
 Custom configurations are possible via the @Configuration@ type and the filter 
 functions @plotTransformWithConfig@ and @makePlotWithConfig@. 
 -}
