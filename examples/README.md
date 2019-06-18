@@ -39,3 +39,23 @@ If you have a LaTeX toolchain installed, you can generate a PDF as well:
 ```
 pandoc --filter pandoc-pyplot --filter pandoc-crossref -i crossref.md -o crossref.pdf
 ```
+
+## Example 3 : pandoc-pyplot and LaTeX
+
+This third example demonstrates how pandoc-pyplot can be included in a LaTeX pipeline. It is recommended that the figures first be rendered "in-place":
+
+```bash
+pandoc --filter pandoc-pyplot -i latex.tex -o latex_with_figures.tex
+```
+
+and then your usual LaTeX -> PDF rendering happens. The intermediate file will not be human-readable, most probably.
+
+To label a figure, you can use raw TeX macros in captions (requires pandoc-pyplot > 2.1.4.0):
+
+```latex
+\begin{minted}[caption=This is an example\label{example} include=style.py, format=png]{pyplot}
+...
+\end{minted}
+
+... as seen in Figure \ref{example}.
+```
