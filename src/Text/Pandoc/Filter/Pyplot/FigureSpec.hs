@@ -134,6 +134,7 @@ addPlotCapture spec =
             , ")"
             ]
 
+-- | Reader options for captions.
 readerOptions :: ReaderOptions
 readerOptions = def 
     {readerExtensions = 
@@ -141,6 +142,7 @@ readerOptions = def
             [ Ext_tex_math_dollars
             , Ext_superscript 
             , Ext_subscript
+            , Ext_raw_tex
             ] 
     }
 

@@ -8,6 +8,7 @@
 * [Usage](#usage)
     * [Markdown](#Markdown)
     * [LaTeX](#latex)
+    * [Examples])(#examples)
 * [Features](#features)
 * [Installation](#installation)
 * [Running the filter](#running-the-filter)
@@ -21,15 +22,15 @@ The filter recognizes code blocks with the `.pyplot` class present in Markdown d
 
 Here is a basic example using the scripting `matplotlib.pyplot` API:
 
-```markdown
-    ```{.pyplot}
-    import matplotlib.pyplot as plt
+~~~markdown
+```{.pyplot}
+import matplotlib.pyplot as plt
 
-    plt.figure()
-    plt.plot([0,1,2,3,4], [1,2,3,4,5])
-    plt.title('This is an example figure')
-    ```
+plt.figure()
+plt.plot([0,1,2,3,4], [1,2,3,4,5])
+plt.title('This is an example figure')
 ```
+~~~
 
 Putting the above in `input.md`, we can then generate the plot and embed it:
 
@@ -61,6 +62,8 @@ plt.title('This is an example figure')
 
 Note that __you do not need to have `minted` installed__.
 
+### Examples
+
 There are more examples in the [source repository](https://github.com/LaurentRDC/pandoc-pyplot), in the `\examples` directory.
 
 ## Features
@@ -71,15 +74,15 @@ You can also specify a caption for your image. This is done using the optional `
 
 __Markdown__:
 
-```markdown
-    ```{.pyplot caption="This is a simple figure"}
-    import matplotlib.pyplot as plt
+~~~markdown
+```{.pyplot caption="This is a simple figure"}
+import matplotlib.pyplot as plt
 
-    plt.figure()
-    plt.plot([0,1,2,3,4], [1,2,3,4,5])
-    plt.title('This is an example figure')
-    ```
+plt.figure()
+plt.plot([0,1,2,3,4], [1,2,3,4,5])
+plt.title('This is an example figure')
 ```
+~~~
 
 __LaTex__:
 
@@ -103,11 +106,11 @@ In case of an output format that supports links (e.g. HTML), the embedded image 
 
 __Markdown__:
 
-```markdown
-    ```{.pyplot links=false}
-    ...
-    ```
+~~~markdown
+```{.pyplot links=false}
+...
 ```
+~~~
 
 __LaTex__:
 
@@ -130,26 +133,26 @@ plt.style.use('ggplot')
 
 and include it in your document as follows:
 
-```markdown
-    ```{.pyplot include=style.py}
-    plt.figure()
-    plt.plot([0,1,2,3,4], [1,2,3,4,5])
-    plt.title('This is an example figure')
-    ```
+~~~markdown
+```{.pyplot include=style.py}
+plt.figure()
+plt.plot([0,1,2,3,4], [1,2,3,4,5])
+plt.title('This is an example figure')
 ```
+~~~
 
 Which is equivalent to writing the following markdown:
 
-```markdown
-    ```{.pyplot}
-    import matplotlib.pyplot as plt
-    plt.style.use('ggplot')
+~~~markdown
+```{.pyplot}
+import matplotlib.pyplot as plt
+plt.style.use('ggplot')
 
-    plt.figure()
-    plt.plot([0,1,2,3,4], [1,2,3,4,5])
-    plt.title('This is an example figure')
-    ```
+plt.figure()
+plt.plot([0,1,2,3,4], [1,2,3,4,5])
+plt.title('This is an example figure')
 ```
+~~~
 
 The equivalent LaTeX usage is as follows:
 
@@ -167,17 +170,17 @@ This `include` parameter is perfect for longer documents with many plots. Simply
 
 ### Compatibility with pandoc-crossref
 
-[`pandoc-crossref`](https://github.com/lierdakil/pandoc-crossref) is a pandoc filter that makes it effortless to cross-reference objects on documents. 
+[`pandoc-crossref`](https://github.com/lierdakil/pandoc-crossref) is a pandoc filter that makes it effortless to cross-reference objects in Markdown documents. 
 
 You can use `pandoc-crossref` in conjunction with `pandoc-pyplot` for the ultimate figure-making pipeline. You can combine both in a figure like so:
 
-```markdown
-    ```{#fig:myexample .pyplot caption="This is a caption"}
-    # Insert figure script here
-    ```
-
-    As you can see in @fig:myexample, ...
+~~~markdown
+```{#fig:myexample .pyplot caption="This is a caption"}
+# Insert figure script here
 ```
+
+As you can see in @fig:myexample, ...
+~~~
 
 If the above source is located in file `myfile.md`, you can render the figure and references by applying `pandoc-pyplot` **first**, and then `pandoc-crossref`. For example:
 
