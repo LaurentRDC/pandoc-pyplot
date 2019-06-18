@@ -8,7 +8,7 @@
 * [Usage](#usage)
     * [Markdown](#Markdown)
     * [LaTeX](#latex)
-    * [Examples])(#examples)
+    * [Examples](#examples)
 * [Features](#features)
 * [Installation](#installation)
 * [Running the filter](#running-the-filter)
