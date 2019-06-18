@@ -6,6 +6,14 @@ Release 2.1.4.0
 ---------------
 
 * Added examples and documentation on how to use `pandoc-pyplot` on LaTeX documents.
+* Allowed raw LaTeX macros in figure captions. This is required to label figures in LaTeX. E.g.:
+  
+  ```latex
+  \begin{minted}[caption=myCaption\label{myfig}]{pyplot}
+  
+  \end{minted}
+  ```
+
 * `with-links` key changed to `links`. I'm sorry. Pandoc doesn't support LaTeX tokens with `-`.
 
 Release 2.1.3.0
