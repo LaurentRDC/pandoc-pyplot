@@ -1,5 +1,5 @@
 name:           pandoc-pyplot
-version:        2.1.4.0
+version:        2.1.5.0
 cabal-version:  >= 1.12
 synopsis:       A Pandoc filter to include figures generated from Python code blocks
 description:    A Pandoc filter to include figures generated from Python code blocks. Keep the document and Python code in the same location. Output from Matplotlib is captured and included as a figure.
@@ -43,7 +43,7 @@ library
         , filepath           >= 1.4   && < 2
         , hashable           >= 1     && < 2
         , pandoc             >= 2     && < 3
-        , pandoc-types       >=1.12   && < 2
+        , pandoc-types       >= 1.12  && < 2
         , temporary
         , text               >= 1     && < 2
         , typed-process      >= 0.2.1 && < 1
