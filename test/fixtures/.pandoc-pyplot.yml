@@ -3,4 +3,4 @@ format: jpg
 dpi: 150
 flags: [-Wignore]
 transparent: false
-tight_bbox: true
+tight_bbox: false
