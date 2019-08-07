@@ -164,6 +164,15 @@ The equivalent LaTeX usage is as follows:
 
 This `include` parameter is perfect for longer documents with many plots. Simply define the style you want in a separate script! You can also import packages this way, or define functions you often use.
 
+Customization of figures beyond what is available in `pandoc-pyplot` can also be done through the `include` script. For example, if you wanted to have transparent figures, you can do so via `matplotlib.pyplot.rcParams`:
+```python
+import matplotlib.pyplot as plt
+
+plt.rcParams['savefig.transparent'] = True
+...
+```
+You can take a look at all available `matplotlib` parameters [here](https://matplotlib.org/users/customizing.html).
+
 ### No wasted work
 
 `pandoc-pyplot` minimizes work, only generating figures if it absolutely must. Therefore, you can confidently run the filter on very large documents containing dozens of figures --- like a book or a thesis --- and only the figures which have recently changed will be re-generated.
