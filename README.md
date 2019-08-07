@@ -18,6 +18,7 @@
     * [Compatibility with
       pandoc-crossref](#compatibility-with-pandoc-crossref)
     * [Configurable](#configurable)
+        * [Configuration-only parameters](#configuration-only-parameters)
 * [Installation](#installation)
 * [Running the filter](#running-the-filter)
 * [Usage as a Haskell library](#usage-as-a-haskell-library)
@@ -242,6 +243,15 @@ flags: []
 ```
 
 Using `pandoc-pyplot --write-example-config` will write the default configuration to a file `.pandoc-pyplot.yml`, which you can then customize.
+
+#### Configuration-only parameters
+
+There are a few parameters that are __only__ available via the configuration file `.pandoc-pyplot.yml`: 
+
+* `interpreter` is the name of the interpreter to use. For example, `interpreter: python36`;
+* `flags` is a list of strings, which are flags that are passed to the python interpreter. For example, `flags: [-O, -Wignore]`;
+* `tight_bbox` is a boolean that determines whether to use `bbox_inches="tight"` or not when saving Matplotlib figures. For example, `tight_bbox: true`. See [here](https://matplotlib.org/api/_as_gen/matplotlib.pyplot.savefig.html) for details;
+* `transparent` is a boolean that determines whether to make figure background transparent or not. This is useful, for example, for displaying a plot on top of a colored background on a web page. For example, `transparent: true`.
 
 ## Installation
 
