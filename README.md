@@ -5,14 +5,24 @@
 
 `pandoc-pyplot` turns Python code present in your documents into embedded Matplotlib figures.
 
-* [Usage](#usage)
-    * [Markdown](#Markdown)
-    * [LaTeX](#latex)
-    * [Examples](#examples)
-* [Features](#features)
-* [Installation](#installation)
-* [Running the filter](#running-the-filter)
-* [Usage as a Haskell library](#usage-as-a-haskell-library)
+-   [Usage](#usage)
+  -   [Markdown](#markdown)
+  -   [LaTeX](#latex)
+  -   [Examples](#examples)
+-   [Features](#features)
+  -   [Captions](#captions)
+  -   [Link to source code and high-resolution
+      figure](#link-to-source-code-and-high-resolution-figure)
+  -   [Including scripts](#including-scripts)
+  -   [No wasted work](#no-wasted-work)
+  -   [Compatibility with
+      pandoc-crossref](#compatibility-with-pandoc-crossref)
+  -   [Configurable](#configurable)
+-   [Installation](#installation)
+-   [Running the filter](#running-the-filter)
+-   [Usage as a Haskell library](#usage-as-a-haskell-library)
+  -   [Usage with Hakyll](#usage-with-hakyll)
+-   [Warning](#warning)
 
 ## Usage
 
