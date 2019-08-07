@@ -5,7 +5,7 @@ pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 Release 2.1.5.0
 ---------------
 
-
+* Added support for two new configuration values: `tight_bbox: true|false` and `transparent: true|false`. These values are only supported via configuration files `.pandoc-pyplot.yml`.
 
 Release 2.1.4.0
 ---------------
