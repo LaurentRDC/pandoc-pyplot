@@ -126,13 +126,15 @@ addPlotCapture spec =
     mconcat
         [ script spec
         , "\nimport matplotlib.pyplot as plt" -- Just in case
-        , plotCapture (figurePath spec) (dpi spec)
-        , plotCapture (hiresFigurePath spec) (minimum [200, 2 * dpi spec])
+        -- Note that the high-resolution figure always has non-transparent background
+        -- because it is difficult to see the image when opened directly 
+        -- in Chrome, for example.
+        , plotCapture (figurePath spec) (dpi spec) (transparent spec)
+        , plotCapture (hiresFigurePath spec) (minimum [200, 2 * dpi spec]) False
         ]
   where
     tight' = tightBbox spec
-    transparent' = transparent spec
-    plotCapture fname' dpi' = mconcat $ 
+    plotCapture fname' dpi' transparent' = mconcat $ 
         [ "\nplt.savefig("
         , T.pack $ show fname' -- show is required for quotes
         , ", dpi="

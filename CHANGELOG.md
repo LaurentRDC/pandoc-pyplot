@@ -2,6 +2,11 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+Release 2.1.5.1
+---------------
+
+* Fixed an issue where setting the configuration option `transparent: true`  left high-resolution figures difficult to see. Therefore, the option `transparent: true` does not affect high-resolution figures anymore.
+
 Release 2.1.5.0
 ---------------
 
