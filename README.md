@@ -251,7 +251,7 @@ There are a few parameters that are __only__ available via the configuration fil
 * `interpreter` is the name of the interpreter to use. For example, `interpreter: python36`;
 * `flags` is a list of strings, which are flags that are passed to the python interpreter. For example, `flags: [-O, -Wignore]`;
 * (*New in version 2.1.5.0*) `tight_bbox` is a boolean that determines whether to use `bbox_inches="tight"` or not when saving Matplotlib figures. For example, `tight_bbox: true`. See [here](https://matplotlib.org/api/_as_gen/matplotlib.pyplot.savefig.html) for details;
-* (*New in version 2.1.5.0*) `transparent` is a boolean that determines whether to make figure background transparent or not. This is useful, for example, for displaying a plot on top of a colored background on a web page. For example, `transparent: true`.
+* (*New in version 2.1.5.0*) `transparent` is a boolean that determines whether to make figure background transparent or not. This is useful, for example, for displaying a plot on top of a colored background on a web page. High-resolution figures are not affected. For example, `transparent: true`.
 
 ## Installation
 
