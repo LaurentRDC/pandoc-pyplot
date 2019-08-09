@@ -1,5 +1,6 @@
 {-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-|
 Module      : Text.Pandoc.Filter.Pyplot.Types
 Copyright   : (c) Laurent P René de Cotret, 2019
@@ -15,12 +16,39 @@ module Text.Pandoc.Filter.Pyplot.Types where
 
 import Data.Char              (toLower)
 import Data.Default.Class     (Default, def)
-import Data.Hashable          (Hashable, hashWithSalt)
+import Data.Hashable          (Hashable)
 import Data.Semigroup         as Sem
-import Data.Text              (Text)
+import Data.Text              (Text, pack)
 import Data.Yaml
 
+import GHC.Generics           (Generic)
+
 import Text.Pandoc.Definition (Attr)   
+
+
+-- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
+directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey, withLinksKey, isTightBboxKey, isTransparentKey :: String
+directoryKey     = "directory"
+captionKey       = "caption"
+dpiKey           = "dpi"
+includePathKey   = "include"
+saveFormatKey    = "format"
+withLinksKey     = "links"
+isTightBboxKey   = "tight_bbox"
+isTransparentKey = "transparent"
+
+-- | list of all keys related to pandoc-pyplot that 
+-- can be specified in source material.
+inclusionKeys :: [String]
+inclusionKeys = [ directoryKey
+                , captionKey
+                , dpiKey
+                , includePathKey
+                , saveFormatKey
+                , withLinksKey
+                , isTightBboxKey
+                , isTransparentKey
+                ]
 
 
 -- | String representation of a Python script
@@ -73,7 +101,9 @@ data SaveFormat
     | EPS
     | GIF
     | TIF
-    deriving (Bounded, Enum, Eq, Show)
+    deriving (Bounded, Enum, Eq, Show, Generic)
+
+instance Hashable SaveFormat -- From Generic
 
 -- | Parse an image save format string
 --
@@ -125,6 +155,8 @@ data Configuration
         , defaultWithLinks     :: Bool         -- ^ The default behavior of whether or not to include links to source code and high-res
         , defaultSaveFormat    :: SaveFormat   -- ^ The default save format of generated figures.
         , defaultDPI           :: Int          -- ^ The default dots-per-inch value for generated figures.
+        , isTightBbox          :: Bool         -- ^ Whether the figures should be saved with @bbox_inches="tight"@ or not. Useful for larger figures with subplots.
+        , isTransparent        :: Bool         -- ^ If True, figures will be saved with transparent background rather than solid color.
         , interpreter          :: String       -- ^ The name of the interpreter to use to render figures.
         , flags                :: [String]     -- ^ Command-line flags to be passed to the Python interpreger, e.g. ["-O", "-Wignore"]
         }
@@ -137,22 +169,26 @@ instance Default Configuration where
         , defaultWithLinks     = True
         , defaultSaveFormat    = PNG
         , defaultDPI           = 80
+        , isTightBbox          = False
+        , isTransparent        = False
         , interpreter          = defaultPlatformInterpreter
         , flags                = mempty
     }
 
 instance ToJSON Configuration where
-    toJSON (Configuration dir' _ withLinks' savefmt' dpi' interp' flags') = 
+    toJSON (Configuration dir' _ withLinks' savefmt' dpi' tightbbox' transparent' interp' flags') = 
         -- We ignore the include script as we want to examplify that
         -- this is for a filepath
-            object [ "directory"    .= dir'
-                    , "include"     .= ("example.py" :: FilePath)
-                    , "links"       .= withLinks'
-                    , "dpi"         .= dpi'
-                    , "format"      .= (toLower <$> show savefmt')
-                    , "interpreter" .= interp'
-                    , "flags"       .= flags'
-                    ]
+            object [ pack directoryKey      .= dir'
+                   , pack includePathKey   .= ("example.py" :: FilePath)
+                   , pack withLinksKey     .= withLinks'
+                   , pack dpiKey           .= dpi'
+                   , pack saveFormatKey    .= (toLower <$> show savefmt')
+                   , pack isTightBboxKey   .= tightbbox'
+                   , pack isTransparentKey .= transparent'
+                   , "interpreter" .= interp'
+                   , "flags"       .= flags'
+                   ]
 
     
 -- | Datatype containing all parameters required to run pandoc-pyplot. 
@@ -160,22 +196,15 @@ instance ToJSON Configuration where
 -- It is assumed that once a @FigureSpec@ has been created, no configuration
 -- can overload it; hence, a @FigureSpec@ completely encodes a particular figure.
 data FigureSpec = FigureSpec
-    { caption    :: String       -- ^ Figure caption.
-    , withLinks  :: Bool         -- ^ Append links to source code and high-dpi figure to caption
-    , script     :: PythonScript -- ^ Source code for the figure.
-    , saveFormat :: SaveFormat   -- ^ Save format of the figure
-    , directory  :: FilePath     -- ^ Directory where to save the file
-    , dpi        :: Int          -- ^ Dots-per-inch of figure
-    , blockAttrs :: Attr         -- ^ Attributes not related to @pandoc-pyplot@ will be propagated.
-    }
+    { caption     :: String       -- ^ Figure caption.
+    , withLinks   :: Bool         -- ^ Append links to source code and high-dpi figure to caption.
+    , script      :: PythonScript -- ^ Source code for the figure.
+    , saveFormat  :: SaveFormat   -- ^ Save format of the figure.
+    , directory   :: FilePath     -- ^ Directory where to save the file.
+    , dpi         :: Int          -- ^ Dots-per-inch of figure.
+    , tightBbox   :: Bool         -- ^ Enforce tight bounding-box with @bbox_inches="tight"@.
+    , transparent :: Bool         -- ^ Make figure background transparent.
+    , blockAttrs  :: Attr         -- ^ Attributes not related to @pandoc-pyplot@ will be propagated.
+    } deriving Generic
 
-instance Hashable FigureSpec where
-    hashWithSalt salt spec =
-        -- Some things are not included in the hash because they do not affect the outcome 
-        -- of running scripts, e.g. whether links should be shown or not.
-        hashWithSalt salt ( caption spec
-                          , script spec
-                          , fromEnum . saveFormat $ spec
-                          , directory spec, dpi spec
-                          , blockAttrs spec
-                          )
+instance Hashable FigureSpec -- From Generic

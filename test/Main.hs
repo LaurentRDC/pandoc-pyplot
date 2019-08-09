@@ -279,6 +279,11 @@ testBuildConfiguration =
                          , defaultSaveFormat = JPG
                          , defaultDPI = 150
                          , flags = ["-Wignore"]
+<<<<<<< HEAD
+=======
+                         , isTightBbox = True
+                         , isTransparent = True
+>>>>>>> 6fe32e3bd0fa418c94890d72ca0345736575ab2a
                          }
         parsedConfig <- configuration "test/fixtures/.pandoc-pyplot.yml"
         assertEqual "" config parsedConfig
