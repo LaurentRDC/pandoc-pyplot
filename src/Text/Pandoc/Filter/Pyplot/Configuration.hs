@@ -21,6 +21,8 @@ module Text.Pandoc.Filter.Pyplot.Configuration (
     , includePathKey
     , saveFormatKey
     , withLinksKey
+    , isTightBboxKey
+    , isTransparentKey
 ) where
 
 import           Data.Maybe                    (fromMaybe)
@@ -33,25 +35,6 @@ import           Data.Yaml.Config              (loadYamlSettings, ignoreEnv)
 import           System.Directory              (doesFileExist)
 
 import Text.Pandoc.Filter.Pyplot.Types
-
--- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
-directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey, withLinksKey :: String
-directoryKey   = "directory"
-captionKey     = "caption"
-dpiKey         = "dpi"
-includePathKey = "include"
-saveFormatKey  = "format"
-withLinksKey   = "links"
-
--- | list of all keys related to pandoc-pyplot.
-inclusionKeys :: [String]
-inclusionKeys = [ directoryKey
-                , captionKey
-                , dpiKey
-                , includePathKey
-                , saveFormatKey
-                , withLinksKey
-                ]
 
 -- A @Configuration@ cannot be directly created from a YAML file
 -- for two reasons:
@@ -69,19 +52,23 @@ data ConfigPrecursor
         , defaultWithLinks_   :: Bool
         , defaultSaveFormat_  :: String
         , defaultDPI_         :: Int
+        , tightBbox_          :: Bool
+        , transparent_        :: Bool
         , interpreter_        :: String
         , flags_              :: [String]
         } 
 
 instance FromJSON ConfigPrecursor where
     parseJSON (Object v) = ConfigPrecursor
-        <$> v .:? (T.pack directoryKey)  .!= (defaultDirectory def)
+        <$> v .:? (T.pack directoryKey)     .!= (defaultDirectory def)
         <*> v .:? (T.pack includePathKey)
-        <*> v .:? (T.pack withLinksKey)  .!= (defaultWithLinks def)
-        <*> v .:? (T.pack saveFormatKey) .!= (extension $ defaultSaveFormat def)
-        <*> v .:? (T.pack dpiKey)        .!= (defaultDPI def)
-        <*> v .:? "interpreter"          .!= (interpreter def)
-        <*> v .:? "flags"                .!= (flags def)
+        <*> v .:? (T.pack withLinksKey)     .!= (defaultWithLinks def)
+        <*> v .:? (T.pack saveFormatKey)    .!= (extension $ defaultSaveFormat def)
+        <*> v .:? (T.pack dpiKey)           .!= (defaultDPI def)
+        <*> v .:? (T.pack isTightBboxKey)   .!= (isTightBbox def)
+        <*> v .:? (T.pack isTransparentKey) .!= (isTransparent def)
+        <*> v .:? "interpreter"             .!= (interpreter def)
+        <*> v .:? "flags"                   .!= (flags def)
     
     parseJSON _ = fail "Could not parse the configuration"
 
@@ -94,6 +81,8 @@ renderConfiguration prec = do
                            , defaultSaveFormat    = saveFormat'
                            , defaultWithLinks     = defaultWithLinks_ prec
                            , defaultDPI           = defaultDPI_ prec
+                           , isTightBbox          = tightBbox_ prec
+                           , isTransparent        = transparent_ prec
                            , interpreter          = interpreter_ prec
                            , flags                = flags_ prec
                            }

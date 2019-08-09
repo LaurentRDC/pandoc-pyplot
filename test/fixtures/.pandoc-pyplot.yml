@@ -2,3 +2,5 @@ directory: generated/other
 format: jpg
 dpi: 150
 flags: [-Wignore]
+transparent: true
+tight_bbox: true

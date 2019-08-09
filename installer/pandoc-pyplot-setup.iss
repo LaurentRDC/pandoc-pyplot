@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define AppName "pandoc-pyplot"
-#define AppVersion "2.1.5.0"
+#define AppVersion "2.1.5.1"
 #define AppPublisher "Laurent P. René de Cotret"
 #define AppURL "https://github.com/LaurentRDC/pandoc-pyplot"
 #define AppEXEName "pandoc-pyplot.exe"
@@ -24,7 +24,11 @@ DisableProgramGroupPage=yes
 ChangesEnvironment=true
 LicenseFile=..\LICENSE.md
 OutputDir=.\setup-{#AppVersion}
+<<<<<<< HEAD
 OutputBaseFilename={#AppName}-installer-windows-{#AppVersion}
+=======
+OutputBaseFilename={#AppName}-installer-{#AppVersion}
+>>>>>>> 6fe32e3bd0fa418c94890d72ca0345736575ab2a
 Compression=lzma2/ultra64
 SolidCompression=yes
 
