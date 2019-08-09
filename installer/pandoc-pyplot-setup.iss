@@ -24,11 +24,7 @@ DisableProgramGroupPage=yes
 ChangesEnvironment=true
 LicenseFile=..\LICENSE.md
 OutputDir=.\setup-{#AppVersion}
-<<<<<<< HEAD
-OutputBaseFilename={#AppName}-installer-windows-{#AppVersion}
-=======
 OutputBaseFilename={#AppName}-installer-{#AppVersion}
->>>>>>> 6fe32e3bd0fa418c94890d72ca0345736575ab2a
 Compression=lzma2/ultra64
 SolidCompression=yes
 

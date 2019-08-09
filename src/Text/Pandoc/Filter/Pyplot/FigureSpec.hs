@@ -97,6 +97,7 @@ toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
         captionLinks = mconcat [" (", srcLink, ", ", hiresLink, ")"]
         caption'     = if withLinks' then captionText <> captionLinks else captionText
 
+
 -- | Determine the path a figure should have.
 figurePath :: FigureSpec -> FilePath
 figurePath spec = directory spec </> stem spec
@@ -104,15 +105,18 @@ figurePath spec = directory spec </> stem spec
     stem = flip addExtension ext . show . hash
     ext  = extension . saveFormat $ spec
 
+
 -- | Determine the path to the source code that generated the figure.
 sourceCodePath :: FigureSpec -> FilePath
 sourceCodePath = flip replaceExtension ".txt" . figurePath
+
 
 -- | The path to the high-resolution figure.
 hiresFigurePath :: FigureSpec -> FilePath
 hiresFigurePath spec = flip replaceExtension (".hires" <> ext) . figurePath $ spec
   where
     ext = extension . saveFormat $ spec
+
 
 -- | Modify a Python plotting script to save the figure to a filename.
 -- An additional file will also be captured.
@@ -154,6 +158,7 @@ readerOptions = def
             , Ext_raw_tex
             ] 
     }
+
 
 -- | Read a figure caption in Markdown format. LaTeX math @$...$@ is supported,
 -- as are Markdown subscripts and superscripts.
