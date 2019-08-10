@@ -295,15 +295,15 @@ stack install # Alternatively, `cabal install`
 
 ### Requirements
 
-This filter only works with the Matplotlib plotting library. Therefore, you a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The name of the Python interpreter to use can be specified in a `.pandoc-pyplot.yml` file; by default, `pandoc-pyplot` will use the `"python"` name on Windows, and `"python3"` otherwise.
+This filter only works with the Matplotlib plotting library. Therefore, you need a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The name of the Python interpreter to use can be specified in a `.pandoc-pyplot.yml` file; by default, `pandoc-pyplot` will use the `"python"` name on Windows, and `"python3"` otherwise.
 
-You can use the filter with Pandoc as follows:
+Use the filter with Pandoc as follows:
 
 ```bash
 pandoc --filter pandoc-pyplot input.md --output output.html
 ```
 
-In which case, the output is HTML. Another example with PDF output:
+in which case, the output is HTML. Another example with PDF output:
 
 ```bash
 pandoc --filter pandoc-pyplot input.md --output output.pdf
@@ -319,7 +319,7 @@ pandoc-pyplot --help
 
 ## Usage as a Haskell library
 
-To include the functionality of `pandoc-pyplot` in a Haskell package, you can use the `makePlot :: Block -> IO Block` function (for single blocks) or `plotTransform :: Pandoc -> IO Pandoc` function (for entire documents).
+To include the functionality of `pandoc-pyplot` in a Haskell package, you can use the `makePlot :: Block -> IO Block` function (for single blocks) or `plotTransform :: Pandoc -> IO Pandoc` function (for entire documents). Variations of these functions exist for more advanced configurations. [Take a look at the documentation on Hackage](https://hackage.haskell.org/package/pandoc-pyplot).
 
 ### Usage with Hakyll
 
