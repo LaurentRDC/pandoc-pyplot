@@ -68,10 +68,10 @@ import           Text.Pandoc.Filter.Pyplot.Internal
 makePlot' :: Configuration -> Block -> IO (Either PandocPyplotError Block)
 makePlot' config block = do
     parsed <- parseFigureSpec config block  
-    case parsed of
-        Nothing   -> return $ Right block
-        Just spec -> handleResult spec <$> runScriptIfNecessary config spec
-
+    maybe 
+        (return $ Right block)
+        (\s -> handleResult s <$> runScriptIfNecessary config s)
+        parsed
     where
         handleResult _ (ScriptChecksFailed msg) = Left  $ ScriptChecksFailedError msg
         handleResult _ (ScriptFailure code)     = Left  $ ScriptError code

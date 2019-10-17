@@ -136,11 +136,11 @@ addPlotCapture spec =
     tight' = tightBbox spec
     plotCapture fname' dpi' transparent' = mconcat $ 
         [ "\nplt.savefig("
-        , T.pack $ show fname' -- show is required for quotes
+        , tshow fname' -- show is required for quotes
         , ", dpi="
-        , T.pack $ show dpi'
+        , tshow dpi'
         , ", transparent="
-        , T.pack $ show transparent'
+        , tshow transparent'
         , if tight' 
             then ", bbox_inches=\"tight\")"
             else ")"
@@ -180,3 +180,7 @@ readBool :: String -> Bool
 readBool s | s `elem` ["True",  "true",  "'True'",  "'true'",  "1"] = True
            | s `elem` ["False", "false", "'False'", "'false'", "0"] = False
            | otherwise = error $ mconcat ["Could not parse '", s, "' into a boolean. Please use 'True' or 'False'"] 
+
+-- | Show a value as Text
+tshow :: Show a => a -> T.Text
+tshow = T.pack . show
