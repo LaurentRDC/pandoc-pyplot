@@ -36,7 +36,7 @@ import           System.Directory              (doesFileExist)
 
 import Text.Pandoc.Filter.Pyplot.Types
 
--- A @Configuration@ cannot be directly created from a YAML file
+-- | A @Configuration@ cannot be directly created from a YAML file
 -- for two reasons:
 --
 --     * we want to store an include script. However, it makes more sense to 
@@ -59,16 +59,17 @@ data ConfigPrecursor
         } 
 
 instance FromJSON ConfigPrecursor where
-    parseJSON (Object v) = ConfigPrecursor
-        <$> v .:? (T.pack directoryKey)     .!= (defaultDirectory def)
-        <*> v .:? (T.pack includePathKey)
-        <*> v .:? (T.pack withLinksKey)     .!= (defaultWithLinks def)
-        <*> v .:? (T.pack saveFormatKey)    .!= (extension $ defaultSaveFormat def)
-        <*> v .:? (T.pack dpiKey)           .!= (defaultDPI def)
-        <*> v .:? (T.pack isTightBboxKey)   .!= (isTightBbox def)
-        <*> v .:? (T.pack isTransparentKey) .!= (isTransparent def)
-        <*> v .:? "interpreter"             .!= (interpreter def)
-        <*> v .:? "flags"                   .!= (flags def)
+    parseJSON (Object v) = 
+        ConfigPrecursor
+            <$> v .:? (T.pack directoryKey)     .!= (defaultDirectory def)
+            <*> v .:? (T.pack includePathKey)
+            <*> v .:? (T.pack withLinksKey)     .!= (defaultWithLinks def)
+            <*> v .:? (T.pack saveFormatKey)    .!= (extension $ defaultSaveFormat def)
+            <*> v .:? (T.pack dpiKey)           .!= (defaultDPI def)
+            <*> v .:? (T.pack isTightBboxKey)   .!= (isTightBbox def)
+            <*> v .:? (T.pack isTransparentKey) .!= (isTransparent def)
+            <*> v .:? "interpreter"             .!= (interpreter def)
+            <*> v .:? "flags"                   .!= (flags def)
     
     parseJSON _ = fail "Could not parse the configuration"
 
@@ -76,16 +77,17 @@ renderConfiguration :: ConfigPrecursor -> IO Configuration
 renderConfiguration prec = do
     includeScript <- fromMaybe mempty $ T.readFile <$> defaultIncludePath_ prec
     let saveFormat' = fromMaybe (defaultSaveFormat def) $ saveFormatFromString $ defaultSaveFormat_ prec
-    return $ Configuration { defaultDirectory     = defaultDirectory_ prec
-                           , defaultIncludeScript = includeScript
-                           , defaultSaveFormat    = saveFormat'
-                           , defaultWithLinks     = defaultWithLinks_ prec
-                           , defaultDPI           = defaultDPI_ prec
-                           , isTightBbox          = tightBbox_ prec
-                           , isTransparent        = transparent_ prec
-                           , interpreter          = interpreter_ prec
-                           , flags                = flags_ prec
-                           }
+    return $ Configuration 
+        { defaultDirectory     = defaultDirectory_ prec
+        , defaultIncludeScript = includeScript
+        , defaultSaveFormat    = saveFormat'
+        , defaultWithLinks     = defaultWithLinks_ prec
+        , defaultDPI           = defaultDPI_ prec
+        , isTightBbox          = tightBbox_ prec
+        , isTransparent        = transparent_ prec
+        , interpreter          = interpreter_ prec
+        , flags                = flags_ prec
+        }
 
 
 -- | Building configuration from a YAML file. The
