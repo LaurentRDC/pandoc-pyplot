@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Text.Pandoc.Filter.Pyplot
+Module      : $header$
 Description : Pandoc filter to create Matplotlib figures from code blocks
 Copyright   : (c) Laurent P René de Cotret, 2019
 License     : MIT
