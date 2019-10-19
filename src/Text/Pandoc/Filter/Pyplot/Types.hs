@@ -14,6 +14,8 @@ This module defines types in use in pandoc-pyplot
 
 module Text.Pandoc.Filter.Pyplot.Types where
 
+import Control.Monad.Reader
+
 import Data.Char              (toLower)
 import Data.Default.Class     (Default, def)
 import Data.Hashable          (Hashable)
@@ -49,6 +51,10 @@ inclusionKeys = [ directoryKey
                 , isTightBboxKey
                 , isTransparentKey
                 ]
+
+
+-- | Monad in which to run pandoc-pyplot computations
+type PyplotM a = ReaderT Configuration IO a
 
 
 -- | String representation of a Python script
