@@ -1,33 +1,35 @@
+{-# LANGUAGE ApplicativeDo   #-}
 {-# LANGUAGE LambdaCase      #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE ApplicativeDo   #-}
 
 module Main where
 
-import           Control.Applicative       ((<|>))
-import           Control.Monad             (join)
+import           Control.Applicative                ((<|>))
+import           Control.Monad                      (join)
 
-import           Data.Default.Class        (def)
-import           Data.List                 (intersperse)
-import           Data.Monoid               ((<>))
-import qualified Data.Text                 as T
+import           Data.Default.Class                 (def)
+import           Data.List                          (intersperse)
+import           Data.Monoid                        ((<>))
+import qualified Data.Text                          as T
 
 import           Options.Applicative
-import qualified Options.Applicative.Help.Pretty as P
+import qualified Options.Applicative.Help.Pretty    as P
 
-import           System.Directory          (doesFileExist)
-import           System.IO.Temp            (writeSystemTempFile)
+import           System.Directory                   (doesFileExist)
+import           System.IO.Temp                     (writeSystemTempFile)
 
-import           Text.Pandoc.Filter.Pyplot (plotTransformWithConfig, configuration, SaveFormat(..))
+import           Text.Pandoc.Filter.Pyplot          (SaveFormat (..),
+                                                     configuration,
+                                                     plotTransformWithConfig)
 import           Text.Pandoc.Filter.Pyplot.Internal (writeConfig)
-import           Text.Pandoc.JSON          (toJSONFilter)
+import           Text.Pandoc.JSON                   (toJSONFilter)
 
-import           Web.Browser               (openBrowser)
+import           Web.Browser                        (openBrowser)
 
-import qualified Data.Version              as V
-import           Paths_pandoc_pyplot       (version)
+import qualified Data.Version                       as V
+import           Paths_pandoc_pyplot                (version)
 
-import           ManPage                   (embedManualHtml)
+import           ManPage                            (embedManualHtml)
 
 main :: IO ()
 main = join $ execParser opts
@@ -38,7 +40,7 @@ main = join $ execParser opts
             <> header "pandoc-pyplot - generate Matplotlib figures directly in documents."
             <> footerDoc (Just footer')
             )
-    
+
 
 toJSONFilterWithConfig :: IO ()
 toJSONFilterWithConfig = do
@@ -58,28 +60,28 @@ data Flag = Version
 
 run :: Parser (IO ())
 run = do
-    versionP <- flag Nothing (Just Version) (long "version" <> short 'v' 
+    versionP <- flag Nothing (Just Version) (long "version" <> short 'v'
                     <> help "Show version number and exit.")
 
-    formatsP <- flag Nothing (Just Formats) (long "formats" <> short 'f' 
+    formatsP <- flag Nothing (Just Formats) (long "formats" <> short 'f'
                     <> help "Show supported output figure formats and exit.")
 
-    manualP  <- flag Nothing (Just Manual)  (long "manual"  <> short 'm' 
+    manualP  <- flag Nothing (Just Manual)  (long "manual"  <> short 'm'
                     <> help "Open the manual page in the default web browser and exit.")
 
-    configP  <- flag Nothing (Just Config)  (long "write-example-config" 
+    configP  <- flag Nothing (Just Config)  (long "write-example-config"
                     <> help "Write the default configuration in '.pandoc-pyplot.yml', \
                             \which you can subsequently customize, and exit. If '.pandoc-pyplot.yml' \
                             \already exists, an error will be thrown. ")
-                            
+
     input    <- optional $ strArgument (metavar "AST")
     return $ go (versionP <|> formatsP <|> manualP <|> configP) input
     where
         go :: Maybe Flag -> Maybe String -> IO ()
         go (Just Version) _ = putStrLn (V.showVersion version)
         go (Just Formats) _ = putStrLn . mconcat . intersperse ", " . fmap show $ supportedSaveFormats
-        go (Just Manual)  _ = writeSystemTempFile "pandoc-pyplot-manual.html" (T.unpack manualHtml) 
-                                >>= \fp -> openBrowser ("file:///" <> fp) 
+        go (Just Manual)  _ = writeSystemTempFile "pandoc-pyplot-manual.html" (T.unpack manualHtml)
+                                >>= \fp -> openBrowser ("file:///" <> fp)
                                 >> return ()
         go (Just Config) _  = writeConfig ".pandoc-pyplot.yml" def
         go Nothing _ = toJSONFilterWithConfig

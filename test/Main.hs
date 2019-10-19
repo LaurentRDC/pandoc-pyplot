@@ -3,13 +3,13 @@
 
 module Main where
 
-import           Control.Monad                 (unless)
+import           Control.Monad                      (unless)
 import           Control.Monad.Reader
 
-import           Data.Default.Class            (def)
-import           Data.List                     (isInfixOf, isSuffixOf)
-import           Data.Monoid                   ((<>))
-import           Data.Text                     (unpack)
+import           Data.Default.Class                 (def)
+import           Data.List                          (isInfixOf, isSuffixOf)
+import           Data.Monoid                        ((<>))
+import           Data.Text                          (unpack)
 
 import           Test.Tasty
 import           Test.Tasty.HUnit
@@ -17,18 +17,19 @@ import           Test.Tasty.HUnit
 import           Text.Pandoc.Filter.Pyplot
 import           Text.Pandoc.Filter.Pyplot.Internal
 
+import qualified Text.Pandoc.Builder                as B
+import qualified Text.Pandoc.Definition             as B
 import           Text.Pandoc.JSON
-import qualified Text.Pandoc.Builder           as B
-import qualified Text.Pandoc.Definition        as B
 
-import           System.Directory              (createDirectory,
-                                                createDirectoryIfMissing,
-                                                doesDirectoryExist,
-                                                doesFileExist, listDirectory,
-                                                removeDirectoryRecursive,
-                                                removePathForcibly)
-import           System.FilePath               ((</>), takeExtensions)
-import           System.IO.Temp                (getCanonicalTemporaryDirectory)
+import           System.Directory                   (createDirectory,
+                                                     createDirectoryIfMissing,
+                                                     doesDirectoryExist,
+                                                     doesFileExist,
+                                                     listDirectory,
+                                                     removeDirectoryRecursive,
+                                                     removePathForcibly)
+import           System.FilePath                    (takeExtensions, (</>))
+import           System.IO.Temp                     (getCanonicalTemporaryDirectory)
 
 main :: IO ()
 main =
@@ -88,7 +89,7 @@ assertFileExists filepath = do
 isExtensionOf :: String -> FilePath -> Bool
 isExtensionOf ext@('.':_) = isSuffixOf ext . takeExtensions
 isExtensionOf ext         = isSuffixOf ('.':ext) . takeExtensions
-    
+
 
 -- | Assert that the first list is contained,
 -- wholly and intact, anywhere within the second.
@@ -174,7 +175,7 @@ testBlockingCallError =
                     else assertFailure "An error was caught but not the expected blocking call"
     where
         isCheckError (ScriptChecksFailedError msg) = True
-        isCheckError _ = False
+        isCheckError _                             = False
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -191,14 +192,14 @@ testMarkdownFormattingCaption =
             codeBlock = addDirectory tempDir $ addCaption "**caption**" $ plotCodeBlock "import matplotlib.pyplot as plt"
         result <- runReaderT (makePlot' codeBlock) def
         case result of
-            Left error -> assertFailure $ "an error occured: " <> show error
+            Left error  -> assertFailure $ "an error occured: " <> show error
             Right block -> assertIsInfix expected (extractCaption block)
     where
         extractCaption (B.Para blocks) = extractImageCaption . head $ blocks
-        extractCaption _ = mempty
+        extractCaption _               = mempty
 
         extractImageCaption (Image _ c _) = c
-        extractImageCaption _ = mempty
+        extractImageCaption _             = mempty
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -215,14 +216,14 @@ testWithLinks =
             codeBlock = addWithLinks False $ addDirectory tempDir $ addCaption mempty $ plotCodeBlock "import matplotlib.pyplot as plt"
         result <- runReaderT (makePlot' codeBlock) def
         case result of
-            Left error -> assertFailure $ "an error occured: " <> show error
+            Left error  -> assertFailure $ "an error occured: " <> show error
             Right block -> assertIsInfix expected (extractCaption block)
     where
         extractCaption (B.Para blocks) = extractImageCaption . head $ blocks
-        extractCaption _ = mempty
+        extractCaption _               = mempty
 
         extractImageCaption (Image _ c _) = c
-        extractImageCaption _ = mempty
+        extractImageCaption _             = mempty
 -------------------------------------------------------------------------------
 
 
@@ -242,8 +243,8 @@ testOverridingConfiguration =
 
         -- The default from config says the save format should be JPG
         -- but the code block save format="png"
-        let codeBlock = (addSaveFormat PNG $ 
-                         plotCodeBlock 
+        let codeBlock = (addSaveFormat PNG $
+                         plotCodeBlock
                             "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])")
         _ <- runReaderT (makePlot' codeBlock) config
 
@@ -274,7 +275,7 @@ testWithConfiguration =
 -------------------------------------------------------------------------------
 
 testBuildConfiguration :: TestTree
-testBuildConfiguration = 
+testBuildConfiguration =
     testCase "configuration is correctly parsed" $ do
         let config = def { defaultDirectory = "generated/other"
                          , defaultSaveFormat = JPG
