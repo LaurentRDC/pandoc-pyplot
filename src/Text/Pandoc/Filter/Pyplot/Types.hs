@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-|
-Module      : Text.Pandoc.Filter.Pyplot.Types
+Module      : $header$
 Copyright   : (c) Laurent P René de Cotret, 2019
 License     : MIT
 Maintainer  : laurent.decotret@outlook.com
