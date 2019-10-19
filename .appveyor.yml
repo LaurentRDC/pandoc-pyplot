@@ -40,7 +40,7 @@ environment:
   - ARGS: "--resolver lts-12"  # GHC 8.4
   - ARGS: "--resolver lts-13"  # GHC 8.6
   - ARGS: "--resolver lts-14"  # GHC 8.6
-  - ARGS: "--resolver nightly"
+  # - ARGS: "--resolver nightly"
 
 matrix:
   fast_finish: true
