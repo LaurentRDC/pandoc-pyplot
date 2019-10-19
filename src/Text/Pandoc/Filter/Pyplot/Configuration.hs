@@ -25,23 +25,23 @@ module Text.Pandoc.Filter.Pyplot.Configuration (
     , isTransparentKey
 ) where
 
-import           Data.Maybe                    (fromMaybe)
-import           Data.Default.Class            (def)
-import qualified Data.Text                     as T
-import qualified Data.Text.IO                  as T
-import           Data.Yaml         
-import           Data.Yaml.Config              (loadYamlSettings, ignoreEnv)
+import           Data.Default.Class              (def)
+import           Data.Maybe                      (fromMaybe)
+import qualified Data.Text                       as T
+import qualified Data.Text.IO                    as T
+import           Data.Yaml
+import           Data.Yaml.Config                (ignoreEnv, loadYamlSettings)
 
-import           System.Directory              (doesFileExist)
+import           System.Directory                (doesFileExist)
 
-import Text.Pandoc.Filter.Pyplot.Types
+import           Text.Pandoc.Filter.Pyplot.Types
 
 -- | A @Configuration@ cannot be directly created from a YAML file
 -- for two reasons:
 --
---     * we want to store an include script. However, it makes more sense to 
+--     * we want to store an include script. However, it makes more sense to
 --       specify the script path in a YAML file.
---     * Save format is best specified by a string, and this must be parsed later 
+--     * Save format is best specified by a string, and this must be parsed later
 --
 -- Therefore, we have another type, ConfigPrecursor, which CAN be created directly from
 -- a YAML file.
@@ -56,10 +56,10 @@ data ConfigPrecursor
         , transparent_        :: Bool
         , interpreter_        :: String
         , flags_              :: [String]
-        } 
+        }
 
 instance FromJSON ConfigPrecursor where
-    parseJSON (Object v) = 
+    parseJSON (Object v) =
         ConfigPrecursor
             <$> v .:? (T.pack directoryKey)     .!= (defaultDirectory def)
             <*> v .:? (T.pack includePathKey)
@@ -70,14 +70,14 @@ instance FromJSON ConfigPrecursor where
             <*> v .:? (T.pack isTransparentKey) .!= (isTransparent def)
             <*> v .:? "interpreter"             .!= (interpreter def)
             <*> v .:? "flags"                   .!= (flags def)
-    
+
     parseJSON _ = fail "Could not parse the configuration"
 
 renderConfiguration :: ConfigPrecursor -> IO Configuration
 renderConfiguration prec = do
     includeScript <- fromMaybe mempty $ T.readFile <$> defaultIncludePath_ prec
     let saveFormat' = fromMaybe (defaultSaveFormat def) $ saveFormatFromString $ defaultSaveFormat_ prec
-    return $ Configuration 
+    return $ Configuration
         { defaultDirectory     = defaultDirectory_ prec
         , defaultIncludeScript = includeScript
         , defaultSaveFormat    = saveFormat'

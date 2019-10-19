@@ -17,7 +17,7 @@ module Text.Pandoc.Filter.Pyplot.Internal (
     , module Text.Pandoc.Filter.Pyplot.Types
  ) where
 
-import Text.Pandoc.Filter.Pyplot.Configuration
-import Text.Pandoc.Filter.Pyplot.FigureSpec
-import Text.Pandoc.Filter.Pyplot.Scripting
-import Text.Pandoc.Filter.Pyplot.Types
+import           Text.Pandoc.Filter.Pyplot.Configuration
+import           Text.Pandoc.Filter.Pyplot.FigureSpec
+import           Text.Pandoc.Filter.Pyplot.Scripting
+import           Text.Pandoc.Filter.Pyplot.Types

@@ -10,7 +10,7 @@ Maintainer  : laurent.decotret@outlook.com
 Stability   : stable
 Portability : portable
 
-This module defines a Pandoc filter @makePlot@ and related functions 
+This module defines a Pandoc filter @makePlot@ and related functions
 that can be used to walk over a Pandoc document and generate figures from
 Python code blocks.
 
@@ -30,14 +30,14 @@ Here are the possible attributes what pandoc-pyplot understands:
     * @caption="..."@: Specify a plot caption (or alternate text). Captions support Markdown formatting and LaTeX math (@$...$@).
     * @dpi=...@: Specify a value for figure resolution, or dots-per-inch. Default is 80DPI.
     * @include=...@: Path to a Python script to include before the code block. Ideal to avoid repetition over many figures.
-    * @links=true|false@: Add links to source code and high-resolution version of this figure. 
+    * @links=true|false@: Add links to source code and high-resolution version of this figure.
       This is @true@ by default, but you may wish to disable this for PDF output.
-      
-Custom configurations are possible via the @Configuration@ type and the filter 
-functions @plotTransformWithConfig@ and @makePlotWithConfig@. 
+
+Custom configurations are possible via the @Configuration@ type and the filter
+functions @plotTransformWithConfig@ and @makePlotWithConfig@.
 -}
 module Text.Pandoc.Filter.Pyplot (
-    -- * Operating on single Pandoc blocks 
+    -- * Operating on single Pandoc blocks
       makePlot
     , makePlotWithConfig
     -- * Operating on whole Pandoc documents
@@ -55,10 +55,10 @@ module Text.Pandoc.Filter.Pyplot (
 
 import           Control.Monad.Reader
 
-import           Data.Default.Class            (def)
+import           Data.Default.Class                 (def)
 
 import           Text.Pandoc.Definition
-import           Text.Pandoc.Walk              (walkM)
+import           Text.Pandoc.Walk                   (walkM)
 
 import           Text.Pandoc.Filter.Pyplot.Internal
 
@@ -68,7 +68,7 @@ import           Text.Pandoc.Filter.Pyplot.Internal
 makePlot' :: Block -> PyplotM (Either PandocPyplotError Block)
 makePlot' block = do
     parsed <- parseFigureSpec block
-    maybe 
+    maybe
         (return $ Right block)
         (\s -> handleResult s <$> runScriptIfNecessary s)
         parsed
@@ -87,7 +87,7 @@ makePlot = makePlotWithConfig def
 --
 -- @since 2.1.0.0
 makePlotWithConfig :: Configuration -> Block -> IO Block
-makePlotWithConfig config block = 
+makePlotWithConfig config block =
     runReaderT (makePlot' block >>= either (fail . show) return) config
 
 -- | Walk over an entire Pandoc document, changing appropriate code blocks

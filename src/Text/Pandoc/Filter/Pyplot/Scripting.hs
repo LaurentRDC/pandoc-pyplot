@@ -16,31 +16,31 @@ module Text.Pandoc.Filter.Pyplot.Scripting
     , runScriptIfNecessary
     ) where
 
-import           Control.Monad.Reader.Class
 import           Control.Monad.IO.Class
+import           Control.Monad.Reader.Class
 
-import           Data.Hashable        (hash)
-import           Data.List            (intersperse)
-import           Data.Monoid          (Any(..), (<>))
-import qualified Data.Text            as T
-import qualified Data.Text.IO         as T
+import           Data.Hashable                        (hash)
+import           Data.List                            (intersperse)
+import           Data.Monoid                          (Any (..), (<>))
+import qualified Data.Text                            as T
+import qualified Data.Text.IO                         as T
 
-import           System.Directory     (createDirectoryIfMissing,
-                                      doesFileExist)
-import           System.Exit          (ExitCode (..))
-import           System.FilePath      ((</>), takeDirectory)
-import           System.IO.Temp       (getCanonicalTemporaryDirectory)
-import           System.Process.Typed (runProcess, shell)
+import           System.Directory                     (createDirectoryIfMissing,
+                                                       doesFileExist)
+import           System.Exit                          (ExitCode (..))
+import           System.FilePath                      (takeDirectory, (</>))
+import           System.IO.Temp                       (getCanonicalTemporaryDirectory)
+import           System.Process.Typed                 (runProcess, shell)
 
-import           Text.Pandoc.Filter.Pyplot.Types
 import           Text.Pandoc.Filter.Pyplot.FigureSpec
+import           Text.Pandoc.Filter.Pyplot.Types
 
 -- | Detect the presence of a blocking show call, for example "plt.show()"
 checkBlockingShowCall :: PythonScript -> CheckResult
-checkBlockingShowCall script' = 
-    if hasShowCall 
+checkBlockingShowCall script' =
+    if hasShowCall
         then CheckFailed "The script has a blocking call to `matplotlib.pyplot.show`. "
-        else CheckPassed 
+        else CheckPassed
     where
         scriptLines = T.lines script'
         hasShowCall = getAny $ mconcat $ Any <$>
@@ -79,7 +79,7 @@ runTempPythonScript script' =  case checkResult of
 
 -- | Run the Python script. In case the file already exists, we can safely assume
 -- there is no need to re-run it.
-runScriptIfNecessary :: FigureSpec 
+runScriptIfNecessary :: FigureSpec
                      -> PyplotM ScriptResult
 runScriptIfNecessary spec = do
     liftIO $ createDirectoryIfMissing True . takeDirectory $ figurePath spec
@@ -88,7 +88,7 @@ runScriptIfNecessary spec = do
     result <- if fileAlreadyExists
                 then return ScriptSuccess
                 else runTempPythonScript scriptWithCapture
-    
+
     case result of
         ScriptSuccess      -> liftIO $ T.writeFile (sourceCodePath spec) (script spec) >> return ScriptSuccess
         ScriptFailure code -> return $ ScriptFailure code

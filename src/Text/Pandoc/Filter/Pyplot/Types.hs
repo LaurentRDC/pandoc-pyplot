@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP               #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-|
 Module      : $header$
 Copyright   : (c) Laurent P René de Cotret, 2019
@@ -14,18 +14,18 @@ This module defines types in use in pandoc-pyplot
 
 module Text.Pandoc.Filter.Pyplot.Types where
 
-import Control.Monad.Reader
+import           Control.Monad.Reader
 
-import Data.Char              (toLower)
-import Data.Default.Class     (Default, def)
-import Data.Hashable          (Hashable)
-import Data.Semigroup         as Sem
-import Data.Text              (Text, pack)
-import Data.Yaml
+import           Data.Char              (toLower)
+import           Data.Default.Class     (Default, def)
+import           Data.Hashable          (Hashable)
+import           Data.Semigroup         as Sem
+import           Data.Text              (Text, pack)
+import           Data.Yaml
 
-import GHC.Generics           (Generic)
+import           GHC.Generics           (Generic)
 
-import Text.Pandoc.Definition (Attr)   
+import           Text.Pandoc.Definition (Attr)
 
 
 -- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
@@ -39,7 +39,7 @@ withLinksKey     = "links"
 isTightBboxKey   = "tight_bbox"
 isTransparentKey = "transparent"
 
--- | list of all keys related to pandoc-pyplot that 
+-- | list of all keys related to pandoc-pyplot that
 -- can be specified in source material.
 inclusionKeys :: [String]
 inclusionKeys = [ directoryKey
@@ -69,19 +69,19 @@ data ScriptResult
 
 
 -- | Result of checking scripts for problems
-data CheckResult 
+data CheckResult
     = CheckPassed
     | CheckFailed String
     deriving (Eq)
 
 instance Sem.Semigroup CheckResult where
-    (<>) CheckPassed a = a
-    (<>) a CheckPassed = a
+    (<>) CheckPassed a                         = a
+    (<>) a CheckPassed                         = a
     (<>) (CheckFailed msg1) (CheckFailed msg2) = CheckFailed (msg1 <> msg2)
 
 instance Monoid CheckResult where
     mempty = CheckPassed
-    
+
 #if !(MIN_VERSION_base(4,11,0))
     mappend = (<>)
 #endif
@@ -92,13 +92,13 @@ data PandocPyplotError
     = ScriptError Int                 -- ^ Running Python script has yielded an error
     | ScriptChecksFailedError String  -- ^ Python script did not pass all checks
     deriving (Eq)
-    
+
 instance Show PandocPyplotError where
     show (ScriptError exitcode)        = "Script error: plot could not be generated. Exit code " <> (show exitcode)
     show (ScriptChecksFailedError msg) = "Script did not pass all checks: " <> msg
 
 
--- | Generated figure file format supported by pandoc-pyplot. 
+-- | Generated figure file format supported by pandoc-pyplot.
 data SaveFormat
     = PNG
     | PDF
@@ -136,7 +136,7 @@ saveFormatFromString s
 extension :: SaveFormat -> String
 extension fmt = mconcat [".", fmap toLower . show $ fmt]
 
--- | Default interpreter should be Python 3, which has a different 
+-- | Default interpreter should be Python 3, which has a different
 -- name on Windows ("python") vs Unix ("python3")
 --
 -- @since 2.1.2.0
@@ -148,14 +148,14 @@ defaultPlatformInterpreter = "python3"
 #endif
 
 -- | Configuration of pandoc-pyplot, describing the default behavior
--- of the filter. 
+-- of the filter.
 --
 -- A Configuration is useful when dealing with lots of figures; it avoids
 -- repeating the same values.sta
--- 
+--
 -- @since 2.1.0.0
-data Configuration 
-    = Configuration 
+data Configuration
+    = Configuration
         { defaultDirectory     :: FilePath     -- ^ The default directory where figures will be saved.
         , defaultIncludeScript :: PythonScript -- ^ The default script to run before other instructions.
         , defaultWithLinks     :: Bool         -- ^ The default behavior of whether or not to include links to source code and high-res
@@ -182,7 +182,7 @@ instance Default Configuration where
     }
 
 instance ToJSON Configuration where
-    toJSON (Configuration dir' _ withLinks' savefmt' dpi' tightbbox' transparent' interp' flags') = 
+    toJSON (Configuration dir' _ withLinks' savefmt' dpi' tightbbox' transparent' interp' flags') =
         -- We ignore the include script as we want to examplify that
         -- this is for a filepath
             object [ pack directoryKey      .= dir'
@@ -196,8 +196,8 @@ instance ToJSON Configuration where
                    , "flags"       .= flags'
                    ]
 
-    
--- | Datatype containing all parameters required to run pandoc-pyplot. 
+
+-- | Datatype containing all parameters required to run pandoc-pyplot.
 --
 -- It is assumed that once a @FigureSpec@ has been created, no configuration
 -- can overload it; hence, a @FigureSpec@ completely encodes a particular figure.
