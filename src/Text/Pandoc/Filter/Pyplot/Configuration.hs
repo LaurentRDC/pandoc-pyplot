@@ -52,7 +52,6 @@ data ConfigPrecursor
         , defaultWithLinks_   :: Bool
         , defaultSaveFormat_  :: String
         , defaultDPI_         :: Int
-        , renderingLib_       :: RenderingLibrary
         , tightBbox_          :: Bool
         , transparent_        :: Bool
         , interpreter_        :: String
@@ -67,7 +66,6 @@ instance FromJSON ConfigPrecursor where
             <*> v .:? (T.pack withLinksKey)     .!= (defaultWithLinks def)
             <*> v .:? (T.pack saveFormatKey)    .!= (extension $ defaultSaveFormat def)
             <*> v .:? (T.pack dpiKey)           .!= (defaultDPI def)
-            <*> v .:? "rendering_library"       .!= (renderingLibrary def)
             <*> v .:? (T.pack isTightBboxKey)   .!= (isTightBbox def)
             <*> v .:? (T.pack isTransparentKey) .!= (isTransparent def)
             <*> v .:? "interpreter"             .!= (interpreter def)
@@ -85,7 +83,6 @@ renderConfiguration prec = do
         , defaultSaveFormat    = saveFormat'
         , defaultWithLinks     = defaultWithLinks_ prec
         , defaultDPI           = defaultDPI_ prec
-        , renderingLibrary     = renderingLib_ prec
         , isTightBbox          = tightBbox_ prec
         , isTransparent        = transparent_ prec
         , interpreter          = interpreter_ prec

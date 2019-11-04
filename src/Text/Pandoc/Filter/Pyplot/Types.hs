@@ -175,7 +175,6 @@ data Configuration
         , defaultWithLinks     :: Bool             -- ^ The default behavior of whether or not to include links to source code and high-res
         , defaultSaveFormat    :: SaveFormat       -- ^ The default save format of generated figures.
         , defaultDPI           :: Int              -- ^ The default dots-per-inch value for generated figures.
-        , renderingLibrary     :: RenderingLibrary -- ^ Rendering library to use in producing the figure.
         , isTightBbox          :: Bool             -- ^ Whether the figures should be saved with @bbox_inches="tight"@ or not. Useful for larger figures with subplots.
         , isTransparent        :: Bool             -- ^ If True, figures will be saved with transparent background rather than solid color.
         , interpreter          :: String           -- ^ The name of the interpreter to use to render figures.
@@ -190,7 +189,6 @@ instance Default Configuration where
         , defaultWithLinks     = True
         , defaultSaveFormat    = PNG
         , defaultDPI           = 80
-        , renderingLibrary     = Matplotlib
         , isTightBbox          = False
         , isTransparent        = False
         , interpreter          = defaultPlatformInterpreter
@@ -198,7 +196,7 @@ instance Default Configuration where
     }
 
 instance ToJSON Configuration where
-    toJSON (Configuration dir' _ withLinks' savefmt' dpi' renderingLib' tightbbox' transparent' interp' flags') =
+    toJSON (Configuration dir' _ withLinks' savefmt' dpi' tightbbox' transparent' interp' flags') =
         -- We ignore the include script as we want to examplify that
         -- this is for a filepath
             object [ pack directoryKey     .= dir'
@@ -208,7 +206,6 @@ instance ToJSON Configuration where
                    , pack saveFormatKey    .= (toLower <$> show savefmt')
                    , pack isTightBboxKey   .= tightbbox'
                    , pack isTransparentKey .= transparent'
-                   , "rendering_library"   .= renderingLib'
                    , "interpreter"         .= interp'
                    , "flags"               .= flags'
                    ]
