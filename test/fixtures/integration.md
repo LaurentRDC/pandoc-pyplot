@@ -76,3 +76,30 @@ ax2.axhline(y=0, color='k')
 ax2.set_xlabel('Abcissa')
 ax1.set_title('Residuals in ggplot style')
 ```
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+```{.plotly caption="This is a Plotly figure!"}
+import plotly.graph_objects as go
+import numpy as np
+np.random.seed(1)
+
+N = 100
+x = np.random.rand(N)
+y = np.random.rand(N)
+colors = np.random.rand(N)
+sz = np.random.rand(N) * 30
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=x,
+    y=y,
+    mode="markers",
+    marker=go.scatter.Marker(
+        size=sz,
+        color=colors,
+        opacity=0.6,
+        colorscale="Viridis"
+    )
+))
+```
