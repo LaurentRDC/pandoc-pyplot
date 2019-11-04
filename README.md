@@ -3,7 +3,7 @@
 [![Hackage version](https://img.shields.io/hackage/v/pandoc-pyplot.svg)](http://hackage.haskell.org/package/pandoc-pyplot) [![Stackage version (LTS)](http://stackage.org/package/pandoc-pyplot/badge/lts)](http://stackage.org/nightly/package/pandoc-pyplot) [![Windows Build status](https://ci.appveyor.com/api/projects/status/qbmq9cyks5jup48e?svg=true)](https://ci.appveyor.com/project/LaurentRDC/pandoc-pyplot) [![macOS and Linux Build Status](https://dev.azure.com/laurentdecotret/pandoc-pyplot/_apis/build/status/LaurentRDC.pandoc-pyplot?branchName=master)](https://dev.azure.com/laurentdecotret/pandoc-pyplot/_build/latest?definitionId=2&branchName=master) 
 ![GitHub](https://img.shields.io/github/license/LaurentRDC/pandoc-pyplot.svg)
 
-`pandoc-pyplot` turns Python code present in your documents into embedded Matplotlib figures.
+`pandoc-pyplot` turns Python code present in your documents into embedded figures via Matplotlib or Plotly.
 
 * [Usage](#usage)
     * [Markdown](#markdown)
@@ -29,7 +29,7 @@
 
 ### Markdown
 
-The filter recognizes code blocks with the `.pyplot` class present in Markdown documents. It will run the script in the associated code block in a Python interpreter and capture the generated Matplotlib figure.
+The filter recognizes code blocks with the `.pyplot` class present in Markdown documents. It will run the script in the associated code block in a Python interpreter and capture the generated Matplotlib/Pyplot figure.
 
 Here is a basic example using the scripting `matplotlib.pyplot` API:
 
@@ -251,7 +251,8 @@ There are a few parameters that are __only__ available via the configuration fil
 * `interpreter` is the name of the interpreter to use. For example, `interpreter: python36`;
 * `flags` is a list of strings, which are flags that are passed to the python interpreter. For example, `flags: [-O, -Wignore]`;
 * (*New in version 2.1.5.0*) `tight_bbox` is a boolean that determines whether to use `bbox_inches="tight"` or not when saving Matplotlib figures. For example, `tight_bbox: true`. See [here](https://matplotlib.org/api/_as_gen/matplotlib.pyplot.savefig.html) for details;
-* (*New in version 2.1.5.0*) `transparent` is a boolean that determines whether to make figure background transparent or not. This is useful, for example, for displaying a plot on top of a colored background on a web page. High-resolution figures are not affected. For example, `transparent: true`.
+* (*New in version 2.1.5.0*) `transparent` is a boolean that determines whether to make Matplotlib figure background transparent or not. This is useful, for example, for displaying a plot on top of a colored background on a web page. High-resolution figures are not affected. For example, `transparent: true`.
+* (*New in version 2.2.0.0*) `rendering_library = Matplotlib` (default) or `rendering_library=Plotly` sets the rendering library. By default, Matplotlib is used.
 
 ## Installation
 
@@ -295,7 +296,7 @@ stack install # Alternatively, `cabal install`
 
 ### Requirements
 
-This filter only works with the Matplotlib plotting library. Therefore, you need a Python interpreter and at least [Matplotlib](https://matplotlib.org/) installed. The name of the Python interpreter to use can be specified in a `.pandoc-pyplot.yml` file; by default, `pandoc-pyplot` will use the `"python"` name on Windows, and `"python3"` otherwise.
+This filter requires a Python interpreter and at least [Matplotlib](https://matplotlib.org/) or [Plotly](https://plot.ly/python/) installed. The name of the Python interpreter to use can be specified in a `.pandoc-pyplot.yml` file; by default, `pandoc-pyplot` will use the `"python"` name on Windows, and `"python3"` otherwise.
 
 Use the filter with Pandoc as follows:
 
