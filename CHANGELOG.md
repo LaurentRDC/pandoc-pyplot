@@ -2,6 +2,11 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+Release 2.2.0.0
+---------------
+
+* Added support for rendering figures via the Plotly library
+
 Release 2.1.5.1
 ---------------
 
