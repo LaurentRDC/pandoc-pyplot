@@ -51,6 +51,7 @@ before_test:
 # Miniconda is preinstalled on Appveyor images
 # https://www.appveyor.com/docs/windows-images-software/#python
 - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+- conda update --yes -n base -c defaults conda
 - conda create --yes -n testenv python=3.7
 - activate testenv
 
@@ -61,9 +62,6 @@ before_test:
 # https://plot.ly/python/static-image-export/
 - conda install --yes -c plotly plotly-orca psutil requests
 - conda install --yes plotly
-
-- "conda --version"
-- "python --version"
 
 test_script:
 
