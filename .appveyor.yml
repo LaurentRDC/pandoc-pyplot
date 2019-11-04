@@ -50,12 +50,14 @@ test_script:
 # Install toolchain, but do it silently due to lots of output
 - stack %ARGS% setup > nul
 
-# Python is preinstalled on Appveyor images
+# Miniconda is preinstalled on Appveyor images
 # https://www.appveyor.com/docs/windows-images-software/#python
-# The default is unfortunately Python 2.7
 # Pillow is required to save images to jpg
-- python -m pip install --upgrade matplotlib 
-- python -m pip install --upgrade pillow
+- set PATH=C:\Miniconda3-x64\;C:\Miniconda3-x64\scripts;%PATH%;
+- conda install matplotlib pillow
+
+- conda install -c plotly plotly-orca psutil requests
+- conda install plotly
 
 # The ugly echo "" hack is to avoid complaints about 0 being an invalid file
 # descriptor
