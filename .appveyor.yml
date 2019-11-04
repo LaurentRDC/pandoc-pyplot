@@ -15,8 +15,11 @@ before_test:
 
 # Miniconda is preinstalled on Appveyor images
 # https://www.appveyor.com/docs/windows-images-software/#python
-- set PATH=C:\Miniconda3-x64\;C:\Miniconda3-x64\scripts;%PATH%;
+- "SET PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
 - conda update --yes -n base conda
+
+- "conda --version"
+- "python --version"
 
 cache: 
   - "C:\\sr"
@@ -40,6 +43,8 @@ environment:
     # See https://github.com/haskell/cabal/issues/5386
     TMP: "c:\\tmp"
 
+    MINICONDA: "C:\\Miniconda3-64"
+    
   matrix:
   - ARGS: "--resolver lts-11"  # GHC 8.2
   - ARGS: "--resolver lts-12"  # GHC 8.4
