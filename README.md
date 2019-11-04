@@ -219,9 +219,9 @@ directory: mydirectory/
 include: mystyle.py
 format: jpeg
 links: false
-dpi: 150
-tight_bbox: true
-transparent: false
+dpi: 150            # Matplotlib only
+tight_bbox: true    # Matplotlib only
+transparent: false  # Matplotlib only
 flags: [-O, -Wignore]
 ```
 
