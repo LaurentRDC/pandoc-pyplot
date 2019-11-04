@@ -1,4 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE QuasiQuotes       #-}
 
 {-|
 Module      : $header$
@@ -36,6 +38,7 @@ import           Data.Maybe                      (fromMaybe)
 import           Data.Monoid                     ((<>))
 import qualified Data.Text                       as T
 import qualified Data.Text.IO                    as T
+import           Data.Text.Lazy                  (toStrict)
 import           Data.Version                    (showVersion)
 
 import           Paths_pandoc_pyplot             (version)
@@ -44,6 +47,8 @@ import           System.FilePath                 (FilePath, addExtension,
                                                   makeValid, replaceExtension,
                                                   (</>))
 
+import           Text.Hamlet                     (shamlet)
+import           Text.Blaze.Renderer.Text        (renderMarkup)
 import           Text.Pandoc.Builder             (fromList, imageWith, link,
                                                   para, toList)
 import           Text.Pandoc.Definition
@@ -141,31 +146,25 @@ hiresFigurePath spec = flip replaceExtension (".hires" <> ext) . figurePath $ sp
 -- An additional file will also be captured.
 addPlotCapture :: FigureSpec   -- ^ Path where to save the figure
                -> PythonScript -- ^ Code block with added capture
-addPlotCapture spec =
-    mconcat
+addPlotCapture spec = mconcat
         [ script spec
-        , "\nimport matplotlib.pyplot as plt" -- Just in case
+        , "\nimport matplotlib.pyplot as plt;" -- Just in case
         -- Note that the high-resolution figure always has non-transparent background
         -- because it is difficult to see the image when opened directly
         -- in Chrome, for example.
-        , plotCapture (figurePath spec) (dpi spec) (transparent spec)
-        , plotCapture (hiresFigurePath spec) (minimum [200, 2 * dpi spec]) False
+        , plotCapture (renderingLib spec) (figurePath spec) (dpi spec) (transparent spec)
+        , plotCapture (renderingLib spec) (hiresFigurePath spec) (minimum [200, 2 * dpi spec]) False
         ]
   where
-    tight' = tightBbox spec
-    plotCapture fname' dpi' transparent' = mconcat $
-        [ "\nplt.savefig("
-        , tshow fname' -- show is required for quotes
-        , ", dpi="
-        , tshow dpi'
-        , ", transparent="
-        , tshow transparent'
-        , if tight'
-            then ", bbox_inches=\"tight\")"
-            else ")"
-        ]
+    tight' = if tightBbox spec then ("'tight'" :: T.Text) else ("None"  :: T.Text)
+    -- Note that, especially for Windows, raw strings (r"...") must be used because path separators might
+    -- be interpreted as escape characters
+    plotCapture Matplotlib fname' dpi' transparent' = 
+        toStrict $ renderMarkup [shamlet|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent'}, bbox_inches=#{tight'});|]
+    plotCapture Plotly fname' dpi' transparent' =
+        toStrict $ renderMarkup [shamlet|fig.write_image(r"#{fname'}")|]
 
-
+        
 -- | Reader options for captions.
 readerOptions :: ReaderOptions
 readerOptions = def
@@ -199,7 +198,3 @@ readBool :: String -> Bool
 readBool s | s `elem` ["True",  "true",  "'True'",  "'true'",  "1"] = True
            | s `elem` ["False", "false", "'False'", "'false'", "0"] = False
            | otherwise = error $ mconcat ["Could not parse '", s, "' into a boolean. Please use 'True' or 'False'"]
-
--- | Show a value as Text
-tshow :: Show a => a -> T.Text
-tshow = T.pack . show
