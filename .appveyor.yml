@@ -16,7 +16,7 @@ before_test:
 # Miniconda is preinstalled on Appveyor images
 # https://www.appveyor.com/docs/windows-images-software/#python
 - set PATH=C:\Miniconda3-x64\;C:\Miniconda3-x64\scripts;%PATH%;
-- conda update -n base conda
+- conda update --yes -n base conda
 
 cache: 
   - "C:\\sr"
