@@ -13,6 +13,11 @@ before_test:
 - curl -sS -ostack.zip -L --insecure https://get.haskellstack.org/stable/windows-x86_64.zip
 - 7z x stack.zip stack.exe
 
+# Miniconda is preinstalled on Appveyor images
+# https://www.appveyor.com/docs/windows-images-software/#python
+- set PATH=C:\Miniconda3-x64\;C:\Miniconda3-x64\scripts;%PATH%;
+- conda update -n base conda
+
 cache: 
   - "C:\\sr"
 
@@ -50,10 +55,7 @@ test_script:
 # Install toolchain, but do it silently due to lots of output
 - stack %ARGS% setup > nul
 
-# Miniconda is preinstalled on Appveyor images
-# https://www.appveyor.com/docs/windows-images-software/#python
 # Pillow is required to save images to jpg
-- set PATH=C:\Miniconda3-x64\;C:\Miniconda3-x64\scripts;%PATH%;
 - conda install --yes matplotlib pillow
 
 # Plotly installation instructions are more complex because we export static images
