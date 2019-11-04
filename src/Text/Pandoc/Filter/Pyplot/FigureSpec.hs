@@ -66,15 +66,16 @@ import           Text.Pandoc.Filter.Pyplot.Types
 -- Note that the @".pyplot"@ class is required, but all other parameters are optional
 parseFigureSpec :: Block -> PyplotM (Maybe FigureSpec)
 parseFigureSpec (CodeBlock (id', cls, attrs) content)
-    | "pyplot" `elem` cls = Just <$> figureSpec
+    | "pyplot" `elem` cls = Just <$> figureSpec Matplotlib
+    | "plotly" `elem` cls = Just <$> figureSpec Plotly
     | otherwise = return Nothing
   where
     attrs'        = Map.fromList attrs
     filteredAttrs = filter (\(k, _) -> k `notElem` inclusionKeys) attrs
     includePath   = Map.lookup includePathKey attrs'
 
-    figureSpec :: PyplotM FigureSpec
-    figureSpec = do
+    figureSpec :: RenderingLibrary -> PyplotM FigureSpec
+    figureSpec lib = do
         config <- ask
         includeScript <- fromMaybe
                             (return $ defaultIncludeScript config)
@@ -85,7 +86,6 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
             format       = fromMaybe (defaultSaveFormat config) $ join $ saveFormatFromString <$> Map.lookup saveFormatKey attrs'
             dir          = makeValid $ Map.findWithDefault (defaultDirectory config) directoryKey attrs'
             dpi'         = fromMaybe (defaultDPI config) $ read <$> Map.lookup dpiKey attrs'
-            renderingLib'= renderingLibrary config
             withLinks'   = fromMaybe (defaultWithLinks config) $ readBool <$> Map.lookup withLinksKey attrs'
             tightBbox'   = isTightBbox config
             transparent' = isTransparent config
@@ -97,7 +97,7 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
                     format
                     dir
                     dpi'
-                    renderingLib'
+                    lib
                     tightBbox'
                     transparent'
                     blockAttrs'
@@ -161,8 +161,9 @@ addPlotCapture spec = mconcat
     -- be interpreted as escape characters
     plotCapture Matplotlib fname' dpi' transparent' = 
         toStrict $ renderMarkup [shamlet|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent'}, bbox_inches=#{tight'});|]
-    plotCapture Plotly fname' dpi' transparent' =
-        toStrict $ renderMarkup [shamlet|fig.write_image(r"#{fname'}")|]
+    -- TODO: insert DPI in plotly export?
+    plotCapture Plotly fname' _ _ =
+        toStrict $ renderMarkup [shamlet|fig.write_image(r"#{fname'}");|]
 
         
 -- | Reader options for captions.
