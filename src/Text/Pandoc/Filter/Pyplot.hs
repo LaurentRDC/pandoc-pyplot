@@ -21,7 +21,7 @@ of the figure and the source code used to generate the figure.
 
 To trigger pandoc-pyplot, the following is __required__:
 
-    * @.pyplot@: Trigger pandoc-pyplot but let it decide on a filename
+    * @.pyplot@: Trigger pandoc-pyplot
 
 Here are the possible attributes what pandoc-pyplot understands:
 

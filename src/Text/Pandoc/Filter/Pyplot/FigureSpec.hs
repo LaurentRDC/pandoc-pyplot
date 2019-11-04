@@ -80,6 +80,7 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
             format       = fromMaybe (defaultSaveFormat config) $ join $ saveFormatFromString <$> Map.lookup saveFormatKey attrs'
             dir          = makeValid $ Map.findWithDefault (defaultDirectory config) directoryKey attrs'
             dpi'         = fromMaybe (defaultDPI config) $ read <$> Map.lookup dpiKey attrs'
+            renderingLib'= renderingLibrary config
             withLinks'   = fromMaybe (defaultWithLinks config) $ readBool <$> Map.lookup withLinksKey attrs'
             tightBbox'   = isTightBbox config
             transparent' = isTransparent config
@@ -91,6 +92,7 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
                     format
                     dir
                     dpi'
+                    renderingLib'
                     tightBbox'
                     transparent'
                     blockAttrs'
