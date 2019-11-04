@@ -1,4 +1,4 @@
-# pandoc-pyplot - A Pandoc filter to generate Matplotlib figures directly in documents
+# pandoc-pyplot - A Pandoc filter to generate Matplotlib/Plotly figures directly in documents
 
 [![Hackage version](https://img.shields.io/hackage/v/pandoc-pyplot.svg)](http://hackage.haskell.org/package/pandoc-pyplot) [![Stackage version (LTS)](http://stackage.org/package/pandoc-pyplot/badge/lts)](http://stackage.org/nightly/package/pandoc-pyplot) [![Windows Build status](https://ci.appveyor.com/api/projects/status/qbmq9cyks5jup48e?svg=true)](https://ci.appveyor.com/project/LaurentRDC/pandoc-pyplot) [![macOS and Linux Build Status](https://dev.azure.com/laurentdecotret/pandoc-pyplot/_apis/build/status/LaurentRDC.pandoc-pyplot?branchName=master)](https://dev.azure.com/laurentdecotret/pandoc-pyplot/_build/latest?definitionId=2&branchName=master) 
 ![GitHub](https://img.shields.io/github/license/LaurentRDC/pandoc-pyplot.svg)
