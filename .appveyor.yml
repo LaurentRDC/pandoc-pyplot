@@ -54,10 +54,12 @@ test_script:
 # https://www.appveyor.com/docs/windows-images-software/#python
 # Pillow is required to save images to jpg
 - set PATH=C:\Miniconda3-x64\;C:\Miniconda3-x64\scripts;%PATH%;
-- conda install matplotlib pillow
+- conda install --yes matplotlib pillow
 
-- conda install -c plotly plotly-orca psutil requests
-- conda install plotly
+# Plotly installation instructions are more complex because we export static images
+# https://plot.ly/python/static-image-export/
+- conda install --yes -c plotly plotly-orca psutil requests
+- conda install --yes plotly
 
 # The ugly echo "" hack is to avoid complaints about 0 being an invalid file
 # descriptor
