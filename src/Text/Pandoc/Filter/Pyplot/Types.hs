@@ -64,8 +64,9 @@ type PythonScript = Text
 -- | Rendering library
 --
 -- @since 2.2.0.0
-data RenderingLibrary = Matplotlib
-                      | Plotly
+data RenderingLibrary 
+    = Matplotlib
+    | Plotly
     deriving (Show, Eq, Generic)
 
 instance Hashable RenderingLibrary

@@ -96,3 +96,5 @@ runScriptIfNecessary spec = do
 
     where
         scriptWithCapture = addPlotCapture spec
+
+
