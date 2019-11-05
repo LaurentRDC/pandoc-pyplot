@@ -44,13 +44,13 @@ import           Data.Version                    (showVersion)
 import           Paths_pandoc_pyplot             (version)
 
 import           System.FilePath                 (FilePath, addExtension,
-                                                  makeValid, replaceExtension,
+                                                  makeValid, normalise, replaceExtension,
                                                   (</>))
 
 import           Text.Pandoc.Builder             (fromList, imageWith, link,
                                                   para, toList)
 import           Text.Pandoc.Definition
-import           Text.Shakespeare.Text           (ToText (..), sbt)
+import           Text.Shakespeare.Text           (sbt)
 
 import           Text.Pandoc.Class               (runPure)
 import           Text.Pandoc.Extensions          (Extension (..),
@@ -123,7 +123,7 @@ toImage spec = head . toList $ para $ imageWith attrs' target' "fig:" caption'
 
 -- | Determine the path a figure should have.
 figurePath :: FigureSpec -> FilePath
-figurePath spec = directory spec </> stem spec
+figurePath spec = normalise $ directory spec </> stem spec
   where
     stem = flip addExtension ext . show . hash
     ext  = extension . saveFormat $ spec
@@ -131,12 +131,12 @@ figurePath spec = directory spec </> stem spec
 
 -- | Determine the path to the source code that generated the figure.
 sourceCodePath :: FigureSpec -> FilePath
-sourceCodePath = flip replaceExtension ".txt" . figurePath
+sourceCodePath = normalise . flip replaceExtension ".txt" . figurePath
 
 
 -- | The path to the high-resolution figure.
 hiresFigurePath :: FigureSpec -> FilePath
-hiresFigurePath spec = flip replaceExtension (".hires" <> ext) . figurePath $ spec
+hiresFigurePath spec = normalise $ flip replaceExtension (".hires" <> ext) . figurePath $ spec
   where
     ext = extension . saveFormat $ spec
 
@@ -161,20 +161,21 @@ addPlotCapture spec = mconcat
     plotCapture Matplotlib = captureMatplotlib
     plotCapture Plotly     = capturePlotly
 
+
 type Tight = T.Text
 type IsTransparent = Bool
 type RenderingFunc = (FilePath -> Int -> IsTransparent -> Tight -> PythonScript)
 
-instance ToText IsTransparent where
-    toText True  = toText ("True" :: T.Text)
-    toText False = toText ("False" :: T.Text)
 
 -- | Capture plot from Matplotlib
 -- Note that, especially for Windows, raw strings (r"...") must be used because path separators might
 -- be interpreted as escape characters
 captureMatplotlib :: RenderingFunc
 captureMatplotlib fname' dpi' transparent' tight' =
-    [sbt|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent'}, bbox_inches=#{tight'});|]
+    [sbt|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent''}, bbox_inches=#{tight'});|]
+    where
+        transparent'' :: T.Text
+        transparent'' = if transparent' then "True" else "False"
 
 -- | Capture Plotly figure
 --
