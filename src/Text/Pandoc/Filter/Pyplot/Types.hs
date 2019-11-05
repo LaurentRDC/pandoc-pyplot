@@ -39,6 +39,7 @@ withLinksKey     = "links"
 isTightBboxKey   = "tight_bbox"
 isTransparentKey = "transparent"
 
+
 -- | list of all keys related to pandoc-pyplot that
 -- can be specified in source material.
 inclusionKeys :: [String]
