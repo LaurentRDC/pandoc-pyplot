@@ -50,7 +50,7 @@ import           System.FilePath                 (FilePath, addExtension,
 import           Text.Pandoc.Builder             (fromList, imageWith, link,
                                                   para, toList)
 import           Text.Pandoc.Definition
-import           Text.Shakespeare.Text           (sbt)
+import           Text.Shakespeare.Text           (st)
 
 import           Text.Pandoc.Class               (runPure)
 import           Text.Pandoc.Extensions          (Extension (..),
@@ -88,7 +88,7 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
             withLinks'   = fromMaybe (defaultWithLinks config) $ readBool <$> Map.lookup withLinksKey attrs'
             tightBbox'   = isTightBbox config
             transparent' = isTransparent config
-            blockAttrs'  = (id', filter (/= "pyplot") cls, filteredAttrs)
+            blockAttrs'  = (id', filter (\c -> c `notElem` ["pyplot", "plotly"]) cls, filteredAttrs)
         return $ FigureSpec
                     caption'
                     withLinks'
@@ -146,8 +146,7 @@ hiresFigurePath spec = normalise $ flip replaceExtension (".hires" <> ext) . fig
 addPlotCapture :: FigureSpec   -- ^ Path where to save the figure
                -> PythonScript -- ^ Code block with added capture
 addPlotCapture spec = mconcat
-        [ script spec
-        , "\nimport matplotlib.pyplot as plt;" -- Just in case
+        [ script spec <> "\n"
         -- Note that the high-resolution figure always has non-transparent background
         -- because it is difficult to see the image when opened directly
         -- in Chrome, for example.
@@ -171,24 +170,25 @@ type RenderingFunc = (FilePath -> Int -> IsTransparent -> Tight -> PythonScript)
 -- Note that, especially for Windows, raw strings (r"...") must be used because path separators might
 -- be interpreted as escape characters
 captureMatplotlib :: RenderingFunc
-captureMatplotlib fname' dpi' transparent' tight' =
-    [sbt|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent''}, bbox_inches=#{tight'});|]
+captureMatplotlib fname' dpi' transparent' tight' = [st|
+import matplotlib.pyplot as plt
+plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent''}, bbox_inches=#{tight'})
+|]
     where
         transparent'' :: T.Text
         transparent'' = if transparent' then "True" else "False"
 
 -- | Capture Plotly figure
 --
--- We are trying to emulate the behavior of "matplotlib.pyplot.savefig" which knows the "current figure".
--- This saves us from contraining users to always have the same Plotly figure name, e.g. "fig" is all examples
+-- We are trying to emulate the behavior of "matplotlib.pyplot.savefig" which 
+-- knows the "current figure". This saves us from contraining users to always 
+-- have the same Plotly figure name, e.g. "fig" in all examples
 capturePlotly :: RenderingFunc
-capturePlotly fname' _ _ _ =
-    -- sbt QuasiQuoter aligns text to the bar |
-    [sbt|
-        from plotly.graph_objects import Figure
-        _current_plotly_figure = next(obj for obj in globals().values() if type(obj) == Figure)
-        _current_plotly_figure.write_image("#{fname'}")
-        |]
+capturePlotly fname' _ _ _ = [st|
+import plotly.graph_objects as go
+__current_plotly_figure = next(obj for obj in globals().values() if type(obj) == go.Figure)
+__current_plotly_figure.write_image("#{fname'}")
+|]
 
 
 -- | Reader options for captions.
