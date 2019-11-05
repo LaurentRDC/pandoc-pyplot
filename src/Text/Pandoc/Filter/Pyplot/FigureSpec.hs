@@ -1,6 +1,7 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE TemplateHaskell      #-}
+{-# LANGUAGE QuasiQuotes          #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 {-|
 Module      : $header$
@@ -47,8 +48,7 @@ import           System.FilePath                 (FilePath, addExtension,
                                                   makeValid, replaceExtension,
                                                   (</>))
 
-import           Text.Hamlet                     (shamlet)
-import           Text.Blaze.Renderer.Text        (renderMarkup)
+import           Text.Shakespeare.Text           (st, ToText(..))
 import           Text.Pandoc.Builder             (fromList, imageWith, link,
                                                   para, toList)
 import           Text.Pandoc.Definition
@@ -156,7 +156,7 @@ addPlotCapture spec = mconcat
         , plotCapture (renderingLib spec) (hiresFigurePath spec) (minimum [200, 2 * dpi spec]) False (tight')
         ]
   where
-    tight' = if tightBbox spec then ("'tight'" :: T.Text) else ("None"  :: T.Text)
+    tight' = if tightBbox spec then ("'tight'" :: T.Text) else ("None" :: T.Text)
     -- Note that, especially for Windows, raw strings (r"...") must be used because path separators might
     -- be interpreted as escape characters
     plotCapture Matplotlib = captureMatplotlib
@@ -166,21 +166,23 @@ type Tight = T.Text
 type IsTransparent = Bool
 type RenderingFunc = (FilePath -> Int -> IsTransparent -> Tight -> PythonScript)
 
+instance ToText IsTransparent where
+    toText True = toText ("True" :: T.Text)
+    toText False = toText ("False" :: T.Text)
+
 -- | Capture plot from Matplotlib
 -- Note that, especially for Windows, raw strings (r"...") must be used because path separators might
 -- be interpreted as escape characters
 captureMatplotlib :: RenderingFunc
 captureMatplotlib fname' dpi' transparent' tight' = 
-    toStrict $ renderMarkup [shamlet|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent'}, bbox_inches=#{tight'});|]
+    [st|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent'}, bbox_inches=#{tight'});|]
 
 -- | Capture Plotly figure
 -- 
 -- We are trying to emulate the behavior of "matplotlib.pyplot.savefig" which knows the "current figure". 
 -- This saves us from contraining users to always have the same Plotly figure name, e.g. "fig" is all examples
---
----- TODO: insert DPI in plotly export?
 capturePlotly :: RenderingFunc
-capturePlotly fname' _ _ _ = toStrict $ renderMarkup [shamlet|
+capturePlotly fname' _ _ _ = [st|
     from plotly.graph_objects import Figure
     _current_plotly_figure = next(obj for obj in globals().values() if type(obj) == Figure)
     _current_plotly_figure.write_image(r"#{fname'}");
