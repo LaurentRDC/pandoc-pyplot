@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE QuasiQuotes          #-}
+{-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 
 {-|
@@ -47,10 +47,10 @@ import           System.FilePath                 (FilePath, addExtension,
                                                   makeValid, replaceExtension,
                                                   (</>))
 
-import           Text.Shakespeare.Text           (sbt, ToText(..))
 import           Text.Pandoc.Builder             (fromList, imageWith, link,
                                                   para, toList)
 import           Text.Pandoc.Definition
+import           Text.Shakespeare.Text           (ToText (..), sbt)
 
 import           Text.Pandoc.Class               (runPure)
 import           Text.Pandoc.Extensions          (Extension (..),
@@ -159,36 +159,36 @@ addPlotCapture spec = mconcat
     -- Note that, especially for Windows, raw strings (r"...") must be used because path separators might
     -- be interpreted as escape characters
     plotCapture Matplotlib = captureMatplotlib
-    plotCapture Plotly = capturePlotly
+    plotCapture Plotly     = capturePlotly
 
 type Tight = T.Text
 type IsTransparent = Bool
 type RenderingFunc = (FilePath -> Int -> IsTransparent -> Tight -> PythonScript)
 
 instance ToText IsTransparent where
-    toText True = toText ("True" :: T.Text)
+    toText True  = toText ("True" :: T.Text)
     toText False = toText ("False" :: T.Text)
 
 -- | Capture plot from Matplotlib
 -- Note that, especially for Windows, raw strings (r"...") must be used because path separators might
 -- be interpreted as escape characters
 captureMatplotlib :: RenderingFunc
-captureMatplotlib fname' dpi' transparent' tight' = 
+captureMatplotlib fname' dpi' transparent' tight' =
     [sbt|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent'}, bbox_inches=#{tight'});|]
 
 -- | Capture Plotly figure
--- 
--- We are trying to emulate the behavior of "matplotlib.pyplot.savefig" which knows the "current figure". 
+--
+-- We are trying to emulate the behavior of "matplotlib.pyplot.savefig" which knows the "current figure".
 -- This saves us from contraining users to always have the same Plotly figure name, e.g. "fig" is all examples
 capturePlotly :: RenderingFunc
-capturePlotly fname' _ _ _ = 
+capturePlotly fname' _ _ _ =
     -- sbt QuasiQuoter aligns text to the bar |
     [sbt|
         from plotly.graph_objects import Figure
         _current_plotly_figure = next(obj for obj in globals().values() if type(obj) == Figure)
         _current_plotly_figure.write_image("#{fname'}")
         |]
-        
+
 
 -- | Reader options for captions.
 readerOptions :: ReaderOptions
