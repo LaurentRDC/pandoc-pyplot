@@ -3,7 +3,7 @@
 
 {-|
 Module      : $header$
-Description : Pandoc filter to create Matplotlib figures from code blocks
+Description : Pandoc filter to create Matplotlib/Plotly figures from code blocks
 Copyright   : (c) Laurent P René de Cotret, 2019
 License     : MIT
 Maintainer  : laurent.decotret@outlook.com
@@ -14,21 +14,22 @@ This module defines a Pandoc filter @makePlot@ and related functions
 that can be used to walk over a Pandoc document and generate figures from
 Python code blocks.
 
-The syntax for code blocks is simple, Code blocks with the @.pyplot@
+The syntax for code blocks is simple, Code blocks with the @.pyplot@ or @.plotly@
 attribute will trigger the filter. The code block will be reworked into a Python
 script and the output figure will be captured, along with a high-resolution version
 of the figure and the source code used to generate the figure.
 
-To trigger pandoc-pyplot, the following is __required__:
+To trigger pandoc-pyplot, one of the following is __required__:
 
-    * @.pyplot@: Trigger pandoc-pyplot
+    * @.pyplot@: Trigger pandoc-pyplot, rendering via the Matplotlib library
+    * @.plotly@: Trigger pandoc-pyplot, rendering via the Plotly library
 
 Here are the possible attributes what pandoc-pyplot understands:
 
     * @directory=...@ : Directory where to save the figure.
     * @format=...@: Format of the generated figure. This can be an extension or an acronym, e.g. @format=png@.
     * @caption="..."@: Specify a plot caption (or alternate text). Captions support Markdown formatting and LaTeX math (@$...$@).
-    * @dpi=...@: Specify a value for figure resolution, or dots-per-inch. Default is 80DPI.
+    * @dpi=...@: Specify a value for figure resolution, or dots-per-inch. Default is 80DPI. (Matplotlib only, ignored otherwise)
     * @include=...@: Path to a Python script to include before the code block. Ideal to avoid repetition over many figures.
     * @links=true|false@: Add links to source code and high-resolution version of this figure.
       This is @true@ by default, but you may wish to disable this for PDF output.

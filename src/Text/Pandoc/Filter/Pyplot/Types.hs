@@ -65,14 +65,11 @@ type PythonScript = Text
 --
 -- @since 2.2.0.0
 data RenderingLibrary 
-    = Matplotlib
-    | Plotly
+    = Matplotlib -- ^ Rendering via the Matplotlib library. This library has the most features. 
+    | Plotly     -- ^ Rendering via the Plotly library.
     deriving (Show, Eq, Generic)
 
 instance Hashable RenderingLibrary
-
-instance ToJSON RenderingLibrary
-instance FromJSON RenderingLibrary
 
 
 -- | Possible result of running a Python script
@@ -113,6 +110,8 @@ instance Show PandocPyplotError where
 
 
 -- | Generated figure file format supported by pandoc-pyplot.
+-- Note: all formats are supported by Matplotlib, but not all 
+-- formats are supported by Plotly
 data SaveFormat
     = PNG
     | PDF
@@ -162,7 +161,7 @@ defaultPlatformInterpreter = "python3"
 #endif
 
 -- | Configuration of pandoc-pyplot, describing the default behavior
--- of the filter.
+-- of the filter. 
 --
 -- A Configuration is useful when dealing with lots of figures; it avoids
 -- repeating the same values.sta
@@ -170,15 +169,15 @@ defaultPlatformInterpreter = "python3"
 -- @since 2.1.0.0
 data Configuration
     = Configuration
-        { defaultDirectory     :: FilePath         -- ^ The default directory where figures will be saved.
-        , defaultIncludeScript :: PythonScript     -- ^ The default script to run before other instructions.
-        , defaultWithLinks     :: Bool             -- ^ The default behavior of whether or not to include links to source code and high-res
-        , defaultSaveFormat    :: SaveFormat       -- ^ The default save format of generated figures.
-        , defaultDPI           :: Int              -- ^ The default dots-per-inch value for generated figures.
-        , isTightBbox          :: Bool             -- ^ Whether the figures should be saved with @bbox_inches="tight"@ or not. Useful for larger figures with subplots.
-        , isTransparent        :: Bool             -- ^ If True, figures will be saved with transparent background rather than solid color.
-        , interpreter          :: String           -- ^ The name of the interpreter to use to render figures.
-        , flags                :: [String]         -- ^ Command-line flags to be passed to the Python interpreger, e.g. ["-O", "-Wignore"]
+        { defaultDirectory     :: FilePath     -- ^ The default directory where figures will be saved.
+        , defaultIncludeScript :: PythonScript -- ^ The default script to run before other instructions.
+        , defaultWithLinks     :: Bool         -- ^ The default behavior of whether or not to include links to source code and high-res
+        , defaultSaveFormat    :: SaveFormat   -- ^ The default save format of generated figures.
+        , defaultDPI           :: Int          -- ^ The default dots-per-inch value for generated figures. Matplotlib only, ignored otherwise.
+        , isTightBbox          :: Bool         -- ^ Whether the figures should be saved with @bbox_inches="tight"@ or not. Useful for larger figures with subplots. Matplotlib only, ignored otherwise.
+        , isTransparent        :: Bool         -- ^ If True, figures will be saved with transparent background rather than solid color. .Matplotlib only, ignored otherwise.
+        , interpreter          :: String       -- ^ The name of the interpreter to use to render figures.
+        , flags                :: [String]     -- ^ Command-line flags to be passed to the Python interpreger, e.g. ["-O", "-Wignore"]
         }
     deriving (Eq, Show)
 

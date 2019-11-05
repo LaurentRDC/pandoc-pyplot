@@ -14,6 +14,7 @@
     * [Link to source code and high-resolution
       figure](#link-to-source-code-and-high-resolution-figure)
     * [Including scripts](#including-scripts)
+    * [Multiple backends](#multiple-backends)
     * [No wasted work](#no-wasted-work)
     * [Compatibility with
       pandoc-crossref](#compatibility-with-pandoc-crossref)
@@ -184,9 +185,36 @@ plt.rcParams['savefig.facecolor'] = 'k'
 ```
 You can take a look at all available `matplotlib` parameters [here](https://matplotlib.org/users/customizing.html).
 
+### Multiple backends
+
+(*new in version 2.2.0.0*) Both Matplotlib and Plotly are supported!
+
+To render Plotly figures in Markdown:
+
+~~~markdown
+```{.plotly caption="This is a Plotly figure"}
+import plotly.graph_objects as go
+figure = go.Figure(
+    data=[go.Bar(y=[2, 1, 3])],
+)
+~~~
+
+Here is the LaTeX equivalent:
+
+```latex
+\begin{minted}[caption=This is a Plotly figure]{plotly}
+import plotly.graph_objects as go
+figure = go.Figure(
+    data=[go.Bar(y=[2, 1, 3])],
+)
+\end{minted}
+```
+
+`pandoc-pyplot` will render and capture your figure automagically. 
+
 ### No wasted work
 
-`pandoc-pyplot` minimizes work, only generating figures if it absolutely must. Therefore, you can confidently run the filter on very large documents containing dozens of figures --- like a book or a thesis --- and only the figures which have recently changed will be re-generated.
+`pandoc-pyplot` minimizes work, only generating figures if it absolutely must. Therefore, you can confidently run the filter on very large documents containing dozens of figures --- like a book or a thesis --- and only the figures which have changed will be re-generated.
 
 ### Compatibility with pandoc-crossref
 

@@ -152,20 +152,41 @@ addPlotCapture spec = mconcat
         -- Note that the high-resolution figure always has non-transparent background
         -- because it is difficult to see the image when opened directly
         -- in Chrome, for example.
-        , plotCapture (renderingLib spec) (figurePath spec) (dpi spec) (transparent spec)
-        , plotCapture (renderingLib spec) (hiresFigurePath spec) (minimum [200, 2 * dpi spec]) False
+        , plotCapture (renderingLib spec) (figurePath spec) (dpi spec) (transparent spec) (tight')
+        , plotCapture (renderingLib spec) (hiresFigurePath spec) (minimum [200, 2 * dpi spec]) False (tight')
         ]
   where
     tight' = if tightBbox spec then ("'tight'" :: T.Text) else ("None"  :: T.Text)
     -- Note that, especially for Windows, raw strings (r"...") must be used because path separators might
     -- be interpreted as escape characters
-    plotCapture Matplotlib fname' dpi' transparent' = 
-        toStrict $ renderMarkup [shamlet|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent'}, bbox_inches=#{tight'});|]
-    -- TODO: insert DPI in plotly export?
-    plotCapture Plotly fname' _ _ =
-        toStrict $ renderMarkup [shamlet|fig.write_image(r"#{fname'}");|]
+    plotCapture Matplotlib = captureMatplotlib
+    plotCapture Plotly = capturePlotly
 
+type Tight = T.Text
+type IsTransparent = Bool
+type RenderingFunc = (FilePath -> Int -> IsTransparent -> Tight -> PythonScript)
+
+-- | Capture plot from Matplotlib
+-- Note that, especially for Windows, raw strings (r"...") must be used because path separators might
+-- be interpreted as escape characters
+captureMatplotlib :: RenderingFunc
+captureMatplotlib fname' dpi' transparent' tight' = 
+    toStrict $ renderMarkup [shamlet|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent'}, bbox_inches=#{tight'});|]
+
+-- | Capture Plotly figure
+-- 
+-- We are trying to emulate the behavior of "matplotlib.pyplot.savefig" which knows the "current figure". 
+-- This saves us from contraining users to always have the same Plotly figure name, e.g. "fig" is all examples
+--
+---- TODO: insert DPI in plotly export?
+capturePlotly :: RenderingFunc
+capturePlotly fname' _ _ _ = toStrict $ renderMarkup [shamlet|
+    from plotly.graph_objects import Figure
+    _current_plotly_figure = next(obj for obj in globals().values() if type(obj) == Figure)
+    _current_plotly_figure.write_image(r"#{fname'}");
+|]
         
+
 -- | Reader options for captions.
 readerOptions :: ReaderOptions
 readerOptions = def
