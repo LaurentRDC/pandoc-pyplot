@@ -39,7 +39,6 @@ import           Data.Maybe                      (fromMaybe)
 import           Data.Monoid                     ((<>))
 import qualified Data.Text                       as T
 import qualified Data.Text.IO                    as T
-import           Data.Text.Lazy                  (toStrict)
 import           Data.Version                    (showVersion)
 
 import           Paths_pandoc_pyplot             (version)
@@ -48,7 +47,7 @@ import           System.FilePath                 (FilePath, addExtension,
                                                   makeValid, replaceExtension,
                                                   (</>))
 
-import           Text.Shakespeare.Text           (st, ToText(..))
+import           Text.Shakespeare.Text           (sbt, ToText(..))
 import           Text.Pandoc.Builder             (fromList, imageWith, link,
                                                   para, toList)
 import           Text.Pandoc.Definition
@@ -175,18 +174,20 @@ instance ToText IsTransparent where
 -- be interpreted as escape characters
 captureMatplotlib :: RenderingFunc
 captureMatplotlib fname' dpi' transparent' tight' = 
-    [st|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent'}, bbox_inches=#{tight'});|]
+    [sbt|plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent'}, bbox_inches=#{tight'});|]
 
 -- | Capture Plotly figure
 -- 
 -- We are trying to emulate the behavior of "matplotlib.pyplot.savefig" which knows the "current figure". 
 -- This saves us from contraining users to always have the same Plotly figure name, e.g. "fig" is all examples
 capturePlotly :: RenderingFunc
-capturePlotly fname' _ _ _ = [st|
-    from plotly.graph_objects import Figure
-    _current_plotly_figure = next(obj for obj in globals().values() if type(obj) == Figure)
-    _current_plotly_figure.write_image(r"#{fname'}");
-|]
+capturePlotly fname' _ _ _ = 
+    -- sbt QuasiQuoter aligns text to the bar |
+    [sbt|
+        from plotly.graph_objects import Figure
+        _current_plotly_figure = next(obj for obj in globals().values() if type(obj) == Figure)
+        _current_plotly_figure.write_image("#{fname'}")
+        |]
         
 
 -- | Reader options for captions.
