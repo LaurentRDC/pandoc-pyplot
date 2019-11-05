@@ -64,8 +64,8 @@ type PythonScript = Text
 -- | Rendering library
 --
 -- @since 2.2.0.0
-data RenderingLibrary 
-    = Matplotlib -- ^ Rendering via the Matplotlib library. This library has the most features. 
+data RenderingLibrary
+    = Matplotlib -- ^ Rendering via the Matplotlib library. This library has the most features.
     | Plotly     -- ^ Rendering via the Plotly library.
     deriving (Show, Eq, Generic)
 
@@ -110,7 +110,7 @@ instance Show PandocPyplotError where
 
 
 -- | Generated figure file format supported by pandoc-pyplot.
--- Note: all formats are supported by Matplotlib, but not all 
+-- Note: all formats are supported by Matplotlib, but not all
 -- formats are supported by Plotly
 data SaveFormat
     = PNG
@@ -161,7 +161,7 @@ defaultPlatformInterpreter = "python3"
 #endif
 
 -- | Configuration of pandoc-pyplot, describing the default behavior
--- of the filter. 
+-- of the filter.
 --
 -- A Configuration is useful when dealing with lots of figures; it avoids
 -- repeating the same values.sta

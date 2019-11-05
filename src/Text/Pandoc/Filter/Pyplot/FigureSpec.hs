@@ -44,8 +44,8 @@ import           Data.Version                    (showVersion)
 import           Paths_pandoc_pyplot             (version)
 
 import           System.FilePath                 (FilePath, addExtension,
-                                                  makeValid, normalise, replaceExtension,
-                                                  (</>))
+                                                  makeValid, normalise,
+                                                  replaceExtension, (</>))
 
 import           Text.Pandoc.Builder             (fromList, imageWith, link,
                                                   para, toList)
@@ -62,7 +62,8 @@ import           Text.Pandoc.Filter.Pyplot.Types
 
 
 -- | Determine inclusion specifications from Block attributes.
--- Note that the @".pyplot"@ class is required, but all other parameters are optional
+-- Note that the @".pyplot"@ OR @.plotly@ class is required, but all other
+-- parameters are optional.
 parseFigureSpec :: Block -> PyplotM (Maybe FigureSpec)
 parseFigureSpec (CodeBlock (id', cls, attrs) content)
     | "pyplot" `elem` cls = Just <$> figureSpec Matplotlib
@@ -180,8 +181,8 @@ plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent''}, bbox_inches
 
 -- | Capture Plotly figure
 --
--- We are trying to emulate the behavior of "matplotlib.pyplot.savefig" which 
--- knows the "current figure". This saves us from contraining users to always 
+-- We are trying to emulate the behavior of "matplotlib.pyplot.savefig" which
+-- knows the "current figure". This saves us from contraining users to always
 -- have the same Plotly figure name, e.g. "fig" in all examples
 capturePlotly :: RenderingFunc
 capturePlotly fname' _ _ _ = [st|
