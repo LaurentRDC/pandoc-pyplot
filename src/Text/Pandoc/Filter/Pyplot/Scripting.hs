@@ -47,12 +47,15 @@ checkBlockingShowCall script' =
             [ "plt.show()" `elem` scriptLines
             , "pyplot.show()" `elem` scriptLines
             , "matplotlib.pyplot.show()" `elem` scriptLines
+            , "fig.show()" `elem` scriptLines
             ]
+
 
 -- | List of all script checks
 -- This might be overkill right now but extension to other languages will be easier
 scriptChecks :: [PythonScript -> CheckResult]
 scriptChecks = [checkBlockingShowCall]
+
 
 -- | Take a python script in string form, write it in a temporary directory,
 -- then execute it.
@@ -77,6 +80,7 @@ runTempPythonScript script' =  case checkResult of
         checkResult = mconcat $ scriptChecks <*> [script']
         hashedPath = show . hash $ script'
 
+        
 -- | Run the Python script. In case the file already exists, we can safely assume
 -- there is no need to re-run it.
 runScriptIfNecessary :: FigureSpec
