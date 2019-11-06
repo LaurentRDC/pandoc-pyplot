@@ -116,7 +116,7 @@ testFileCreation =
         ensureDirectoryExistsAndEmpty tempDir
 
         let codeBlock = (addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
-        _ <- runReaderT (makePlot' codeBlock) def
+        _ <- runReaderT (makePlot' Nothing codeBlock) def
         filesCreated <- length <$> listDirectory tempDir
         assertEqual "" filesCreated 3
 
@@ -131,7 +131,7 @@ testFileInclusion =
         let codeBlock =
                 (addInclusion "test/fixtures/include.py" $
                  addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\n")
-        _ <- runReaderT (makePlot' codeBlock) def
+        _ <- runReaderT (makePlot' Nothing codeBlock) def
         inclusion <- readFile "test/fixtures/include.py"
         sourcePath <- head . filter (isExtensionOf "txt") <$> listDirectory tempDir
         src <- readFile (tempDir </> sourcePath)
@@ -150,7 +150,7 @@ testSaveFormat =
                  addDirectory tempDir $
                  plotCodeBlock
                      "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])")
-        _ <- runReaderT (makePlot' codeBlock) def
+        _ <- runReaderT (makePlot' Nothing codeBlock) def
         numberjpgFiles <-
             length <$> filter (isExtensionOf (extension JPG)) <$>
             listDirectory tempDir
@@ -166,7 +166,7 @@ testBlockingCallError =
         ensureDirectoryExistsAndEmpty tempDir
 
         let codeBlock = addDirectory tempDir $ plotCodeBlock "import matplotlib.pyplot as plt\nplt.show()"
-        result <- runReaderT (makePlot' codeBlock) def
+        result <- runReaderT (makePlot' Nothing codeBlock) def
         case result of
             Right block -> assertFailure "did not catch the expected blocking call"
             Left error ->
@@ -190,7 +190,7 @@ testMarkdownFormattingCaption =
         -- constructed
         let expected = [B.Strong [B.Str "caption"]]
             codeBlock = addDirectory tempDir $ addCaption "**caption**" $ plotCodeBlock "import matplotlib.pyplot as plt"
-        result <- runReaderT (makePlot' codeBlock) def
+        result <- runReaderT (makePlot' Nothing codeBlock) def
         case result of
             Left error  -> assertFailure $ "an error occured: " <> show error
             Right block -> assertIsInfix expected (extractCaption block)
@@ -214,7 +214,7 @@ testWithLinks =
         -- constructed
         let expected = mempty
             codeBlock = addWithLinks False $ addDirectory tempDir $ addCaption mempty $ plotCodeBlock "import matplotlib.pyplot as plt"
-        result <- runReaderT (makePlot' codeBlock) def
+        result <- runReaderT (makePlot' Nothing codeBlock) def
         case result of
             Left error  -> assertFailure $ "an error occured: " <> show error
             Right block -> assertIsInfix expected (extractCaption block)
@@ -246,7 +246,7 @@ testOverridingConfiguration =
         let codeBlock = (addSaveFormat PNG $
                          plotCodeBlock
                             "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])")
-        _ <- runReaderT (makePlot' codeBlock) config
+        _ <- runReaderT (makePlot' Nothing codeBlock) config
 
         numberjpgFiles <-
             length <$> filter (isExtensionOf (extension JPG)) <$>
@@ -266,7 +266,7 @@ testWithConfiguration =
         config <- testConfig
 
         let codeBlock = plotCodeBlock "import matplotlib.pyplot as plt\nplt.figure()\nplt.plot([1,2], [1,2])"
-        _ <- runReaderT (makePlot' codeBlock) config
+        _ <- runReaderT (makePlot' Nothing codeBlock) config
 
         numberjpgFiles <-
             length <$> filter (isExtensionOf (extension JPG)) <$>
