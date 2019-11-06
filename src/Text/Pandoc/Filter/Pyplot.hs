@@ -66,8 +66,8 @@ import           Text.Pandoc.Filter.Pyplot.Internal
 -- | Main routine to include Matplotlib plots.
 -- Code blocks containing the attributes @.pyplot@ are considered
 -- Python plotting scripts. All other possible blocks are ignored.
-makePlot' :: Maybe Format -> Block -> PyplotM (Either PandocPyplotError Block)
-makePlot' _ block = do
+makePlot' :: Block -> PyplotM (Either PandocPyplotError Block)
+makePlot' block = do
     parsed <- parseFigureSpec block
     maybe
         (return $ Right block)
@@ -89,7 +89,7 @@ makePlot = makePlotWithConfig def
 -- @since 2.1.0.0
 makePlotWithConfig :: Configuration -> Block -> IO Block
 makePlotWithConfig config block =
-    runReaderT (makePlot' Nothing block >>= either (fail . show) return) config
+    runReaderT (makePlot' block >>= either (fail . show) return) config
 
 -- | Walk over an entire Pandoc document, changing appropriate code blocks
 -- into figures. Default configuration is used.
