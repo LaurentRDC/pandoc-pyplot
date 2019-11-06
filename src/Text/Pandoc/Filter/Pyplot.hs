@@ -67,8 +67,8 @@ import           Text.Pandoc.Filter.Pyplot.Internal
 -- Code blocks containing the attributes @.pyplot@ are considered
 -- Python plotting scripts. All other possible blocks are ignored.
 makePlot' :: Maybe Format -> Block -> PyplotM (Either PandocPyplotError Block)
-makePlot' _ block = do
-    parsed <- parseFigureSpec block
+makePlot' mfmt block = do
+    parsed <- parseFigureSpec mfmt block
     maybe
         (return $ Right block)
         (\s -> handleResult s <$> runScriptIfNecessary s)

@@ -112,7 +112,7 @@ instance Show PandocPyplotError where
 
 -- | Generated figure file format supported by pandoc-pyplot.
 -- Note: all formats are supported by Matplotlib, but not all
--- formats are supported by Plotly
+-- formats are supported by Plotly.
 data SaveFormat
     = PNG
     | PDF
@@ -121,6 +121,7 @@ data SaveFormat
     | EPS
     | GIF
     | TIF
+    | HTML -- ^ Only for interactive Plotly plots. Fallback is the default save format, based on configuration.
     deriving (Bounded, Enum, Eq, Show, Generic)
 
 instance Hashable SaveFormat -- From Generic
@@ -144,6 +145,7 @@ saveFormatFromString s
     | s `elem` ["gif", "GIF", ".gif"] = Just GIF
     | s `elem` ["jpg", "jpeg", "JPG", "JPEG", ".jpg", ".jpeg"] = Just JPG
     | s `elem` ["tif", "tiff", "TIF", "TIFF", ".tif", ".tiff"] = Just TIF
+    | s `elem` ["html", "HTML", ".html"] = Just HTML
     | otherwise = Nothing
 
 -- | Save format file extension
