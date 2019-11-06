@@ -223,10 +223,10 @@ data FigureSpec = FigureSpec
     , script       :: PythonScript     -- ^ Source code for the figure.
     , saveFormat   :: SaveFormat       -- ^ Save format of the figure.
     , directory    :: FilePath         -- ^ Directory where to save the file.
-    , dpi          :: Int              -- ^ Dots-per-inch of figure. This option only affects the Matplotlib backend.
+    , dpi          :: Int              -- ^ Dots-per-inch of figure.
     , renderingLib :: RenderingLibrary -- ^ Rendering library.
-    , tightBbox    :: Bool             -- ^ Enforce tight bounding-box with @bbox_inches="tight"@. This option only affects the Matplotlib backend.
-    , transparent  :: Bool             -- ^ Make figure background transparent. This option only affects the Matplotlib backend.
+    , tightBbox    :: Bool             -- ^ Enforce tight bounding-box with @bbox_inches="tight"@.
+    , transparent  :: Bool             -- ^ Make figure background transparent.
     , blockAttrs   :: Attr             -- ^ Attributes not related to @pandoc-pyplot@ will be propagated.
     } deriving Generic
 
