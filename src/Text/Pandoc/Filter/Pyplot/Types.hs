@@ -21,7 +21,7 @@ import           Data.Default.Class     (Default, def)
 import           Data.Hashable          (Hashable)
 import           Data.Semigroup         as Sem
 import           Data.Text              (Text, pack)
-import           Data.Yaml              (ToJSON, toJSON, object, (.=))
+import           Data.Yaml              (ToJSON, object, toJSON, (.=))
 
 import           GHC.Generics           (Generic)
 

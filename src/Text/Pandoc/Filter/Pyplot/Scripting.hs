@@ -80,7 +80,7 @@ runTempPythonScript script' =  case checkResult of
         checkResult = mconcat $ scriptChecks <*> [script']
         hashedPath = show . hash $ script'
 
-        
+
 -- | Run the Python script. In case the file already exists, we can safely assume
 -- there is no need to re-run it.
 runScriptIfNecessary :: FigureSpec

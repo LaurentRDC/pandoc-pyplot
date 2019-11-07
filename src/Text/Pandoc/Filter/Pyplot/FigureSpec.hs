@@ -1,6 +1,6 @@
-{-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE QuasiQuotes          #-}
-{-# LANGUAGE TemplateHaskell      #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 {-|
 Module      : $header$
@@ -48,7 +48,8 @@ import           System.FilePath                 (FilePath, addExtension,
 
 import           Text.Pandoc.Builder             (fromList, imageWith, link,
                                                   para, toList)
-import           Text.Pandoc.Definition          (Pandoc(..), Block(..), Inline)
+import           Text.Pandoc.Definition          (Block (..), Inline,
+                                                  Pandoc (..))
 import           Text.Shakespeare.Text           (st)
 
 import           Text.Pandoc.Class               (runPure)
@@ -80,7 +81,7 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
         includeScript <- fromMaybe
                             (return $ defaultIncludeScript config)
                             ((liftIO . T.readFile) <$> includePath)
-        return $ 
+        return $
             FigureSpec
                 { caption      = Map.findWithDefault mempty captionKey attrs'
                 , withLinks    = fromMaybe (defaultWithLinks config) $ readBool <$> Map.lookup withLinksKey attrs'
