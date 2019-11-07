@@ -73,7 +73,7 @@ instance FromJSON ConfigPrecursor where
 
     parseJSON _ = fail "Could not parse the configuration"
 
-    
+
 renderConfiguration :: ConfigPrecursor -> IO Configuration
 renderConfiguration prec = do
     includeScript <- fromMaybe mempty $ T.readFile <$> defaultIncludePath_ prec
