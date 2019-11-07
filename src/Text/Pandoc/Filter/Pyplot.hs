@@ -63,8 +63,8 @@ import           Text.Pandoc.Walk                   (walkM)
 
 import           Text.Pandoc.Filter.Pyplot.Internal
 
--- | Main routine to include Matplotlib plots.
--- Code blocks containing the attributes @.pyplot@ are considered
+-- | Main routine to include plots.
+-- Code blocks containing the attributes @.pyplot@ or @.plotly@ are considered
 -- Python plotting scripts. All other possible blocks are ignored.
 makePlot' :: Block -> PyplotM (Either PandocPyplotError Block)
 makePlot' block = do
@@ -79,7 +79,7 @@ makePlot' block = do
         handleResult spec ScriptSuccess         = Right $ toImage spec
 
 -- | Highest-level function that can be walked over a Pandoc tree.
--- All code blocks that have the '.pyplot' / '.plotly' class will be considered
+-- All code blocks that have the @.pyplot@ / @.plotly@ class will be considered
 -- figures.
 makePlot :: Block -> IO Block
 makePlot = makePlotWithConfig def

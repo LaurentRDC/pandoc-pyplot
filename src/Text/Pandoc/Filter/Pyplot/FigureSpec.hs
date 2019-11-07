@@ -60,7 +60,7 @@ import           Text.Pandoc.Readers             (readMarkdown)
 import           Text.Pandoc.Filter.Pyplot.Types
 
 
--- | Determine inclusion specifications from Block attributes.
+-- | Determine inclusion specifications from @Block@ attributes.
 -- Note that the @".pyplot"@ OR @.plotly@ class is required, but all other
 -- parameters are optional.
 parseFigureSpec :: Block -> PyplotM (Maybe FigureSpec)
@@ -97,7 +97,7 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
 parseFigureSpec _ = return Nothing
 
 
--- | Convert a FigureSpec to a Pandoc block component.
+-- | Convert a @FigureSpec@ to a Pandoc block component.
 -- Note that the script to generate figure files must still
 -- be run in another function.
 toImage :: FigureSpec -> Block
@@ -157,8 +157,9 @@ addPlotCapture spec = mconcat
 
 
 type Tight = T.Text
+type DPI = Int
 type IsTransparent = Bool
-type RenderingFunc = (FilePath -> Int -> IsTransparent -> Tight -> PythonScript)
+type RenderingFunc = (FilePath -> DPI -> IsTransparent -> Tight -> PythonScript)
 
 
 -- | Capture plot from Matplotlib
@@ -175,9 +176,9 @@ plt.savefig(r"#{fname'}", dpi=#{dpi'}, transparent=#{transparent''}, bbox_inches
 
 -- | Capture Plotly figure
 --
--- We are trying to emulate the behavior of "matplotlib.pyplot.savefig" which
+-- We are trying to emulate the behavior of @matplotlib.pyplot.savefig@ which
 -- knows the "current figure". This saves us from contraining users to always
--- have the same Plotly figure name, e.g. "fig" in all examples
+-- have the same Plotly figure name, e.g. @fig@ in all examples on plot.ly
 capturePlotly :: RenderingFunc
 capturePlotly fname' _ _ _ = [st|
 import plotly.graph_objects as go
