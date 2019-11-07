@@ -28,7 +28,7 @@ module Text.Pandoc.Filter.Pyplot.FigureSpec
 
 import           Control.Monad                   (join)
 import           Control.Monad.IO.Class          (liftIO)
-import           Control.Monad.Reader
+import           Control.Monad.Reader            (ask)
 
 import           Data.Default.Class              (def)
 import           Data.Hashable                   (hash)
@@ -48,7 +48,7 @@ import           System.FilePath                 (FilePath, addExtension,
 
 import           Text.Pandoc.Builder             (fromList, imageWith, link,
                                                   para, toList)
-import           Text.Pandoc.Definition
+import           Text.Pandoc.Definition          (Pandoc(..), Block(..), Inline)
 import           Text.Shakespeare.Text           (st)
 
 import           Text.Pandoc.Class               (runPure)
