@@ -267,7 +267,6 @@ links: true
 dpi: 80
 tight_bbox: false
 transparent: false
-flags: []
 ```
 
 Using `pandoc-pyplot --write-example-config` will write the default configuration to a file `.pandoc-pyplot.yml`, which you can then customize.
