@@ -27,8 +27,7 @@ module Text.Pandoc.Filter.Pyplot.Configuration (
 
 import           Data.Default.Class              (def)
 import           Data.Maybe                      (fromMaybe)
-import qualified Data.Text                       as T
-import qualified Data.Text.IO                    as T
+import qualified Data.Text.IO                    as TIO
 import           Data.Yaml
 import           Data.Yaml.Config                (ignoreEnv, loadYamlSettings)
 
@@ -61,22 +60,22 @@ data ConfigPrecursor
 instance FromJSON ConfigPrecursor where
     parseJSON (Object v) =
         ConfigPrecursor
-            <$> v .:? (T.pack directoryKey)     .!= (defaultDirectory def)
-            <*> v .:? (T.pack includePathKey)
-            <*> v .:? (T.pack withLinksKey)     .!= (defaultWithLinks def)
-            <*> v .:? (T.pack saveFormatKey)    .!= (extension $ defaultSaveFormat def)
-            <*> v .:? (T.pack dpiKey)           .!= (defaultDPI def)
-            <*> v .:? (T.pack isTightBboxKey)   .!= (isTightBbox def)
-            <*> v .:? (T.pack isTransparentKey) .!= (isTransparent def)
-            <*> v .:? "interpreter"             .!= (interpreter def)
-            <*> v .:? "flags"                   .!= (flags def)
+            <$> v .:? directoryKey     .!= (defaultDirectory def)
+            <*> v .:? includePathKey
+            <*> v .:? withLinksKey     .!= (defaultWithLinks def)
+            <*> v .:? saveFormatKey    .!= (extension $ defaultSaveFormat def)
+            <*> v .:? dpiKey           .!= (defaultDPI def)
+            <*> v .:? isTightBboxKey   .!= (isTightBbox def)
+            <*> v .:? isTransparentKey .!= (isTransparent def)
+            <*> v .:? "interpreter"    .!= (interpreter def)
+            <*> v .:? "flags"          .!= (flags def)
 
     parseJSON _ = fail "Could not parse the configuration"
 
 
 renderConfiguration :: ConfigPrecursor -> IO Configuration
 renderConfiguration prec = do
-    includeScript <- fromMaybe mempty $ T.readFile <$> defaultIncludePath_ prec
+    includeScript <- fromMaybe mempty $ TIO.readFile <$> defaultIncludePath_ prec
     let saveFormat' = fromMaybe (defaultSaveFormat def) $ saveFormatFromString $ defaultSaveFormat_ prec
     return $ Configuration
         { defaultDirectory     = defaultDirectory_ prec
