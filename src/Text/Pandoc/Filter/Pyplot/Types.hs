@@ -20,7 +20,8 @@ import           Data.Char              (toLower)
 import           Data.Default.Class     (Default, def)
 import           Data.Hashable          (Hashable)
 import           Data.Semigroup         as Sem
-import           Data.Text              (Text, pack)
+import           Data.String            (IsString)
+import           Data.Text              (Text)
 import           Data.Yaml              (ToJSON, object, toJSON, (.=))
 
 import           GHC.Generics           (Generic)
@@ -29,7 +30,7 @@ import           Text.Pandoc.Definition (Attr)
 
 
 -- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
-directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey, withLinksKey, isTightBboxKey, isTransparentKey :: String
+directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey, withLinksKey, isTightBboxKey, isTransparentKey :: IsString s => s
 directoryKey     = "directory"
 captionKey       = "caption"
 dpiKey           = "dpi"
@@ -42,7 +43,7 @@ isTransparentKey = "transparent"
 
 -- | list of all keys related to pandoc-pyplot that
 -- can be specified in source material.
-inclusionKeys :: [String]
+inclusionKeys :: IsString s => [s]
 inclusionKeys = [ directoryKey
                 , captionKey
                 , dpiKey
@@ -199,15 +200,15 @@ instance ToJSON Configuration where
     toJSON (Configuration dir' _ withLinks' savefmt' dpi' tightbbox' transparent' interp' flags') =
         -- We ignore the include script as we want to examplify that
         -- this is for a filepath
-            object [ pack directoryKey     .= dir'
-                   , pack includePathKey   .= ("example.py" :: FilePath)
-                   , pack withLinksKey     .= withLinks'
-                   , pack dpiKey           .= dpi'
-                   , pack saveFormatKey    .= (toLower <$> show savefmt')
-                   , pack isTightBboxKey   .= tightbbox'
-                   , pack isTransparentKey .= transparent'
-                   , "interpreter"         .= interp'
-                   , "flags"               .= flags'
+            object [ directoryKey     .= dir'
+                   , includePathKey   .= ("example.py" :: FilePath)
+                   , withLinksKey     .= withLinks'
+                   , dpiKey           .= dpi'
+                   , saveFormatKey    .= (toLower <$> show savefmt')
+                   , isTightBboxKey   .= tightbbox'
+                   , isTransparentKey .= transparent'
+                   , "interpreter"    .= interp'
+                   , "flags"          .= flags'
                    ]
 
 
