@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE TemplateHaskell   #-}
-
 {-|
 Module      : $header$
 Copyright   : (c) Laurent P René de Cotret, 2019
@@ -16,7 +15,6 @@ with keeping track of figure specifications
 module Text.Pandoc.Filter.Pyplot.FigureSpec
     ( FigureSpec(..)
     , SaveFormat(..)
-    , saveFormatFromString
     , toImage
     , sourceCodePath
     , figurePath
@@ -36,6 +34,7 @@ import           Data.List                       (intersperse)
 import qualified Data.Map.Strict                 as Map
 import           Data.Maybe                      (fromMaybe)
 import           Data.Monoid                     ((<>))
+import           Data.String                     (fromString)
 import           Data.Text                       (Text, pack)
 import qualified Data.Text.IO                    as TIO
 import           Data.Version                    (showVersion)
@@ -86,7 +85,7 @@ parseFigureSpec (CodeBlock (id', cls, attrs) content)
                 { caption      = Map.findWithDefault mempty captionKey attrs'
                 , withLinks    = fromMaybe (defaultWithLinks config) $ readBool <$> Map.lookup withLinksKey attrs'
                 , script       = mconcat $ intersperse "\n" [header, includeScript, pack content]
-                , saveFormat   = fromMaybe (defaultSaveFormat config) $ join $ saveFormatFromString <$> Map.lookup saveFormatKey attrs'
+                , saveFormat   = fromMaybe (defaultSaveFormat config) $ fromString <$> Map.lookup saveFormatKey attrs'
                 , directory    = makeValid $ Map.findWithDefault (defaultDirectory config) directoryKey attrs'
                 , dpi          = fromMaybe (defaultDPI config) $ read <$> Map.lookup dpiKey attrs'
                 , renderingLib = lib

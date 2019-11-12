@@ -19,8 +19,9 @@ import           Control.Monad.Reader
 import           Data.Char              (toLower)
 import           Data.Default.Class     (Default, def)
 import           Data.Hashable          (Hashable)
+import           Data.List              (intersperse)
 import           Data.Semigroup         as Sem
-import           Data.String            (IsString)
+import           Data.String            (IsString(..))
 import           Data.Text              (Text)
 import           Data.Yaml              (ToJSON, object, toJSON, (.=))
 
@@ -124,28 +125,25 @@ data SaveFormat
     | TIF
     deriving (Bounded, Enum, Eq, Show, Generic)
 
-instance Hashable SaveFormat -- From Generic
+instance IsString SaveFormat where
+    -- | An error is thrown if the save format cannot be parsed.
+    fromString s
+        | s `elem` ["png", "PNG", ".png"] = PNG
+        | s `elem` ["pdf", "PDF", ".pdf"] = PDF
+        | s `elem` ["svg", "SVG", ".svg"] = SVG
+        | s `elem` ["eps", "EPS", ".eps"] = EPS
+        | s `elem` ["gif", "GIF", ".gif"] = GIF
+        | s `elem` ["jpg", "jpeg", "JPG", "JPEG", ".jpg", ".jpeg"] = JPG
+        | s `elem` ["tif", "tiff", "TIF", "TIFF", ".tif", ".tiff"] = TIF
+        | otherwise = error $ 
+                mconcat [ s
+                        , " is not one of valid save format : "
+                        , mconcat $ intersperse ", " $ show <$> saveFormats
+                        ]
+        where
+            saveFormats =  (enumFromTo minBound maxBound) :: [SaveFormat]
 
--- | Parse an image save format string
---
--- >>> saveFormatFromString ".png"
--- Just PNG
---
--- >>> saveFormatFromString "jpeg"
--- Just JPEG
---
--- >>> SaveFormatFromString "arbitrary"
--- Nothing
-saveFormatFromString :: String -> Maybe SaveFormat
-saveFormatFromString s
-    | s `elem` ["png", "PNG", ".png"] = Just PNG
-    | s `elem` ["pdf", "PDF", ".pdf"] = Just PDF
-    | s `elem` ["svg", "SVG", ".svg"] = Just SVG
-    | s `elem` ["eps", "EPS", ".eps"] = Just EPS
-    | s `elem` ["gif", "GIF", ".gif"] = Just GIF
-    | s `elem` ["jpg", "jpeg", "JPG", "JPEG", ".jpg", ".jpeg"] = Just JPG
-    | s `elem` ["tif", "tiff", "TIF", "TIFF", ".tif", ".tiff"] = Just TIF
-    | otherwise = Nothing
+instance Hashable SaveFormat -- From Generic
 
 -- | Save format file extension
 extension :: SaveFormat -> String

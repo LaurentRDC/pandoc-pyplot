@@ -27,6 +27,7 @@ module Text.Pandoc.Filter.Pyplot.Configuration (
 
 import           Data.Default.Class              (def)
 import           Data.Maybe                      (fromMaybe)
+import           Data.String                     (fromString)
 import qualified Data.Text.IO                    as TIO
 import           Data.Yaml
 import           Data.Yaml.Config                (ignoreEnv, loadYamlSettings)
@@ -63,7 +64,7 @@ instance FromJSON ConfigPrecursor where
             <$> v .:? directoryKey     .!= (defaultDirectory def)
             <*> v .:? includePathKey
             <*> v .:? withLinksKey     .!= (defaultWithLinks def)
-            <*> v .:? saveFormatKey    .!= (extension $ defaultSaveFormat def)
+            <*> v .:? saveFormatKey    .!= (show $ defaultSaveFormat def)
             <*> v .:? dpiKey           .!= (defaultDPI def)
             <*> v .:? isTightBboxKey   .!= (isTightBbox def)
             <*> v .:? isTransparentKey .!= (isTransparent def)
@@ -76,7 +77,7 @@ instance FromJSON ConfigPrecursor where
 renderConfiguration :: ConfigPrecursor -> IO Configuration
 renderConfiguration prec = do
     includeScript <- fromMaybe mempty $ TIO.readFile <$> defaultIncludePath_ prec
-    let saveFormat' = fromMaybe (defaultSaveFormat def) $ saveFormatFromString $ defaultSaveFormat_ prec
+    let saveFormat' = fromString $ defaultSaveFormat_ prec
     return $ Configuration
         { defaultDirectory     = defaultDirectory_ prec
         , defaultIncludeScript = includeScript
