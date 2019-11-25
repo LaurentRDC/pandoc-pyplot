@@ -17,7 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: lts-14.1
+resolver: lts-14.16
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -38,6 +38,17 @@ packages:
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)
 extra-deps:
+- pandoc-2.8
+- pandoc-types-1.20@sha256:8393b1a73b8a6a1f3feaeb3a6592c176461082c3e4d897f1b316b1a58dd84c39,3999
+- texmath-0.12
+- HsYAML-0.2.1.0@sha256:e4677daeba57f7a1e9a709a1f3022fe937336c91513e893166bd1f023f530d68,5311
+- doclayout-0.2.0.1@sha256:0410e40c4fa8e299b4f5fa03d378111b9d0effdf59134c95882a160637887ba8,2063
+- doctemplates-0.7.2@sha256:e9a3a2182446f6f4548096d1349088144c349c504675660ab30e432af3136bda,3113
+- haddock-library-1.8.0@sha256:9dece2cbca827755fdfc30af5a407b0ca30cf29ec1ee85215b38fd8fc23e7421,3723
+- skylighting-0.8.2.3@sha256:8155893fe493dbd64367573f6f87338375f50f7003a8cc7ef8ae3836aea52a29,9730
+- skylighting-core-0.8.2.3@sha256:3de402288d8748a334461a73bbbbdc0bc92a8533c983bfaeb7017d4653e283e6,8058
+- regex-pcre-builtin-0.95.1.1.8.43@sha256:2d671af361adf1776fde182a687bb6da022b1e5e3b0a064ce264289de63564a5,3088
+- regex-base-0.94.0.0@sha256:d514eab2aa9ba4b9d14900ac40cbdea1993372466a6cc6ffeeab59a1975563c0,2166
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
