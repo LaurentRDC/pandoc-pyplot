@@ -9,7 +9,7 @@ import           Control.Monad.Reader
 import           Data.Default.Class                 (def)
 import           Data.List                          (isInfixOf, isSuffixOf)
 import           Data.Monoid                        ((<>))
-import           Data.Text                          (unpack)
+import           Data.Text                          (unpack, pack)
 
 import           Test.Tasty
 import           Test.Tasty.HUnit
@@ -48,31 +48,31 @@ main =
         ]
 
 plotCodeBlock :: PythonScript -> Block
-plotCodeBlock script = CodeBlock (mempty, ["pyplot"], mempty) (unpack script)
+plotCodeBlock script = CodeBlock (mempty, ["pyplot"], mempty) script
 
 addCaption :: String -> Block -> Block
 addCaption caption (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(captionKey, caption)]) script
+    CodeBlock (id', cls, attrs ++ [(captionKey, pack caption)]) script
 
 addDirectory :: FilePath -> Block -> Block
 addDirectory dir (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(directoryKey, dir)]) script
+    CodeBlock (id', cls, attrs ++ [(directoryKey, pack dir)]) script
 
 addInclusion :: FilePath -> Block -> Block
 addInclusion inclusionPath (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(includePathKey, inclusionPath)]) script
+    CodeBlock (id', cls, attrs ++ [(includePathKey, pack inclusionPath)]) script
 
 addSaveFormat :: SaveFormat -> Block -> Block
 addSaveFormat saveFormat (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(saveFormatKey, extension saveFormat)]) script
+    CodeBlock (id', cls, attrs ++ [(saveFormatKey, pack . extension $ saveFormat)]) script
 
 addDPI :: Int -> Block -> Block
 addDPI dpi (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(dpiKey, show dpi)]) script
+    CodeBlock (id', cls, attrs ++ [(dpiKey, pack . show $ dpi)]) script
 
 addWithLinks :: Bool -> Block -> Block
 addWithLinks yn (CodeBlock (id', cls, attrs) script) =
-    CodeBlock (id', cls, attrs ++ [(withLinksKey, show yn)]) script
+    CodeBlock (id', cls, attrs ++ [(withLinksKey, pack . show $ yn)]) script
 
 
 -- | Assert that a file exists
