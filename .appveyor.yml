@@ -32,9 +32,6 @@ environment:
     MINICONDA: "C:\\Miniconda3-x64"
 
   matrix:
-  - ARGS: "--resolver lts-11"  # GHC 8.2
-  - ARGS: "--resolver lts-12"  # GHC 8.4
-  - ARGS: "--resolver lts-13"  # GHC 8.6
   - ARGS: "--resolver lts-14"  # GHC 8.6
   # - ARGS: "--resolver nightly"
 
