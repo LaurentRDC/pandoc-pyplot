@@ -31,7 +31,7 @@ import           Text.Pandoc.Definition (Attr)
 
 
 -- | Keys that pandoc-pyplot will look for in code blocks. These are only exported for testing purposes.
-directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey, withLinksKey, isTightBboxKey, isTransparentKey :: IsString s => s
+directoryKey, captionKey, dpiKey, includePathKey, saveFormatKey, withLinksKey, isTightBboxKey, isTransparentKey :: Text
 directoryKey     = "directory"
 captionKey       = "caption"
 dpiKey           = "dpi"
@@ -44,7 +44,7 @@ isTransparentKey = "transparent"
 
 -- | list of all keys related to pandoc-pyplot that
 -- can be specified in source material.
-inclusionKeys :: IsString s => [s]
+inclusionKeys :: [Text]
 inclusionKeys = [ directoryKey
                 , captionKey
                 , dpiKey
@@ -202,7 +202,7 @@ instance ToJSON Configuration where
                    , includePathKey   .= ("example.py" :: FilePath)
                    , withLinksKey     .= withLinks'
                    , dpiKey           .= dpi'
-                   , saveFormatKey    .= (toLower <$> show savefmt')
+                   , saveFormatKey    .= (fmap toLower . show $ savefmt')
                    , isTightBboxKey   .= tightbbox'
                    , isTransparentKey .= transparent'
                    , "interpreter"    .= interp'
@@ -215,7 +215,7 @@ instance ToJSON Configuration where
 -- It is assumed that once a @FigureSpec@ has been created, no configuration
 -- can overload it; hence, a @FigureSpec@ completely encodes a particular figure.
 data FigureSpec = FigureSpec
-    { caption      :: String           -- ^ Figure caption.
+    { caption      :: Text             -- ^ Figure caption.
     , withLinks    :: Bool             -- ^ Append links to source code and high-dpi figure to caption.
     , script       :: PythonScript     -- ^ Source code for the figure.
     , saveFormat   :: SaveFormat       -- ^ Save format of the figure.

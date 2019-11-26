@@ -2,10 +2,10 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-Release 2.2.1.0
+Release 2.3.0.0
 ---------------
 
-* Added support for pandoc 2.8 and pandoc-types 1.20 (fixes #9).
+* Added support for pandoc 2.8 and pandoc-types 1.20 (fixes #9). 
 
 Release 2.2.0.0
 ---------------
