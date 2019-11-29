@@ -2,6 +2,11 @@
 
 pandoc-pyplot uses [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+Release 2.3.0.1
+---------------
+
+* Re-licensed package and library to GPL-2, same as pandoc. The previous license (MIT) was not compatible with pandoc's license.
+
 Release 2.3.0.0
 ---------------
 
