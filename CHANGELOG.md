@@ -6,6 +6,7 @@ Release 2.3.0.1
 ---------------
 
 * Re-licensed package and library to GPL-2, same as pandoc. The previous license (MIT) was not compatible with pandoc's license.
+* Fixed an issue where plotly plots would not handle filenames correctly.
 
 Release 2.3.0.0
 ---------------
