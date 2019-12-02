@@ -183,7 +183,7 @@ capturePlotly :: RenderingFunc
 capturePlotly fname' _ _ _ = [st|
 import plotly.graph_objects as go
 __current_plotly_figure = next(obj for obj in globals().values() if type(obj) == go.Figure)
-__current_plotly_figure.write_image("#{fname'}")
+__current_plotly_figure.write_image(r"#{fname'}")
 |]
 
 
