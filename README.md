@@ -5,6 +5,8 @@
 
 `pandoc-pyplot` turns Python code present in your documents into embedded figures via Matplotlib or Plotly.
 
+**The [`pandoc-plot`](https://github.com/LaurentRDC/pandoc-plot) project replaces `pandoc-pyplot` by extending its capabilities to other plotting toolkits. `pandoc-plot` will not received any new features.**
+
 * [Usage](#usage)
     * [Markdown](#markdown)
     * [LaTeX](#latex)
