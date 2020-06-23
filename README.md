@@ -1,4 +1,4 @@
-** DEPRECATED. The [`pandoc-plot`](https://github.com/LaurentRDC/pandoc-plot) project replaces `pandoc-pyplot` by extending its capabilities to other plotting toolkits. `pandoc-pyplot` will not received any new features.**
+**DEPRECATED. The [`pandoc-plot`](https://github.com/LaurentRDC/pandoc-plot) project replaces `pandoc-pyplot` by extending its capabilities to other plotting toolkits. `pandoc-pyplot` will not received any new features.**
 
 # pandoc-pyplot - A Pandoc filter to generate Matplotlib/Plotly figures directly in documents
 
